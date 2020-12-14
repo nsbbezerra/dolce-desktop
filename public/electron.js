@@ -27,7 +27,7 @@ function createWindow() {
   mainWindow.on("closed", () => (mainWindow = null));
   mainWindow.webContents.openDevTools();
 }
-
+app.allowRendererProcessReuse = true;
 app.on("ready", createWindow);
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
