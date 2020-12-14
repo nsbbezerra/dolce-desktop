@@ -1,12 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
-import { ColorModeScript } from "@chakra-ui/react";
+import { ColorModeScript, ColorModeProvider } from "@chakra-ui/react";
 
 ReactDOM.render(
   <React.Fragment>
-    <ColorModeScript initialColorMode={"light"} />
-    <App />
+    <ColorModeProvider options={{ useSystemColorMode: false }}>
+      <ColorModeScript initialColorMode="dark" />
+      <App />
+    </ColorModeProvider>
   </React.Fragment>,
   document.getElementById("root")
 );
