@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, ChakraProvider, useColorMode } from "@chakra-ui/react";
 import theme from "./style/theme";
+import LayoutApp from "./layout/index";
 
 function App() {
   const { colorMode, toggleColorMode, setColorMode } = useColorMode();
@@ -29,9 +30,7 @@ function App() {
 
   return (
     <ChakraProvider theme={theme} resetCSS={true}>
-      <h1>Dolce Desktop</h1>
-      {colorTheme}
-      <Button onClick={() => setColor()}>Mudar</Button>
+      <LayoutApp />
     </ChakraProvider>
   );
 }

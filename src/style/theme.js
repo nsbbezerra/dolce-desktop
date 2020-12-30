@@ -23,6 +23,7 @@ const customTheme = extendTheme({
     ...theme.colors,
     yellow: {
       ...theme.colors.yellow,
+      400: "#D4AF37",
     },
     gray: {
       ...theme.colors.gray,
