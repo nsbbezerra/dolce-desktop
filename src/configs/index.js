@@ -3,6 +3,11 @@ const config = {
     bg: "yellow.400",
     color: "gray.900",
   },
+  sider: {
+    colorBtn: "gray",
+    light: "yellow.100",
+    dark: "yellow.400",
+  },
 };
 
 export default config;

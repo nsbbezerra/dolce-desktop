@@ -4,8 +4,8 @@ const customTheme = extendTheme({
   ...theme,
 
   fonts: {
-    body: "Roboto, system-ui, sans-serif",
-    heading: "Acme, sans-serif",
+    body: "Roboto Condensed, system-ui, sans-serif",
+    heading: "Roboto, system-ui, sans-serif",
     mono: "Menlo, monospaced",
   },
   fontWeights: {
