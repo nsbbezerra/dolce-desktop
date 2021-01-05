@@ -54,7 +54,7 @@ export default function Sider() {
   return (
     <Box
       h="100%"
-      w="100%"
+      w="220px"
       shadow="lg"
       borderRightWidth="1px"
       maxH="100%"
@@ -67,6 +67,7 @@ export default function Sider() {
           colorScheme={config.sider.btnHome}
           variant="ghost"
           _focus={{ outline: "none" }}
+          onClick={() => routing("/")}
         >
           Dashboard
         </Button>
@@ -138,6 +139,7 @@ export default function Sider() {
                 isFullWidth
                 leftIcon={<FaUserFriends />}
                 _focus={{ outline: "none" }}
+                onClick={() => routing("/registerClient")}
               >
                 Clientes
               </Button>

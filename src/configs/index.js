@@ -10,6 +10,7 @@ const config = {
     expanded: "yellow.400",
     btnHome: "yellow",
   },
+  inputs: "yellow.400",
 };
 
 export default config;
