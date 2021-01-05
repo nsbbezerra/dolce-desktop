@@ -14,7 +14,7 @@ export default function Layout() {
           <Sider />
         </Box>
 
-        <Box p={3}>
+        <Box p={2} overflow="hidden">
           <Box w="100%" h="100%" maxH="100%" maxW="100%" overflow="auto" p={3}>
             <Routes />
           </Box>

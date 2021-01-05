@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Box,
   Grid,
@@ -14,15 +14,65 @@ import {
   Td,
   Tr,
   Button,
-  Tfoot,
   Divider,
 } from "@chakra-ui/react";
-
-import { AiOutlineFall, AiOutlineZoomIn } from "react-icons/ai";
+import * as Recharts from "recharts/umd/Recharts";
+import {
+  AiOutlineFall,
+  AiOutlinePieChart,
+  AiOutlineZoomIn,
+} from "react-icons/ai";
 import {} from "react-icons/fa";
 import {} from "react-icons/md";
 
+const LineChart = Recharts.LineChart;
+const Line = Recharts.Line;
+const XAxis = Recharts.XAxis;
+const YAxis = Recharts.YAxis;
+const CartesianGrid = Recharts.CartesianGrid;
+const Tooltip = Recharts.Tooltip;
+const Legend = Recharts.Legend;
+const Responsive = Recharts.ResponsiveContainer;
+
 export default function Dashboard() {
+  const data = [
+    {
+      name: "Janeiro 2021",
+      Entradas: 4000,
+      Saidas: 2400,
+    },
+    {
+      name: "Fevereiro 2021",
+      Entradas: 3000,
+      Saidas: 1398,
+    },
+    {
+      name: "Março 2021",
+      Entradas: 2000,
+      Saidas: 9800,
+    },
+    {
+      name: "Abril 2021",
+      Entradas: 2780,
+      Saidas: 3908,
+    },
+    {
+      name: "Maio 2021",
+      Entradas: 1890,
+      Saidas: 4800,
+    },
+    {
+      name: "Junho 2021",
+      Entradas: 2390,
+      Saidas: 3800,
+    },
+    {
+      name: "Julho 2021",
+      Entradas: 3490,
+      Saidas: 4300,
+    },
+  ];
+
   return (
     <>
       <Grid templateColumns="repeat(3, 1fr)" gap={"25px"}>
@@ -180,8 +230,44 @@ export default function Dashboard() {
               </Tr>
             </Tbody>
           </Table>
+          <Divider />
+          <Flex p={2} justify="flex-end" w="100%">
+            <Button size="sm" leftIcon={<AiOutlineZoomIn />}>
+              Veja Mais
+            </Button>
+          </Flex>
         </Box>
       </Grid>
+
+      <Box borderWidth="1px" rounded="md" shadow="md" mt="25px">
+        <Flex borderBottomWidth="1px" h="35px" align="center" pl={3}>
+          <Icon as={AiOutlinePieChart} mr={3} />
+          <Heading size="sm">Balanço Mensal</Heading>
+        </Flex>
+        <Flex align="center" justify="center" p={2}>
+          <div style={{ width: "100%", height: 300 }}>
+            <Responsive>
+              <LineChart
+                data={data}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="Entradas" stroke="#38A169" />
+                <Line type="monotone" dataKey="Saidas" stroke="#E53E3E" />
+              </LineChart>
+            </Responsive>
+          </div>
+        </Flex>
+      </Box>
     </>
   );
 }
