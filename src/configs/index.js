@@ -7,6 +7,8 @@ const config = {
     colorBtn: "gray",
     light: "yellow.100",
     dark: "yellow.400",
+    expanded: "yellow.400",
+    btnHome: "yellow",
   },
 };
 

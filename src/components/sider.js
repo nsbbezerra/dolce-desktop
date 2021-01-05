@@ -27,9 +27,22 @@ import {
   FaFileAlt,
   FaCalculator,
   FaShoppingCart,
+  FaClipboardList,
+  FaChartPie,
+  FaCreditCard,
+  FaMoneyCheck,
+  FaBarcode,
+  FaPercentage,
 } from "react-icons/fa";
-import { AiFillShop } from "react-icons/ai";
+import {
+  AiFillShop,
+  AiFillBank,
+  AiOutlineRise,
+  AiOutlineFall,
+} from "react-icons/ai";
 import { GiHistogram } from "react-icons/gi";
+import { MdDashboard } from "react-icons/md";
+import config from "../configs";
 
 export default function Sider() {
   const { push } = useHistory();
@@ -47,15 +60,22 @@ export default function Sider() {
       maxH="100%"
       overflow="auto"
     >
-      <Flex align="center" h="50px" pl={2}>
-        <Icon as={FaBars} mr={3} />
-        <Text fontWeight="700">Menu</Text>
+      <Flex align="center" h="50px" pl={2} pr={2}>
+        <Button
+          leftIcon={<MdDashboard />}
+          isFullWidth
+          colorScheme={config.sider.btnHome}
+          variant="ghost"
+          _focus={{ outline: "none" }}
+        >
+          Dashboard
+        </Button>
       </Flex>
 
       <Accordion>
         <AccordionItem>
           <AccordionButton
-            _expanded={{ bg: "yellow.400" }}
+            _expanded={{ bg: config.sider.expanded }}
             _focus={{ outline: "none" }}
           >
             <Flex align="center" flex="1" textAlign="left" fontWeight="700">
@@ -276,41 +296,195 @@ export default function Sider() {
           >
             <Flex align="center" flex="1" textAlign="left" fontWeight="700">
               <FaShoppingCart style={{ marginRight: 10 }} />
-              PDV
+              Ponto de Venda
             </Flex>
             <AccordionIcon />
           </AccordionButton>
           <AccordionPanel p={0}>
             <Flex p={2} direction="column" align="flex-start">
               <Button
-                leftIcon={<FaCalculator />}
+                leftIcon={<FaShoppingBag />}
                 variant="solid"
                 size="sm"
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
               >
-                Movimentação de Caixa
+                Venda de Produtos
               </Button>
               <Button
-                leftIcon={<GiHistogram />}
+                leftIcon={<FaClipboardList />}
                 variant="solid"
                 size="sm"
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
               >
-                Histórico de Caixa
+                Listagem de Pedidos
               </Button>
               <Button
-                leftIcon={<FaFileAlt />}
+                leftIcon={<FaTools />}
                 variant="solid"
                 size="sm"
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
               >
-                Relatório de Caixa
+                Gerenciar Pedidos
+              </Button>
+            </Flex>
+          </AccordionPanel>
+        </AccordionItem>
+
+        <AccordionItem>
+          <AccordionButton
+            _expanded={{ bg: "yellow.400" }}
+            _focus={{ outline: "none" }}
+          >
+            <Flex align="center" flex="1" textAlign="left" fontWeight="700">
+              <FaChartPie style={{ marginRight: 10 }} />
+              Financeiro
+            </Flex>
+            <AccordionIcon />
+          </AccordionButton>
+          <AccordionPanel p={0}>
+            <Flex p={2} direction="column" align="flex-start">
+              <Button
+                leftIcon={<AiFillBank />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Contas Bancárias
+              </Button>
+              <Button
+                leftIcon={<FaClipboardList />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Plano de Contas
+              </Button>
+              <Button
+                leftIcon={<FaCreditCard />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Formas de Pagamento
+              </Button>
+              <Button
+                leftIcon={<FaMoneyCheck />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Gerenciar Cheques
+              </Button>
+              <Button
+                leftIcon={<AiOutlineFall />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Contas a Pagar
+              </Button>
+              <Button
+                leftIcon={<AiOutlineRise />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Contas a Receber
+              </Button>
+              <Button
+                leftIcon={<FaBarcode />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Gerenciar Pagamentos
+              </Button>
+              <Button
+                leftIcon={<FaPercentage />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Gerenciar Comissões
+              </Button>
+            </Flex>
+          </AccordionPanel>
+        </AccordionItem>
+
+        <AccordionItem>
+          <AccordionButton
+            _expanded={{ bg: "yellow.400" }}
+            _focus={{ outline: "none" }}
+          >
+            <Flex align="center" flex="1" textAlign="left" fontWeight="700">
+              <FaFileAlt style={{ marginRight: 10 }} />
+              Relatórios
+            </Flex>
+            <AccordionIcon />
+          </AccordionButton>
+          <AccordionPanel p={0}>
+            <Flex p={2} direction="column" align="flex-start">
+              <Button
+                leftIcon={<FaCashRegister />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Fluxo de Caixa
+              </Button>
+              <Button
+                leftIcon={<FaBarcode />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Pagamentos
+              </Button>
+              <Button
+                leftIcon={<FaSave />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Cadastros
+              </Button>
+              <Button
+                leftIcon={<FaChartPie />}
+                variant="solid"
+                size="sm"
+                isFullWidth
+                mt={1}
+                _focus={{ outline: "none" }}
+              >
+                Relatório Financeiro
               </Button>
             </Flex>
           </AccordionPanel>
