@@ -37,8 +37,13 @@ import {
   FaTimes,
 } from "react-icons/fa";
 
-import { AiOutlineLogout } from "react-icons/ai";
+import {
+  AiOutlineLogout,
+  AiOutlineReload,
+  AiOutlineStop,
+} from "react-icons/ai";
 import config from "../configs";
+import { GiShop } from "react-icons/gi";
 
 import Icone from "../assets/icon-black.png";
 import Logo from "../assets/name-slug.png";
@@ -187,6 +192,15 @@ export default function HeaderApp() {
               />
             </Tooltip>
 
+            <Tooltip label="Informações da Empresa" hasArrow>
+              <IconButton
+                aria-label="Search database"
+                icon={<GiShop />}
+                rounded="xl"
+                ml={3}
+              />
+            </Tooltip>
+
             <Tooltip label="Logout" hasArrow>
               <IconButton
                 aria-label="Search database"
@@ -249,10 +263,19 @@ export default function HeaderApp() {
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button colorScheme="red" onClick={() => setAlert(false)}>
+              <Button
+                colorScheme="red"
+                onClick={() => setAlert(false)}
+                leftIcon={<AiOutlineStop />}
+              >
                 Agora Não
               </Button>
-              <Button colorScheme="blue" onClick={() => closeWindow()} ml={3}>
+              <Button
+                colorScheme="blue"
+                onClick={() => closeWindow()}
+                ml={3}
+                leftIcon={<AiOutlineReload />}
+              >
                 Reiniciar
               </Button>
             </AlertDialogFooter>
