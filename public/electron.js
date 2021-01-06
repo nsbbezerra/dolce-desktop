@@ -9,7 +9,7 @@ const Menu = electron.Menu;
 Menu.setApplicationMenu(false);
 
 function createWindow() {
-  const iconPath = path.resolve(__dirname, "icone512.png");
+  const iconPath = path.resolve(__dirname, "icone.png");
   mainWindow = new BrowserWindow({
     width: 1300,
     height: 700,

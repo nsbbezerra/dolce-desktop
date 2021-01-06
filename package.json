@@ -59,7 +59,7 @@
       "owner": "nkinformatica"
     },
     "win": {
-      "icon": "build/favicon.ico",
+      "icon": "build/icone.ico",
       "target": [
         {
           "target": "nsis",
@@ -72,7 +72,7 @@
     },
     "linux": {
       "target": "AppImage",
-      "icon": "build/icone512.png",
+      "icon": "build/icone.png",
       "category": "Office"
     }
   }

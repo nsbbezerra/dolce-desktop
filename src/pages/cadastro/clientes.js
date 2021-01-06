@@ -21,14 +21,16 @@ import {
 } from "@chakra-ui/react";
 import { FaTimes, FaUserFriends, FaSave } from "react-icons/fa";
 import config from "../../configs";
+import { useHistory } from "react-router-dom";
 
 export default function SaveClient() {
+  const { push } = useHistory();
+
   const [loading, setLoading] = useState(false);
   const [loadingAddress, setLoadingAddress] = useState(false);
   const [modalAddress, setModalAddress] = useState(false);
 
-  function register(e) {
-    e.preventDefault();
+  function register() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -49,13 +51,13 @@ export default function SaveClient() {
       <Flex
         shadow="md"
         rounded="md"
-        borderWidth="1px"
         pt={1}
         pb={1}
         pl={3}
         pr={2}
         justify="space-between"
         align="center"
+        bg={config.headerapp}
       >
         <Flex>
           <Icon as={FaUserFriends} mr={3} />
@@ -64,90 +66,88 @@ export default function SaveClient() {
         <IconButton
           aria-label="Search database"
           icon={<FaTimes />}
-          size="sm"
-          rounded="xl"
-          variant="ghost"
+          size="xs"
+          isRound
           colorScheme="red"
+          onClick={() => push("/")}
         />
       </Flex>
 
       <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
-        <form onSubmit={register}>
-          <Grid templateColumns="1fr 1fr 250px" gap="15px">
-            <FormControl id="first-name" isRequired>
-              <FormLabel>Nome</FormLabel>
-              <Input
-                placeholder="Nome completo"
-                focusBorderColor={config.inputs}
-              />
-            </FormControl>
-            <FormControl id="cpf" isRequired>
-              <FormLabel>CPF</FormLabel>
-              <Input
-                placeholder="CPF"
-                focusBorderColor={config.inputs}
-                type="number"
-                maxLength="11"
-              />
-            </FormControl>
-            <FormControl id="gender" isRequired>
-              <FormLabel>Genero</FormLabel>
-              <Select
-                placeholder="Selecione"
-                variant="outline"
-                focusBorderColor={config.inputs}
-              >
-                <option value="option1">Option 1</option>
-                <option value="option2">Option 2</option>
-                <option value="option3">Option 3</option>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid templateColumns="1fr 1fr" gap="15px" mt={3}>
-            <FormControl id="email" isRequired>
-              <FormLabel>Email</FormLabel>
-              <Input
-                placeholder="Email"
-                focusBorderColor={config.inputs}
-                type="email"
-              />
-            </FormControl>
-            <FormControl id="phone" isRequired>
-              <FormLabel>Telefone</FormLabel>
-              <Input
-                placeholder="00-00000-0000"
-                focusBorderColor={config.inputs}
-                type="tel"
-                pattern="[0-9]{2}-[0-9]{5}-[0-9]{4}"
-              />
-            </FormControl>
-          </Grid>
+        <Grid templateColumns="1fr 1fr 250px" gap="15px">
+          <FormControl id="first-name" isRequired>
+            <FormLabel>Nome</FormLabel>
+            <Input
+              placeholder="Nome completo"
+              focusBorderColor={config.inputs}
+            />
+          </FormControl>
+          <FormControl id="cpf" isRequired>
+            <FormLabel>CPF</FormLabel>
+            <Input
+              placeholder="CPF"
+              focusBorderColor={config.inputs}
+              type="number"
+              maxLength="11"
+            />
+          </FormControl>
+          <FormControl id="gender" isRequired>
+            <FormLabel>Genero</FormLabel>
+            <Select
+              placeholder="Selecione"
+              variant="outline"
+              focusBorderColor={config.inputs}
+            >
+              <option value="option1">Option 1</option>
+              <option value="option2">Option 2</option>
+              <option value="option3">Option 3</option>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid templateColumns="1fr 1fr" gap="15px" mt={3}>
+          <FormControl id="email" isRequired>
+            <FormLabel>Email</FormLabel>
+            <Input
+              placeholder="Email"
+              focusBorderColor={config.inputs}
+              type="email"
+            />
+          </FormControl>
+          <FormControl id="phone" isRequired>
+            <FormLabel>Telefone</FormLabel>
+            <Input
+              placeholder="00-00000-0000"
+              focusBorderColor={config.inputs}
+              type="tel"
+              pattern="[0-9]{2}-[0-9]{5}-[0-9]{4}"
+            />
+          </FormControl>
+        </Grid>
 
-          <Grid templateColumns="1fr 1fr" gap="15px" mt={3}>
-            <FormControl id="user" isRequired>
-              <FormLabel>Usuário</FormLabel>
-              <Input placeholder="Usuário" focusBorderColor={config.inputs} />
-            </FormControl>
-            <FormControl id="pass" isRequired>
-              <FormLabel>Senha</FormLabel>
-              <Input
-                placeholder="Usuário"
-                type="password"
-                focusBorderColor={config.inputs}
-              />
-            </FormControl>
-          </Grid>
-          <Divider mt={5} mb={5} />
-          <Button
-            leftIcon={<FaSave />}
-            colorScheme="blue"
-            size="lg"
-            type="submit"
-            isLoading={loading}
-          >
-            Cadastrar
-          </Button>
-        </form>
+        <Grid templateColumns="1fr 1fr" gap="15px" mt={3}>
+          <FormControl id="user" isRequired>
+            <FormLabel>Usuário</FormLabel>
+            <Input placeholder="Usuário" focusBorderColor={config.inputs} />
+          </FormControl>
+          <FormControl id="pass" isRequired>
+            <FormLabel>Senha</FormLabel>
+            <Input
+              placeholder="Usuário"
+              type="password"
+              focusBorderColor={config.inputs}
+            />
+          </FormControl>
+        </Grid>
+        <Divider mt={5} mb={5} />
+        <Button
+          leftIcon={<FaSave />}
+          colorScheme="blue"
+          size="lg"
+          isLoading={loading}
+          onClick={() => register()}
+        >
+          Cadastrar
+        </Button>
       </Box>
 
       <Modal

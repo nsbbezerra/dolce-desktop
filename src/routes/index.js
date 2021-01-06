@@ -5,6 +5,8 @@ import Dashboard from "../pages/dashboard";
 
 /** CADASTROS */
 import RegisterClientes from "../pages/cadastro/clientes";
+import RegisterAddress from "../pages/cadastro/endereco";
+import RegisterDepartment from "../pages/cadastro/departamento";
 
 export default function Routers() {
   return (
@@ -14,6 +16,12 @@ export default function Routers() {
       </Route>
       <Route path="/registerClient">
         <RegisterClientes />
+      </Route>
+      <Route path="/registerAddress">
+        <RegisterAddress />
+      </Route>
+      <Route path="/registerDepartment">
+        <RegisterDepartment />
       </Route>
     </Switch>
   );

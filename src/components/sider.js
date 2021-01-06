@@ -160,6 +160,7 @@ export default function Sider() {
                 leftIcon={<FaMapMarkedAlt />}
                 mt={1}
                 _focus={{ outline: "none" }}
+                onClick={() => routing("/registerAddress")}
               >
                 Endereços
               </Button>
@@ -170,6 +171,7 @@ export default function Sider() {
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
+                onClick={() => routing("/registerDepartment")}
               >
                 Departamentos
               </Button>
