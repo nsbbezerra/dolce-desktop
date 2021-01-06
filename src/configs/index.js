@@ -8,11 +8,15 @@ const config = {
     colorBtn: "gray",
     light: "yellow.100",
     dark: "yellow.400",
-    expanded: "yellow.400",
     btnHome: "yellow",
   },
   inputs: "yellow.400",
-  headerapp: "yellow.400",
+  switchs: "yellow",
+  tabs: "yellow",
+  headerapp: {
+    dark: "gray.700",
+    light: "gray.100",
+  },
 };
 
 export default config;

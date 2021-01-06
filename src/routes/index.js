@@ -7,6 +7,9 @@ import Dashboard from "../pages/dashboard";
 import RegisterClientes from "../pages/cadastro/clientes";
 import RegisterAddress from "../pages/cadastro/endereco";
 import RegisterDepartment from "../pages/cadastro/departamento";
+import RegisterCategory from "../pages/cadastro/categoria";
+import RegisterEmployee from "../pages/cadastro/colaboradores";
+import RegisterProducts from "../pages/cadastro/produtos";
 
 export default function Routers() {
   return (
@@ -22,6 +25,15 @@ export default function Routers() {
       </Route>
       <Route path="/registerDepartment">
         <RegisterDepartment />
+      </Route>
+      <Route path="/registerCategory">
+        <RegisterCategory />
+      </Route>
+      <Route path="/registerEmlpoyee">
+        <RegisterEmployee />
+      </Route>
+      <Route path="/registerProducts">
+        <RegisterProducts />
       </Route>
     </Switch>
   );

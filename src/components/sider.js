@@ -3,8 +3,6 @@ import { useHistory } from "react-router-dom";
 import {
   Box,
   Flex,
-  Icon,
-  Text,
   Button,
   Accordion,
   AccordionItem,
@@ -13,7 +11,6 @@ import {
   AccordionIcon,
 } from "@chakra-ui/react";
 import {
-  FaBars,
   FaSave,
   FaUserFriends,
   FaMapMarkedAlt,
@@ -75,10 +72,7 @@ export default function Sider() {
 
       <Accordion>
         <AccordionItem>
-          <AccordionButton
-            _expanded={{ bg: config.sider.expanded }}
-            _focus={{ outline: "none" }}
-          >
+          <AccordionButton _focus={{ outline: "none" }}>
             <Flex align="center" flex="1" textAlign="left" fontWeight="700">
               <FaTools style={{ marginRight: 10 }} />
               Administrativo
@@ -121,10 +115,7 @@ export default function Sider() {
         </AccordionItem>
 
         <AccordionItem>
-          <AccordionButton
-            _expanded={{ bg: "yellow.400" }}
-            _focus={{ outline: "none" }}
-          >
+          <AccordionButton _focus={{ outline: "none" }}>
             <Flex align="center" flex="1" textAlign="left" fontWeight="700">
               <FaSave style={{ marginRight: 10 }} />
               Cadastros
@@ -150,6 +141,7 @@ export default function Sider() {
                 leftIcon={<FaIdCard />}
                 _focus={{ outline: "none" }}
                 mt={1}
+                onClick={() => routing("/registerEmlpoyee")}
               >
                 Colaboradores
               </Button>
@@ -182,6 +174,7 @@ export default function Sider() {
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
+                onClick={() => routing("/registerCategory")}
               >
                 Categorias
               </Button>
@@ -192,6 +185,7 @@ export default function Sider() {
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
+                onClick={() => routing("/registerProducts")}
               >
                 Produtos
               </Button>
@@ -200,10 +194,7 @@ export default function Sider() {
         </AccordionItem>
 
         <AccordionItem>
-          <AccordionButton
-            _expanded={{ bg: "yellow.400" }}
-            _focus={{ outline: "none" }}
-          >
+          <AccordionButton _focus={{ outline: "none" }}>
             <Flex align="center" flex="1" textAlign="left" fontWeight="700">
               <FaBoxOpen style={{ marginRight: 10 }} />
               Gerenciar Produtos
@@ -247,10 +238,7 @@ export default function Sider() {
         </AccordionItem>
 
         <AccordionItem>
-          <AccordionButton
-            _expanded={{ bg: "yellow.400" }}
-            _focus={{ outline: "none" }}
-          >
+          <AccordionButton _focus={{ outline: "none" }}>
             <Flex align="center" flex="1" textAlign="left" fontWeight="700">
               <FaCashRegister style={{ marginRight: 10 }} />
               Caixa Diário
@@ -294,10 +282,7 @@ export default function Sider() {
         </AccordionItem>
 
         <AccordionItem>
-          <AccordionButton
-            _expanded={{ bg: "yellow.400" }}
-            _focus={{ outline: "none" }}
-          >
+          <AccordionButton _focus={{ outline: "none" }}>
             <Flex align="center" flex="1" textAlign="left" fontWeight="700">
               <FaShoppingCart style={{ marginRight: 10 }} />
               Ponto de Venda
@@ -341,10 +326,7 @@ export default function Sider() {
         </AccordionItem>
 
         <AccordionItem>
-          <AccordionButton
-            _expanded={{ bg: "yellow.400" }}
-            _focus={{ outline: "none" }}
-          >
+          <AccordionButton _focus={{ outline: "none" }}>
             <Flex align="center" flex="1" textAlign="left" fontWeight="700">
               <FaChartPie style={{ marginRight: 10 }} />
               Financeiro
@@ -438,10 +420,7 @@ export default function Sider() {
         </AccordionItem>
 
         <AccordionItem>
-          <AccordionButton
-            _expanded={{ bg: "yellow.400" }}
-            _focus={{ outline: "none" }}
-          >
+          <AccordionButton _focus={{ outline: "none" }}>
             <Flex align="center" flex="1" textAlign="left" fontWeight="700">
               <FaFileAlt style={{ marginRight: 10 }} />
               Relatórios

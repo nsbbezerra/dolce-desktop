@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import {
-  Flex,
-  Icon,
-  Heading,
   IconButton,
   Box,
   Grid,
@@ -25,48 +22,16 @@ import {
   Td,
   Tooltip,
 } from "@chakra-ui/react";
-import {
-  FaTimes,
-  FaMapMarkedAlt,
-  FaSave,
-  FaSearch,
-  FaCheck,
-} from "react-icons/fa";
+import { FaMapMarkedAlt, FaSave, FaSearch, FaCheck } from "react-icons/fa";
 import config from "../../configs";
-
-import { useHistory } from "react-router-dom";
+import Headerapp from "../../components/headerApp";
 
 export default function Endereco() {
-  const { push } = useHistory();
-
   const [modalClient, setModalClient] = useState(false);
 
   return (
     <>
-      <Flex
-        shadow="md"
-        rounded="md"
-        pt={1}
-        pb={1}
-        pl={3}
-        pr={2}
-        justify="space-between"
-        align="center"
-        bg={config.headerapp}
-      >
-        <Flex>
-          <Icon as={FaMapMarkedAlt} mr={3} />
-          <Heading size="sm">Cadastro de Clientes</Heading>
-        </Flex>
-        <IconButton
-          aria-label="Search database"
-          icon={<FaTimes />}
-          size="xs"
-          isRound
-          colorScheme="red"
-          onClick={() => push("/")}
-        />
-      </Flex>
+      <Headerapp title="Cadastro de Endereços" icon={FaMapMarkedAlt} />
 
       <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
         <Grid templateColumns="1fr 200px" gap="15px">
@@ -153,31 +118,32 @@ export default function Endereco() {
               placeholder="Digite um nome para buscar"
               focusBorderColor={config.inputs}
             />
-            <Divider mt={3} />
-            <Table size="sm" variant="striped">
-              <Thead fontWeight="700">
-                <Tr>
-                  <Td>Nome</Td>
-                  <Td w="10%">Ações</Td>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td>Natanael dos Santos Bezerra</Td>
-                  <Td w="10%" textAlign="center">
-                    <Tooltip label="Selecionar cliente" hasArrow>
-                      <IconButton
-                        aria-label="Search database"
-                        icon={<FaCheck />}
-                        size="xs"
-                        isRound
-                        colorScheme="blue"
-                      />
-                    </Tooltip>
-                  </Td>
-                </Tr>
-              </Tbody>
-            </Table>
+            <Box p={2} borderWidth="1px" rounded="md" mt={3}>
+              <Table size="sm" variant="striped">
+                <Thead fontWeight="700">
+                  <Tr>
+                    <Td>Nome</Td>
+                    <Td w="10%">Ações</Td>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td>Natanael dos Santos Bezerra</Td>
+                    <Td w="10%" textAlign="center">
+                      <Tooltip label="Selecionar cliente" hasArrow>
+                        <IconButton
+                          aria-label="Search database"
+                          icon={<FaCheck />}
+                          size="xs"
+                          isRound
+                          colorScheme="blue"
+                        />
+                      </Tooltip>
+                    </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </Box>
           </ModalBody>
         </ModalContent>
       </Modal>

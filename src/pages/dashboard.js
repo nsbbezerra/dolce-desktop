@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import {
   Box,
   Grid,
@@ -14,7 +14,6 @@ import {
   Td,
   Tr,
   Button,
-  Divider,
 } from "@chakra-ui/react";
 import * as Recharts from "recharts/umd/Recharts";
 import {

@@ -1,9 +1,6 @@
 import React from "react";
 import {
   Flex,
-  Icon,
-  IconButton,
-  Heading,
   Box,
   Grid,
   Text,
@@ -15,42 +12,17 @@ import {
   Button,
   useColorMode,
 } from "@chakra-ui/react";
-import { FaTimes, FaSave, FaImage } from "react-icons/fa";
+import { FaSave, FaImage } from "react-icons/fa";
 import { AiFillShop } from "react-icons/ai";
 import config from "../../configs";
-import { useHistory } from "react-router-dom";
-
+import HeaderApp from "../../components/headerApp";
 import { InputFile, File } from "../../style/uploader";
 
 export default function Departamento() {
-  const { push } = useHistory();
   const { colorMode } = useColorMode();
   return (
     <>
-      <Flex
-        shadow="md"
-        rounded="md"
-        pt={1}
-        pb={1}
-        pl={3}
-        pr={2}
-        justify="space-between"
-        align="center"
-        bg={config.headerapp}
-      >
-        <Flex>
-          <Icon as={AiFillShop} mr={3} />
-          <Heading size="sm">Cadastro de Departamentos</Heading>
-        </Flex>
-        <IconButton
-          aria-label="Search database"
-          icon={<FaTimes />}
-          size="xs"
-          isRound
-          colorScheme="red"
-          onClick={() => push("/")}
-        />
-      </Flex>
+      <HeaderApp title="Cadastro de Departamentos" icon={AiFillShop} />
 
       <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
         <Grid templateColumns="250px 1fr" gap="15px">

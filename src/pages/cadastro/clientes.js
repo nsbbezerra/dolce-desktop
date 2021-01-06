@@ -3,11 +3,7 @@ import {
   Box,
   Button,
   Divider,
-  Flex,
   Grid,
-  Heading,
-  Icon,
-  IconButton,
   Input,
   Select,
   FormControl,
@@ -19,13 +15,11 @@ import {
   ModalFooter,
   ModalBody,
 } from "@chakra-ui/react";
-import { FaTimes, FaUserFriends, FaSave } from "react-icons/fa";
+import { FaUserFriends, FaSave } from "react-icons/fa";
 import config from "../../configs";
-import { useHistory } from "react-router-dom";
+import HeaderApp from "../../components/headerApp";
 
 export default function SaveClient() {
-  const { push } = useHistory();
-
   const [loading, setLoading] = useState(false);
   const [loadingAddress, setLoadingAddress] = useState(false);
   const [modalAddress, setModalAddress] = useState(false);
@@ -48,30 +42,7 @@ export default function SaveClient() {
 
   return (
     <>
-      <Flex
-        shadow="md"
-        rounded="md"
-        pt={1}
-        pb={1}
-        pl={3}
-        pr={2}
-        justify="space-between"
-        align="center"
-        bg={config.headerapp}
-      >
-        <Flex>
-          <Icon as={FaUserFriends} mr={3} />
-          <Heading size="sm">Cadastro de Clientes</Heading>
-        </Flex>
-        <IconButton
-          aria-label="Search database"
-          icon={<FaTimes />}
-          size="xs"
-          isRound
-          colorScheme="red"
-          onClick={() => push("/")}
-        />
-      </Flex>
+      <HeaderApp title="Cadastro de Clientes" icon={FaUserFriends} />
 
       <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
         <Grid templateColumns="1fr 1fr 250px" gap="15px">
