@@ -34,6 +34,7 @@ import config from "../../../configs";
 import dataTrib from "../../../data/data";
 
 import Cores from "./cores";
+import Tamanhos from "./tamanhos";
 
 export default function Produtos() {
   const { colorMode } = useColorMode();
@@ -497,6 +498,10 @@ export default function Produtos() {
 
                 <TabPanel>
                   <Cores id="1200" />
+                </TabPanel>
+
+                <TabPanel>
+                  <Tamanhos id="1200" />
                 </TabPanel>
               </TabPanels>
             </Tabs>

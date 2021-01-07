@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
 import { FaPlus, FaSave, FaTimes } from "react-icons/fa";
+import uniqid from "uniqid";
 
 export default function Cores({ id }) {
   const [colorHex, setColorHex] = useState("fff");
@@ -25,10 +26,20 @@ export default function Cores({ id }) {
   const [colorName, setColorName] = useState("");
 
   function handleColor() {
-    let info = { name: colorName, hexDecimal: colorHex };
+    let info = {
+      id: uniqid(),
+      name: colorName,
+      hexDecimal: colorHex,
+      product: id,
+    };
     setColors([...colors, info]);
     setColorName("");
     setColorHex("fff");
+  }
+
+  function removeColor(id) {
+    const index = colors.filter((item) => item.id !== id);
+    setColors(index);
   }
 
   return (
@@ -83,7 +94,7 @@ export default function Cores({ id }) {
           <Divider mt={5} mb={5} />
           <Wrap spacing="15px">
             {colors.map((clr) => (
-              <WrapItem key={clr.hexDecimal}>
+              <WrapItem key={clr.id}>
                 <Box w="140px">
                   <Box
                     w="140px"
@@ -100,6 +111,7 @@ export default function Cores({ id }) {
                         colorScheme="red"
                         icon={<FaTimes />}
                         ml={1}
+                        onClick={() => removeColor(clr.id)}
                       />
                     </Tooltip>
                   </Center>
@@ -109,6 +121,15 @@ export default function Cores({ id }) {
           </Wrap>
         </>
       )}
+      <Divider mt={5} mb={5} />
+      <Button
+        leftIcon={<FaSave />}
+        colorScheme="blue"
+        size="lg"
+        disabled={colors.length ? false : true}
+      >
+        Salvar Cores
+      </Button>
     </>
   );
 }
