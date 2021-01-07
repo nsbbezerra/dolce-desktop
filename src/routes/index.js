@@ -9,7 +9,7 @@ import RegisterAddress from "../pages/cadastro/endereco";
 import RegisterDepartment from "../pages/cadastro/departamento";
 import RegisterCategory from "../pages/cadastro/categoria";
 import RegisterEmployee from "../pages/cadastro/colaboradores";
-import RegisterProducts from "../pages/cadastro/produtos";
+import RegisterProducts from "../pages/cadastro/produtos/produtos";
 
 export default function Routers() {
   return (

@@ -20,7 +20,7 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import HeaderApp from "../../components/headerApp";
+import HeaderApp from "../../../components/headerApp";
 import {
   FaTag,
   FaSave,
@@ -28,10 +28,12 @@ import {
   FaCalculator,
   FaImage,
 } from "react-icons/fa";
-import { File, InputFile } from "../../style/uploader";
-import config from "../../configs";
+import { File, InputFile } from "../../../style/uploader";
+import config from "../../../configs";
 
-import dataTrib from "../../data/data";
+import dataTrib from "../../../data/data";
+
+import Cores from "./cores";
 
 export default function Produtos() {
   const { colorMode } = useColorMode();
@@ -491,6 +493,10 @@ export default function Produtos() {
                   <Button leftIcon={<FaSave />} colorScheme="blue" size="lg">
                     Salvar e Continuar
                   </Button>
+                </TabPanel>
+
+                <TabPanel>
+                  <Cores id="1200" />
                 </TabPanel>
               </TabPanels>
             </Tabs>
