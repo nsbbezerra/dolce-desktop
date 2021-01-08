@@ -23,7 +23,6 @@ import {
   ModalCloseButton,
   Radio,
   RadioGroup,
-  Stack,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
 import { FaCheck, FaPlus, FaSave, FaSearch, FaTimes } from "react-icons/fa";
