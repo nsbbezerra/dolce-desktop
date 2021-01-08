@@ -21,10 +21,19 @@ import {
   FormLabel,
   Input,
   Divider,
+  Image,
+  Center,
 } from "@chakra-ui/react";
 
 import { InputFile, File } from "../../../style/uploader";
-import { FaImage, FaSave, FaCheck, FaSearch } from "react-icons/fa";
+import {
+  FaImage,
+  FaSave,
+  FaCheck,
+  FaSearch,
+  FaTimes,
+  FaLock,
+} from "react-icons/fa";
 import config from "../../../configs";
 
 export default function Images({ id }) {
@@ -78,6 +87,37 @@ export default function Images({ id }) {
           >
             Salvar Imagem
           </Button>
+        </Box>
+
+        <Box borderWidth="1px" rounded="md" p={3}>
+          <Grid
+            templateColumns="repeat(auto-fit, minmax(300px, 300px))"
+            gap="15px"
+            justifyContent="center"
+          >
+            <Box w="300px" p={2} shadow="md" rounded="md" borderWidth="1px">
+              <Box w="100%" h="40px" bg="yellow.400" />
+              <Center>
+                <Text>Amarelo</Text>
+              </Center>
+              <Divider mt={1} mb={2} />
+              <Image
+                src="https://s2.glbimg.com/kJtPX5DTl6rDcZO5pYEQ4mVv7H8=/620x455/e.glbimg.com/og/ed/f/original/2019/05/30/gettyimages-824872662.jpg"
+                w="300px"
+                h="300px"
+                rounded="md"
+              />
+
+              <Button
+                leftIcon={<FaTimes />}
+                isFullWidth
+                colorScheme="red"
+                mt={3}
+              >
+                Excluir Imagem
+              </Button>
+            </Box>
+          </Grid>
         </Box>
       </Grid>
 
