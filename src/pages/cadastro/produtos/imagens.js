@@ -26,14 +26,7 @@ import {
 } from "@chakra-ui/react";
 
 import { InputFile, File } from "../../../style/uploader";
-import {
-  FaImage,
-  FaSave,
-  FaCheck,
-  FaSearch,
-  FaTimes,
-  FaLock,
-} from "react-icons/fa";
+import { FaImage, FaSave, FaCheck, FaSearch, FaTimes } from "react-icons/fa";
 import config from "../../../configs";
 
 export default function Images({ id }) {

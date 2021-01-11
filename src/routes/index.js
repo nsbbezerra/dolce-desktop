@@ -11,6 +11,9 @@ import RegisterCategory from "../pages/cadastro/categoria";
 import RegisterEmployee from "../pages/cadastro/colaboradores";
 import RegisterProducts from "../pages/cadastro/produtos/produtos";
 
+/** FINANCEIRO */
+import BankAccount from "../pages/financeiro/bankAccount/index";
+
 export default function Routers() {
   return (
     <Switch>
@@ -34,6 +37,9 @@ export default function Routers() {
       </Route>
       <Route path="/registerProducts">
         <RegisterProducts />
+      </Route>
+      <Route path="/bankAccount">
+        <BankAccount />
       </Route>
     </Switch>
   );

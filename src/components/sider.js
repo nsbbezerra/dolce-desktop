@@ -342,6 +342,7 @@ export default function Sider() {
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
+                onClick={() => routing("/bankAccount")}
               >
                 Contas Bancárias
               </Button>
