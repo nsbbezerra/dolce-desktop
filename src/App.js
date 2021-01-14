@@ -3,6 +3,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import theme from "./style/theme";
 import LayoutApp from "./layout/index";
 import { MemoryRouter as Router } from "react-router-dom";
+import "./style/calendar.css";
 
 function App() {
   return (

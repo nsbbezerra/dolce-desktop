@@ -139,6 +139,10 @@ export default function HeaderApp() {
     getCurrentWindow().reload();
   }
 
+  function toogleDevTools() {
+    getCurrentWindow().toggleDevTools();
+  }
+
   return (
     <>
       <Flex
@@ -207,6 +211,7 @@ export default function HeaderApp() {
                 icon={<AiOutlineLogout />}
                 rounded="xl"
                 ml={3}
+                onClick={() => toogleDevTools()}
               />
             </Tooltip>
           </Flex>

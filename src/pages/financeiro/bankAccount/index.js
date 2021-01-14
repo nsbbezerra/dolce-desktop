@@ -5,6 +5,7 @@ import HeaderApp from "../../../components/headerApp";
 import { AiFillBank } from "react-icons/ai";
 
 import Save from "./save";
+import List from "./list";
 
 export default function BankAccountIndex() {
   return (
@@ -23,7 +24,7 @@ export default function BankAccountIndex() {
               <Save />
             </TabPanel>
             <TabPanel>
-              <p>two!</p>
+              <List />
             </TabPanel>
           </TabPanels>
         </Tabs>
