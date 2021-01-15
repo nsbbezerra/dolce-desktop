@@ -16,6 +16,7 @@ import {
 import HeaderApp from "../../components/headerApp";
 import { FaIdCard, FaSave } from "react-icons/fa";
 import config from "../../configs/index";
+import InputMask from "react-input-mask";
 
 export default function Colaboradores() {
   return (
@@ -33,11 +34,10 @@ export default function Colaboradores() {
           </FormControl>
           <FormControl id="phone" isRequired>
             <FormLabel>Telefone</FormLabel>
-            <Input
-              placeholder="00-00000-0000"
-              focusBorderColor={config.inputs}
-              type="tel"
-              pattern="[0-9]{2}-[0-9]{5}-[0-9]{4}"
+            <InputMask
+              mask="(99) 99999-9999"
+              className="mask-chakra"
+              placeholder="Telefone"
             />
           </FormControl>
           <FormControl id="gender" isRequired>

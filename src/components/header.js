@@ -28,6 +28,8 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   useColorMode,
+  Text,
+  Grid,
 } from "@chakra-ui/react";
 import {
   FaUserCircle,
@@ -35,6 +37,8 @@ import {
   FaPaintBrush,
   FaSave,
   FaTimes,
+  FaSun,
+  FaMoon,
 } from "react-icons/fa";
 
 import {
@@ -71,23 +75,45 @@ export default function HeaderApp() {
         <Box
           {...checkbox}
           cursor="pointer"
-          borderWidth="1px"
-          borderRadius="md"
-          boxShadow="md"
+          borderRadius="xl"
           _checked={{
-            bg: "gray.300",
-            color: "white",
+            borderColor: "yellow.300",
+            boxShadow: "0px 0px 0px 4px #ecc94b",
           }}
           _focus={{
             boxShadow: "outline",
           }}
-          px={5}
-          py={3}
         >
           {props.children === "light" ? (
-            <Image src={Light} w="380px" />
+            <Flex
+              w="260px"
+              h="100px"
+              rounded="xl"
+              bg="white"
+              borderWidth="1px"
+              align="center"
+              color="gray.800"
+              justify="center"
+              fontSize="4xl"
+            >
+              <Icon as={FaSun} mr={3} />
+              <Text>Claro</Text>
+            </Flex>
           ) : (
-            <Image src={Dark} w="380px" />
+            <Flex
+              w="260px"
+              h="100px"
+              rounded="xl"
+              bg="gray.800"
+              borderWidth="1px"
+              align="center"
+              color="white"
+              justify="center"
+              fontSize="4xl"
+            >
+              <Icon as={FaMoon} mr={3} />
+              <Text>Escuro</Text>
+            </Flex>
           )}
         </Box>
       </Box>

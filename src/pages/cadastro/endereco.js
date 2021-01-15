@@ -25,6 +25,7 @@ import {
 import { FaMapMarkedAlt, FaSave, FaSearch, FaCheck } from "react-icons/fa";
 import config from "../../configs";
 import Headerapp from "../../components/headerApp";
+import InputMask from "react-input-mask";
 
 export default function Endereco() {
   const [modalClient, setModalClient] = useState(false);
@@ -68,11 +69,10 @@ export default function Endereco() {
         <Grid templateColumns="1fr 1fr 180px" gap="15px" mt={3}>
           <FormControl id="cep" isRequired>
             <FormLabel>CEP</FormLabel>
-            <Input
-              placeholder="000000-000"
-              focusBorderColor={config.inputs}
-              type="tel"
-              pattern="[0-9]{6}-[0-9]{3}"
+            <InputMask
+              mask="99.999-999"
+              className="mask-chakra"
+              placeholder="CEP"
             />
           </FormControl>
           <FormControl id="city" isRequired>

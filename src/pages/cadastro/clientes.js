@@ -18,6 +18,7 @@ import {
 import { FaUserFriends, FaSave } from "react-icons/fa";
 import config from "../../configs";
 import HeaderApp from "../../components/headerApp";
+import InputMask from "react-input-mask";
 
 export default function SaveClient() {
   const [loading, setLoading] = useState(false);
@@ -55,11 +56,10 @@ export default function SaveClient() {
           </FormControl>
           <FormControl id="cpf" isRequired>
             <FormLabel>CPF</FormLabel>
-            <Input
+            <InputMask
+              mask="999.999.999-99"
+              className="mask-chakra"
               placeholder="CPF"
-              focusBorderColor={config.inputs}
-              type="number"
-              maxLength="11"
             />
           </FormControl>
           <FormControl id="gender" isRequired>
@@ -86,11 +86,10 @@ export default function SaveClient() {
           </FormControl>
           <FormControl id="phone" isRequired>
             <FormLabel>Telefone</FormLabel>
-            <Input
-              placeholder="00-00000-0000"
-              focusBorderColor={config.inputs}
-              type="tel"
-              pattern="[0-9]{2}-[0-9]{5}-[0-9]{4}"
+            <InputMask
+              mask="(99) 99999-9999"
+              className="mask-chakra"
+              placeholder="Telefone"
             />
           </FormControl>
         </Grid>
@@ -161,11 +160,10 @@ export default function SaveClient() {
             <Grid templateColumns="1fr 1fr 100px" gap="15px" mt={3}>
               <FormControl id="cep" isRequired>
                 <FormLabel>CEP</FormLabel>
-                <Input
-                  placeholder="000000-000"
-                  focusBorderColor={config.inputs}
-                  type="tel"
-                  pattern="[0-9]{6}-[0-9]{3}"
+                <InputMask
+                  mask="99.999-999"
+                  className="mask-chakra"
+                  placeholder="CEP"
                 />
               </FormControl>
               <FormControl id="city" isRequired>

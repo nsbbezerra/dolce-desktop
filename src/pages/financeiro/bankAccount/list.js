@@ -39,6 +39,7 @@ import config from "../../../configs/index";
 import { FaSave, FaSearch } from "react-icons/fa";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { AiOutlineRise, AiOutlineFall } from "react-icons/ai";
+import InputMask from "react-input-mask";
 
 export default function ListBankAccount() {
   const initialRef = useRef();
@@ -46,6 +47,7 @@ export default function ListBankAccount() {
   const [modalEdit, setModalEdit] = useState(false);
   const [drawerMoviment, setDrawerMoviment] = useState(false);
   const [typeSearch, setTypeSearch] = useState(1);
+  const [initPeriod, setInitPeriod] = useState("");
 
   const DataAtual = new Date();
   const Ano = DataAtual.getFullYear();
@@ -245,10 +247,12 @@ export default function ListBankAccount() {
                   <>
                     <FormControl isRequired>
                       <FormLabel>Período Inicial</FormLabel>
+                      <InputMask mask="99/99/9999" className="mask-chakra" />
                     </FormControl>
 
                     <FormControl isRequired>
                       <FormLabel>Período Final</FormLabel>
+                      <InputMask mask="99/99/9999" className="mask-chakra" />
                     </FormControl>
                   </>
                 ) : (

@@ -1,14 +1,18 @@
-.nkcustomcalendar {
-  border-radius: 8px;
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-  border-color: #ddd;
-}
-.nkcustompicker {
-  height: 39px;
-  border-radius: 8px !important;
-  border-color: #ddd !important;
+.mask-chakra {
+  border: 1px solid rgba(160, 174, 192, 0.3);
+  line-height: 38px;
+  border-radius: 0.375rem;
+  padding-left: 10px;
+  padding-right: 10px;
+  max-width: 100%;
+  background-color: transparent;
+  transition: all 0.3s;
+  max-width: 100%;
+  width: 100%;
 }
 
-.arialabelnk {
-  background-color: burlywood;
+.mask-chakra:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0px 0px 0px 1.5px #ecc94b;
 }
