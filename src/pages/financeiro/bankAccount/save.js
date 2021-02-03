@@ -17,11 +17,19 @@ export default function SaveBankAccount() {
       <Grid templateColumns={"60vw 1fr"} gap="15px">
         <FormControl isRequired>
           <FormLabel>Banco</FormLabel>
-          <Input type="text" focusBorderColor={config.inputs} />
+          <Input
+            type="text"
+            placeholder="Banco"
+            focusBorderColor={config.inputs}
+          />
         </FormControl>
         <FormControl isRequired>
           <FormLabel>Valor Inicial</FormLabel>
-          <Input type="number" focusBorderColor={config.inputs} />
+          <Input
+            type="number"
+            placeholder="Valor Inicial"
+            focusBorderColor={config.inputs}
+          />
         </FormControl>
       </Grid>
       <Divider mt={5} mb={5} />

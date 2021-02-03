@@ -13,6 +13,7 @@ import RegisterProducts from "../pages/cadastro/produtos/produtos";
 
 /** FINANCEIRO */
 import BankAccount from "../pages/financeiro/bankAccount/index";
+import PlanAccount from "../pages/financeiro/planAccount/index";
 
 export default function Routers() {
   return (
@@ -40,6 +41,9 @@ export default function Routers() {
       </Route>
       <Route path="/bankAccount">
         <BankAccount />
+      </Route>
+      <Route path="/planaccount">
+        <PlanAccount />
       </Route>
     </Switch>
   );

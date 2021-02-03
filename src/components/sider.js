@@ -353,6 +353,7 @@ export default function Sider() {
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
+                onClick={() => routing("/planaccount")}
               >
                 Plano de Contas
               </Button>

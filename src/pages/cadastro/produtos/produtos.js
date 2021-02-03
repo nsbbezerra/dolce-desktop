@@ -89,7 +89,7 @@ export default function Produtos() {
             <TabList>
               <Tab>Informações</Tab>
               <Tab>Tributação</Tab>
-              <Tab>Valores</Tab>
+              <Tab>Preço e Frete</Tab>
               <Tab>Cores</Tab>
               <Tab>Tamanhos</Tab>
               <Tab>Imagens</Tab>
@@ -495,6 +495,44 @@ export default function Produtos() {
                 <Button leftIcon={<FaCalculator />} mt={3}>
                   Calcular Preço de Venda
                 </Button>
+                <Divider mt={5} mb={5} />
+                <Text fontSize="sm" color="red.400" mb={3}>
+                  Preencha cada campo com a quantidade referente a 1 (um) item.
+                </Text>
+                <Grid templateColumns="repeat(4, 1fr)" gap="15px">
+                  <FormControl isRequired mr={3}>
+                    <FormLabel>Altura</FormLabel>
+                    <Input
+                      placeholder="Altura"
+                      type="number"
+                      focusBorderColor={config.inputs}
+                    />
+                  </FormControl>
+                  <FormControl isRequired mr={3}>
+                    <FormLabel>Largura</FormLabel>
+                    <Input
+                      placeholder="Largura"
+                      type="number"
+                      focusBorderColor={config.inputs}
+                    />
+                  </FormControl>
+                  <FormControl isRequired mr={3}>
+                    <FormLabel>Comprimento</FormLabel>
+                    <Input
+                      placeholder="Comprimento"
+                      type="number"
+                      focusBorderColor={config.inputs}
+                    />
+                  </FormControl>
+                  <FormControl isRequired mr={3}>
+                    <FormLabel>Peso</FormLabel>
+                    <Input
+                      placeholder="Peso"
+                      type="number"
+                      focusBorderColor={config.inputs}
+                    />
+                  </FormControl>
+                </Grid>
                 <Divider mt={5} mb={5} />
                 <Button leftIcon={<FaSave />} colorScheme="blue" size="lg">
                   Salvar e Continuar
