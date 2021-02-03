@@ -23,6 +23,7 @@ import {
   Select,
   Grid,
   Input,
+  Text,
 } from "@chakra-ui/react";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaSave } from "react-icons/fa";
@@ -73,7 +74,9 @@ export default function ListPlanAccount() {
           <Tr>
             <Td w="18%">Identificação</Td>
             <Td>Plano de Contas</Td>
-            <Td w="20%">Tipo de Movimentação</Td>
+            <Td textAlign="center" w="20%">
+              Tipo de Movimentação
+            </Td>
             <Td w="15%"></Td>
           </Tr>
         </Thead>
@@ -81,8 +84,10 @@ export default function ListPlanAccount() {
           <Tr>
             <Td w="18%">1.1.11</Td>
             <Td>Provimento de Internet</Td>
-            <Td w="20%">
-              <Badge colorScheme="green">Receita</Badge>
+            <Td textAlign="center" w="20%">
+              <Badge colorScheme="green" fontSize="lg" p={1}>
+                Receita
+              </Badge>
             </Td>
             <Td w="15%">
               <Menu>
@@ -108,8 +113,10 @@ export default function ListPlanAccount() {
           <Tr>
             <Td w="18%">1.1.11</Td>
             <Td>Provimento de Internet</Td>
-            <Td w="20%">
-              <Badge colorScheme="red">Despesa</Badge>
+            <Td textAlign="center" w="20%">
+              <Badge colorScheme="red" fontSize="lg" p={1}>
+                Despesa
+              </Badge>
             </Td>
             <Td w="15%">
               <Menu>
@@ -171,6 +178,11 @@ export default function ListPlanAccount() {
                 </Select>
               </FormControl>
             </Grid>
+            <Text fontSize="sm" color="red.400" mt={5}>
+              As identificações dos Plano de Contas devem seguir uma regra:
+              Inicie com o número (1) todas as RECEITAS; Inicie com o número (2)
+              todas as DESPESAS
+            </Text>
           </ModalBody>
 
           <ModalFooter>
