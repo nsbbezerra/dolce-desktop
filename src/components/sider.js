@@ -375,6 +375,7 @@ export default function Sider() {
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
+                onClick={() => routing("/check")}
               >
                 Gerenciar Cheques
               </Button>

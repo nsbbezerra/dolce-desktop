@@ -15,6 +15,7 @@ import RegisterProducts from "../pages/cadastro/produtos/produtos";
 import BankAccount from "../pages/financeiro/bankAccount/index";
 import PlanAccount from "../pages/financeiro/planAccount/index";
 import PayForm from "../pages/financeiro/payForm/index";
+import Check from "../pages/financeiro/check/index";
 
 export default function Routers() {
   return (
@@ -48,6 +49,9 @@ export default function Routers() {
       </Route>
       <Route path={"/payform"}>
         <PayForm />
+      </Route>
+      <Route path={"/check"}>
+        <Check />
       </Route>
     </Switch>
   );

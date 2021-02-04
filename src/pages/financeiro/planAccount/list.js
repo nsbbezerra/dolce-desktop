@@ -26,7 +26,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { FaSave } from "react-icons/fa";
+import { FaSave, FaSearch } from "react-icons/fa";
 import config from "../../../configs/index";
 import InputMask from "react-input-mask";
 
@@ -69,7 +69,27 @@ export default function ListPlanAccount() {
 
   return (
     <>
-      <Table size="sm">
+      <Grid templateColumns="1fr 1fr 200px" gap="15px">
+        <Select
+          placeholder="Selecione uma opção de busca"
+          focusBorderColor={config.inputs}
+        >
+          <option value="option1">Todas as contas</option>
+          <option value="option2">Buscar pelo nome</option>
+          <option value="option3">Buscar ativas</option>
+          <option value="option4">Buscar bloqueadas</option>
+        </Select>
+
+        <Input
+          type="text"
+          placeholder="Digite para buscar"
+          focusBorderColor={config.inputs}
+        />
+
+        <Button leftIcon={<FaSearch />}>Buscar</Button>
+      </Grid>
+
+      <Table size="sm" mt="25px">
         <Thead fontWeight="700">
           <Tr>
             <Td w="18%">Identificação</Td>
