@@ -10,7 +10,6 @@ import {
   MenuItem,
   MenuList,
   Button,
-  Badge,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -24,9 +23,12 @@ import {
   Grid,
   Input,
   Text,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { FaSave, FaSearch } from "react-icons/fa";
+import { FaSave, FaSearch, FaClipboardList } from "react-icons/fa";
+import { AiOutlineAreaChart } from "react-icons/ai";
 import config from "../../../configs/index";
 import InputMask from "react-input-mask";
 
@@ -105,9 +107,15 @@ export default function ListPlanAccount() {
             <Td w="18%">1.1.11</Td>
             <Td>Provimento de Internet</Td>
             <Td textAlign="center" w="20%">
-              <Badge colorScheme="green" fontSize="lg" p={1}>
-                Receita
-              </Badge>
+              <Tag
+                size={"md"}
+                borderRadius="full"
+                variant="solid"
+                colorScheme="green"
+                fontSize="lg"
+              >
+                <TagLabel>Receita</TagLabel>
+              </Tag>
             </Td>
             <Td w="15%">
               <Menu>
@@ -120,10 +128,16 @@ export default function ListPlanAccount() {
                   Opções
                 </MenuButton>
                 <MenuList>
-                  <MenuItem onClick={() => setModalInfo(true)}>
+                  <MenuItem
+                    onClick={() => setModalInfo(true)}
+                    icon={<FaClipboardList />}
+                  >
                     Alterar Dados
                   </MenuItem>
-                  <MenuItem onClick={() => setModalMov(true)}>
+                  <MenuItem
+                    onClick={() => setModalMov(true)}
+                    icon={<AiOutlineAreaChart />}
+                  >
                     Alterar Movimentação
                   </MenuItem>
                 </MenuList>
@@ -134,9 +148,15 @@ export default function ListPlanAccount() {
             <Td w="18%">1.1.11</Td>
             <Td>Provimento de Internet</Td>
             <Td textAlign="center" w="20%">
-              <Badge colorScheme="red" fontSize="lg" p={1}>
-                Despesa
-              </Badge>
+              <Tag
+                size={"md"}
+                borderRadius="full"
+                variant="solid"
+                colorScheme="red"
+                fontSize="lg"
+              >
+                <TagLabel>Despesa</TagLabel>
+              </Tag>
             </Td>
             <Td w="15%">
               <Menu>
@@ -149,10 +169,16 @@ export default function ListPlanAccount() {
                   Opções
                 </MenuButton>
                 <MenuList>
-                  <MenuItem onClick={() => setModalInfo(true)}>
+                  <MenuItem
+                    onClick={() => setModalInfo(true)}
+                    icon={<FaClipboardList />}
+                  >
                     Alterar Dados
                   </MenuItem>
-                  <MenuItem onClick={() => setModalMov(true)}>
+                  <MenuItem
+                    onClick={() => setModalMov(true)}
+                    icon={<AiOutlineAreaChart />}
+                  >
                     Alterar Movimentação
                   </MenuItem>
                 </MenuList>

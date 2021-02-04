@@ -36,9 +36,13 @@ import {
   Text,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
-import { FaSave, FaSearch } from "react-icons/fa";
+import { FaSave, FaSearch, FaEdit, FaTrash } from "react-icons/fa";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { AiOutlineRise, AiOutlineFall } from "react-icons/ai";
+import {
+  AiOutlineRise,
+  AiOutlineFall,
+  AiOutlineAreaChart,
+} from "react-icons/ai";
 import InputMask from "react-input-mask";
 
 export default function ListBankAccount() {
@@ -47,7 +51,6 @@ export default function ListBankAccount() {
   const [modalEdit, setModalEdit] = useState(false);
   const [drawerMoviment, setDrawerMoviment] = useState(false);
   const [typeSearch, setTypeSearch] = useState(1);
-  const [initPeriod, setInitPeriod] = useState("");
 
   const DataAtual = new Date();
   const Ano = DataAtual.getFullYear();
@@ -105,13 +108,19 @@ export default function ListBankAccount() {
                   Opções
                 </MenuButton>
                 <MenuList>
-                  <MenuItem onClick={() => setDrawerMoviment(true)}>
+                  <MenuItem
+                    onClick={() => setDrawerMoviment(true)}
+                    icon={<AiOutlineAreaChart />}
+                  >
                     Movimentação Financeira
                   </MenuItem>
-                  <MenuItem onClick={() => setModalEdit(true)}>
+                  <MenuItem
+                    onClick={() => setModalEdit(true)}
+                    icon={<FaEdit />}
+                  >
                     Alterar Valor
                   </MenuItem>
-                  <MenuItem>Excluir</MenuItem>
+                  <MenuItem icon={<FaTrash />}>Excluir</MenuItem>
                 </MenuList>
               </Menu>
             </Td>
@@ -133,13 +142,19 @@ export default function ListBankAccount() {
                   Opções
                 </MenuButton>
                 <MenuList>
-                  <MenuItem onClick={() => setDrawerMoviment(true)}>
+                  <MenuItem
+                    onClick={() => setDrawerMoviment(true)}
+                    icon={<AiOutlineAreaChart />}
+                  >
                     Movimentação Financeira
                   </MenuItem>
-                  <MenuItem onClick={() => setModalEdit(true)}>
+                  <MenuItem
+                    onClick={() => setModalEdit(true)}
+                    icon={<FaEdit />}
+                  >
                     Alterar Valor
                   </MenuItem>
-                  <MenuItem>Excluir</MenuItem>
+                  <MenuItem icon={<FaTrash />}>Excluir</MenuItem>
                 </MenuList>
               </Menu>
             </Td>
@@ -161,13 +176,19 @@ export default function ListBankAccount() {
                   Opções
                 </MenuButton>
                 <MenuList>
-                  <MenuItem onClick={() => setDrawerMoviment(true)}>
+                  <MenuItem
+                    onClick={() => setDrawerMoviment(true)}
+                    icon={<AiOutlineAreaChart />}
+                  >
                     Movimentação Financeira
                   </MenuItem>
-                  <MenuItem onClick={() => setModalEdit(true)}>
+                  <MenuItem
+                    onClick={() => setModalEdit(true)}
+                    icon={<FaEdit />}
+                  >
                     Alterar Valor
                   </MenuItem>
-                  <MenuItem>Excluir</MenuItem>
+                  <MenuItem icon={<FaTrash />}>Excluir</MenuItem>
                 </MenuList>
               </Menu>
             </Td>
