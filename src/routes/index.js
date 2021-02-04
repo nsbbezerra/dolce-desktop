@@ -16,6 +16,8 @@ import BankAccount from "../pages/financeiro/bankAccount/index";
 import PlanAccount from "../pages/financeiro/planAccount/index";
 import PayForm from "../pages/financeiro/payForm/index";
 import Check from "../pages/financeiro/check/index";
+import Expenses from "../pages/financeiro/expenses/index";
+import Revenues from "../pages/financeiro/revenues/index";
 
 export default function Routers() {
   return (
@@ -52,6 +54,12 @@ export default function Routers() {
       </Route>
       <Route path={"/check"}>
         <Check />
+      </Route>
+      <Route path="/expenses">
+        <Expenses />
+      </Route>
+      <Route path="/revenues">
+        <Revenues />
       </Route>
     </Switch>
   );

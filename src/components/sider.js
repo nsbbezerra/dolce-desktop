@@ -386,6 +386,7 @@ export default function Sider() {
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
+                onClick={() => routing("/expenses")}
               >
                 Contas a Pagar
               </Button>
@@ -396,6 +397,7 @@ export default function Sider() {
                 isFullWidth
                 mt={1}
                 _focus={{ outline: "none" }}
+                onClick={() => routing("/revenues")}
               >
                 Contas a Receber
               </Button>
