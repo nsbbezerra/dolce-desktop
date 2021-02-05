@@ -18,6 +18,8 @@ function createWindow() {
     hasShadow: false,
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true,
+      plugins: true,
     },
     icon: iconPath,
   });
@@ -27,7 +29,6 @@ function createWindow() {
       : `file://${path.join(__dirname, "../build/index.html")}`
   );
   mainWindow.on("closed", () => (mainWindow = null));
-  mainWindow.webContents.openDevTools();
 }
 app.allowRendererProcessReuse = true;
 app.on("ready", createWindow);

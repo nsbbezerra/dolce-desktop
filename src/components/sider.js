@@ -248,8 +248,15 @@ export default function Sider() {
             Contas a Receber
           </MenuItem>
           <MenuDivider />
-          <MenuItem icon={<FaBarcode />}>Gerenciar Pagamentos</MenuItem>
-          <MenuItem icon={<FaPercentage />}>Gerenciar Comissões</MenuItem>
+          <MenuItem icon={<FaBarcode />} onClick={() => routing("/payments")}>
+            Gerenciar Pagamentos
+          </MenuItem>
+          <MenuItem
+            icon={<FaPercentage />}
+            onClick={() => routing("/comissions")}
+          >
+            Gerenciar Comissões
+          </MenuItem>
         </MenuList>
       </Menu>
 

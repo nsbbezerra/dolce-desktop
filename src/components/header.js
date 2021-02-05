@@ -8,7 +8,6 @@ import {
   Icon,
   IconButton,
   Tooltip,
-  Heading,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -52,7 +51,6 @@ import { GiShop } from "react-icons/gi";
 import Icone from "../assets/icon-black.png";
 import Logo from "../assets/name-slug.png";
 
-const { getCurrentWindow } = window.require("electron").remote;
 const remote = window.require("electron").remote;
 
 export default function HeaderApp() {
@@ -193,11 +191,11 @@ export default function HeaderApp() {
   }
 
   function closeWindow() {
-    getCurrentWindow().reload();
+    remote.getCurrentWindow().reload();
   }
 
   function toogleDevTools() {
-    getCurrentWindow().toggleDevTools();
+    remote.getCurrentWindow().toggleDevTools();
   }
 
   return (

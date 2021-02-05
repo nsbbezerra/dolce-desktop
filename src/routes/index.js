@@ -18,6 +18,8 @@ import PayForm from "../pages/financeiro/payForm/index";
 import Check from "../pages/financeiro/check/index";
 import Expenses from "../pages/financeiro/expenses/index";
 import Revenues from "../pages/financeiro/revenues/index";
+import Payments from "../pages/financeiro/payments/index";
+import Comissions from "../pages/financeiro/comission/index";
 
 export default function Routers() {
   return (
@@ -60,6 +62,12 @@ export default function Routers() {
       </Route>
       <Route path="/revenues">
         <Revenues />
+      </Route>
+      <Route path="/payments">
+        <Payments />
+      </Route>
+      <Route path="/comissions">
+        <Comissions />
       </Route>
     </Switch>
   );
