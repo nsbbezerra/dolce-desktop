@@ -208,6 +208,7 @@ export default function HeaderApp() {
         justify="space-between"
         align="center"
         pr={5}
+        pl={3}
         borderBottomWidth="1px"
       >
         <Flex h="60px" w="220px" justify="center" align="center">
@@ -215,11 +216,7 @@ export default function HeaderApp() {
           <Image src={Logo} w="140px" />
         </Flex>
 
-        <Flex w="80%" justify="space-between" align="center">
-          <Flex>
-            <Heading size="md">Dashboard E-commerce e PDV</Heading>
-          </Flex>
-
+        <Flex w="80%" justify="flex-end" align="center">
           <Flex>
             <InputGroup>
               <InputLeftElement
