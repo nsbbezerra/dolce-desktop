@@ -26,7 +26,6 @@ import {
   Stack,
   FormLabel,
   FormControl,
-  HStack,
   Textarea,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";

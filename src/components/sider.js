@@ -1,14 +1,14 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import {
-  Box,
   Flex,
-  Button,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  IconButton,
+  Tooltip,
+  MenuDivider,
 } from "@chakra-ui/react";
 import {
   FaSave,
@@ -30,6 +30,7 @@ import {
   FaMoneyCheck,
   FaBarcode,
   FaPercentage,
+  FaBalanceScale,
 } from "react-icons/fa";
 import {
   AiFillShop,
@@ -49,436 +50,240 @@ export default function Sider() {
   }
 
   return (
-    <Box
+    <Flex
       h="100%"
-      w="220px"
+      w="75px"
       shadow="lg"
       borderRightWidth="1px"
       maxH="100%"
       overflow="auto"
+      direction="column"
+      align="center"
+      p={3}
     >
-      <Flex align="center" h="50px" pl={2} pr={2}>
-        <Button
-          leftIcon={<MdDashboard />}
-          isFullWidth
+      <Tooltip label="Dashboard" hasArrow placement="top-start">
+        <IconButton
+          icon={<MdDashboard />}
+          size="lg"
+          fontSize="2xl"
           colorScheme={config.sider.btnHome}
-          variant="ghost"
           _focus={{ outline: "none" }}
           onClick={() => routing("/")}
-        >
-          Dashboard
-        </Button>
-      </Flex>
+          variant="ghost"
+        />
+      </Tooltip>
 
-      <Accordion>
-        <AccordionItem>
-          <AccordionButton _focus={{ outline: "none" }}>
-            <Flex align="center" flex="1" textAlign="left" fontWeight="700">
-              <FaTools style={{ marginRight: 10 }} />
-              Administrativo
-            </Flex>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel p={0}>
-            <Flex p={2} direction="column" align="flex-start">
-              <Button
-                variant="solid"
-                size="sm"
-                isFullWidth
-                leftIcon={<FaUserFriends />}
-                _focus={{ outline: "none" }}
-              >
-                Clientes
-              </Button>
-              <Button
-                variant="solid"
-                size="sm"
-                isFullWidth
-                leftIcon={<FaIdCard />}
-                _focus={{ outline: "none" }}
-                mt={1}
-              >
-                Colaboradores
-              </Button>
-              <Button
-                variant="solid"
-                size="sm"
-                isFullWidth
-                leftIcon={<FaShoppingBag />}
-                _focus={{ outline: "none" }}
-                mt={1}
-              >
-                Pedidos
-              </Button>
-            </Flex>
-          </AccordionPanel>
-        </AccordionItem>
+      <Menu placement="right">
+        <Tooltip label="Administrativo" hasArrow placement="top-start">
+          <MenuButton
+            mt={3}
+            as={IconButton}
+            aria-label="Options"
+            icon={<FaTools />}
+            size="lg"
+            fontSize="2xl"
+            variant="ghost"
+          />
+        </Tooltip>
+        <MenuList>
+          <MenuItem icon={<FaUserFriends />}>Clientes</MenuItem>
+          <MenuItem icon={<FaIdCard />}>Colaboradores</MenuItem>
+          <MenuItem icon={<FaShoppingBag />}>Pedidos</MenuItem>
+        </MenuList>
+      </Menu>
 
-        <AccordionItem>
-          <AccordionButton _focus={{ outline: "none" }}>
-            <Flex align="center" flex="1" textAlign="left" fontWeight="700">
-              <FaSave style={{ marginRight: 10 }} />
-              Cadastros
-            </Flex>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel p={0}>
-            <Flex p={2} direction="column" align="flex-start">
-              <Button
-                variant="solid"
-                size="sm"
-                isFullWidth
-                leftIcon={<FaUserFriends />}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/registerClient")}
-              >
-                Clientes
-              </Button>
-              <Button
-                variant="solid"
-                size="sm"
-                isFullWidth
-                leftIcon={<FaIdCard />}
-                _focus={{ outline: "none" }}
-                mt={1}
-                onClick={() => routing("/registerEmlpoyee")}
-              >
-                Colaboradores
-              </Button>
-              <Button
-                variant="solid"
-                size="sm"
-                isFullWidth
-                leftIcon={<FaMapMarkedAlt />}
-                mt={1}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/registerAddress")}
-              >
-                Endereços
-              </Button>
-              <Button
-                leftIcon={<AiFillShop />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/registerDepartment")}
-              >
-                Departamentos
-              </Button>
-              <Button
-                leftIcon={<FaTags />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/registerCategory")}
-              >
-                Categorias
-              </Button>
-              <Button
-                leftIcon={<FaTag />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/registerProducts")}
-              >
-                Produtos
-              </Button>
-            </Flex>
-          </AccordionPanel>
-        </AccordionItem>
+      <Menu placement="right">
+        <Tooltip label="Cadastros" hasArrow placement="top-start">
+          <MenuButton
+            mt={3}
+            as={IconButton}
+            aria-label="Options"
+            icon={<FaSave />}
+            size="lg"
+            fontSize="2xl"
+            variant="ghost"
+          />
+        </Tooltip>
+        <MenuList>
+          <MenuItem
+            icon={<FaUserFriends />}
+            onClick={() => routing("/registerClient")}
+          >
+            Clientes
+          </MenuItem>
+          <MenuItem
+            icon={<FaIdCard />}
+            onClick={() => routing("/registerEmlpoyee")}
+          >
+            Colaboradores
+          </MenuItem>
+          <MenuItem
+            icon={<FaMapMarkedAlt />}
+            onClick={() => routing("/registerAddress")}
+          >
+            Endereços
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem
+            icon={<AiFillShop />}
+            onClick={() => routing("/registerDepartment")}
+          >
+            Departamentos
+          </MenuItem>
+          <MenuItem
+            icon={<FaTags />}
+            onClick={() => routing("/registerCategory")}
+          >
+            Categorias
+          </MenuItem>
+          <MenuItem
+            icon={<FaTag />}
+            onClick={() => routing("/registerProducts")}
+          >
+            Produtos
+          </MenuItem>
+        </MenuList>
+      </Menu>
 
-        <AccordionItem>
-          <AccordionButton _focus={{ outline: "none" }}>
-            <Flex align="center" flex="1" textAlign="left" fontWeight="700">
-              <FaBoxOpen style={{ marginRight: 10 }} />
-              Gerenciar Produtos
-            </Flex>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel p={0}>
-            <Flex p={2} direction="column" align="flex-start">
-              <Button
-                leftIcon={<AiFillShop />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Departamentos
-              </Button>
-              <Button
-                leftIcon={<FaTags />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Categorias
-              </Button>
-              <Button
-                leftIcon={<FaTag />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Produtos
-              </Button>
-            </Flex>
-          </AccordionPanel>
-        </AccordionItem>
+      <Menu placement="right">
+        <Tooltip label="Gerenciar Produtos" hasArrow placement="top-start">
+          <MenuButton
+            mt={3}
+            as={IconButton}
+            aria-label="Options"
+            icon={<FaBoxOpen />}
+            size="lg"
+            fontSize="2xl"
+            variant="ghost"
+          />
+        </Tooltip>
+        <MenuList>
+          <MenuItem icon={<AiFillShop />}>Departamentos</MenuItem>
+          <MenuItem icon={<FaTags />}>Categorias</MenuItem>
+          <MenuItem icon={<FaTag />}>Produtos</MenuItem>
+        </MenuList>
+      </Menu>
 
-        <AccordionItem>
-          <AccordionButton _focus={{ outline: "none" }}>
-            <Flex align="center" flex="1" textAlign="left" fontWeight="700">
-              <FaCashRegister style={{ marginRight: 10 }} />
-              Caixa Diário
-            </Flex>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel p={0}>
-            <Flex p={2} direction="column" align="flex-start">
-              <Button
-                leftIcon={<FaCalculator />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Movimentação de Caixa
-              </Button>
-              <Button
-                leftIcon={<GiHistogram />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Histórico de Caixa
-              </Button>
-              <Button
-                leftIcon={<FaFileAlt />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Relatório de Caixa
-              </Button>
-            </Flex>
-          </AccordionPanel>
-        </AccordionItem>
+      <Menu placement="right">
+        <Tooltip label="Caixa Diário" hasArrow placement="top-start">
+          <MenuButton
+            mt={3}
+            as={IconButton}
+            aria-label="Options"
+            icon={<FaCashRegister />}
+            size="lg"
+            fontSize="2xl"
+            variant="ghost"
+          />
+        </Tooltip>
+        <MenuList>
+          <MenuItem icon={<FaCalculator />}>Movimentação de Caixa</MenuItem>
+          <MenuItem icon={<GiHistogram />}>Histórico de Caixa</MenuItem>
+          <MenuItem icon={<FaFileAlt />}>Relatório de Caixa</MenuItem>
+        </MenuList>
+      </Menu>
 
-        <AccordionItem>
-          <AccordionButton _focus={{ outline: "none" }}>
-            <Flex align="center" flex="1" textAlign="left" fontWeight="700">
-              <FaShoppingCart style={{ marginRight: 10 }} />
-              Ponto de Venda
-            </Flex>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel p={0}>
-            <Flex p={2} direction="column" align="flex-start">
-              <Button
-                leftIcon={<FaShoppingBag />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Venda de Produtos
-              </Button>
-              <Button
-                leftIcon={<FaClipboardList />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Listagem de Pedidos
-              </Button>
-              <Button
-                leftIcon={<FaTools />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Gerenciar Pedidos
-              </Button>
-            </Flex>
-          </AccordionPanel>
-        </AccordionItem>
+      <Menu placement="right">
+        <Tooltip label="Ponto de Venda" hasArrow placement="top-start">
+          <MenuButton
+            mt={3}
+            as={IconButton}
+            aria-label="Options"
+            icon={<FaShoppingCart />}
+            size="lg"
+            fontSize="2xl"
+            variant="ghost"
+          />
+        </Tooltip>
+        <MenuList>
+          <MenuItem icon={<FaShoppingBag />}>Venda de Produtos</MenuItem>
+          <MenuItem icon={<FaClipboardList />}>Orçamentos</MenuItem>
+          <MenuItem icon={<FaTools />}>Gerenciar Pedidos</MenuItem>
+        </MenuList>
+      </Menu>
 
-        <AccordionItem>
-          <AccordionButton _focus={{ outline: "none" }}>
-            <Flex align="center" flex="1" textAlign="left" fontWeight="700">
-              <FaChartPie style={{ marginRight: 10 }} />
-              Financeiro
-            </Flex>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel p={0}>
-            <Flex p={2} direction="column" align="flex-start">
-              <Button
-                leftIcon={<AiFillBank />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/bankAccount")}
-              >
-                Contas Bancárias
-              </Button>
-              <Button
-                leftIcon={<FaClipboardList />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/planaccount")}
-              >
-                Plano de Contas
-              </Button>
-              <Button
-                leftIcon={<FaCreditCard />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/payform")}
-              >
-                Formas de Pagamento
-              </Button>
-              <Button
-                leftIcon={<FaMoneyCheck />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/check")}
-              >
-                Gerenciar Cheques
-              </Button>
-              <Button
-                leftIcon={<AiOutlineFall />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/expenses")}
-              >
-                Contas a Pagar
-              </Button>
-              <Button
-                leftIcon={<AiOutlineRise />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-                onClick={() => routing("/revenues")}
-              >
-                Contas a Receber
-              </Button>
-              <Button
-                leftIcon={<FaBarcode />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Gerenciar Pagamentos
-              </Button>
-              <Button
-                leftIcon={<FaPercentage />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Gerenciar Comissões
-              </Button>
-            </Flex>
-          </AccordionPanel>
-        </AccordionItem>
+      <Menu placement="right">
+        <Tooltip label="Financeiro" hasArrow placement="top-start">
+          <MenuButton
+            mt={3}
+            as={IconButton}
+            aria-label="Options"
+            icon={<FaChartPie />}
+            size="lg"
+            fontSize="2xl"
+            variant="ghost"
+          />
+        </Tooltip>
+        <MenuList>
+          <MenuItem
+            icon={<AiFillBank />}
+            onClick={() => routing("/bankAccount")}
+          >
+            Contas Bancárias
+          </MenuItem>
+          <MenuItem
+            icon={<FaClipboardList />}
+            onClick={() => routing("/planaccount")}
+          >
+            Plano de Contas
+          </MenuItem>
+          <MenuItem icon={<FaCreditCard />} onClick={() => routing("/payform")}>
+            Formas de Pagamento
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem icon={<FaMoneyCheck />} onClick={() => routing("/check")}>
+            Gerenciar Cheques
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem
+            icon={<AiOutlineFall />}
+            onClick={() => routing("/expenses")}
+          >
+            Contas a Pagar
+          </MenuItem>
+          <MenuItem
+            icon={<AiOutlineRise />}
+            onClick={() => routing("/revenues")}
+          >
+            Contas a Receber
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem icon={<FaBarcode />}>Gerenciar Pagamentos</MenuItem>
+          <MenuItem icon={<FaPercentage />}>Gerenciar Comissões</MenuItem>
+        </MenuList>
+      </Menu>
 
-        <AccordionItem>
-          <AccordionButton _focus={{ outline: "none" }}>
-            <Flex align="center" flex="1" textAlign="left" fontWeight="700">
-              <FaFileAlt style={{ marginRight: 10 }} />
-              Relatórios
-            </Flex>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel p={0}>
-            <Flex p={2} direction="column" align="flex-start">
-              <Button
-                leftIcon={<FaCashRegister />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Fluxo de Caixa
-              </Button>
-              <Button
-                leftIcon={<FaBarcode />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Pagamentos
-              </Button>
-              <Button
-                leftIcon={<FaSave />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Cadastros
-              </Button>
-              <Button
-                leftIcon={<FaChartPie />}
-                variant="solid"
-                size="sm"
-                isFullWidth
-                mt={1}
-                _focus={{ outline: "none" }}
-              >
-                Relatório Financeiro
-              </Button>
-            </Flex>
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-    </Box>
+      <Menu placement="right">
+        <Tooltip label="Relatórios" hasArrow placement="top-start">
+          <MenuButton
+            mt={3}
+            as={IconButton}
+            aria-label="Options"
+            icon={<FaFileAlt />}
+            size="lg"
+            fontSize="2xl"
+            variant="ghost"
+          />
+        </Tooltip>
+        <MenuList>
+          <MenuItem icon={<FaCashRegister />}>Fluxo de Caixa</MenuItem>
+          <MenuItem icon={<FaBarcode />}>Pagamentos</MenuItem>
+          <MenuItem icon={<FaSave />}>Cadastros</MenuItem>
+          <MenuDivider />
+          <MenuItem icon={<FaChartPie />}>Relatório Financeiro</MenuItem>
+        </MenuList>
+      </Menu>
+
+      <Tooltip label="Notas Fiscais" hasArrow placement="top-start">
+        <IconButton
+          icon={<FaBalanceScale />}
+          size="lg"
+          fontSize="2xl"
+          onClick={() => routing("/")}
+          variant="ghost"
+          mt={3}
+        />
+      </Tooltip>
+    </Flex>
   );
 }

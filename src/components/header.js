@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Flex,
   Image,
@@ -29,7 +29,6 @@ import {
   AlertDialogOverlay,
   useColorMode,
   Text,
-  Grid,
 } from "@chakra-ui/react";
 import {
   FaUserCircle,
@@ -46,15 +45,15 @@ import {
   AiOutlineReload,
   AiOutlineStop,
 } from "react-icons/ai";
+import { FiMinus, FiMaximize, FiX } from "react-icons/fi";
 import config from "../configs";
 import { GiShop } from "react-icons/gi";
 
 import Icone from "../assets/icon-black.png";
 import Logo from "../assets/name-slug.png";
-import Light from "../assets/light.png";
-import Dark from "../assets/dark.png";
 
 const { getCurrentWindow } = window.require("electron").remote;
+const remote = window.require("electron").remote;
 
 export default function HeaderApp() {
   const { setColorMode } = useColorMode();
@@ -62,6 +61,38 @@ export default function HeaderApp() {
   const [modalTheme, setModalTheme] = useState(false);
   const [theme, setTheme] = useState("light");
   const [alert, setAlert] = useState(false);
+
+  const handleCloseWindow = useCallback(() => {
+    const window = remote.getCurrentWindow();
+
+    window.close();
+  }, []);
+
+  const handleMinimize = useCallback(() => {
+    const window = remote.getCurrentWindow();
+
+    window.minimize();
+  }, []);
+
+  const handleMaximize = useCallback(() => {
+    const window = remote.getCurrentWindow();
+
+    const { width: currentWidth, height: currentHeight } = window.getBounds();
+
+    const {
+      width: maxWidth,
+      height: maxHeight,
+    } = remote.screen.getPrimaryDisplay().workAreaSize;
+
+    const isMaximized =
+      currentWidth === maxWidth && currentHeight === maxHeight;
+
+    if (!isMaximized) {
+      window.maximize();
+    } else {
+      window.unmaximize();
+    }
+  }, []);
 
   function RadioCard(props) {
     const { getInputProps, getCheckboxProps } = useRadio(props);
@@ -241,6 +272,40 @@ export default function HeaderApp() {
               />
             </Tooltip>
           </Flex>
+        </Flex>
+
+        <Flex h="60px" justify="center" align="center" ml={3}>
+          <Tooltip label="Minimizar" hasArrow>
+            <IconButton
+              aria-label="Search database"
+              icon={<FiMinus />}
+              rounded="xl"
+              ml={3}
+              size="xs"
+              onClick={() => handleMinimize()}
+            />
+          </Tooltip>
+          <Tooltip label={"Maximizar"} hasArrow>
+            <IconButton
+              aria-label="Search database"
+              icon={<FiMaximize />}
+              rounded="xl"
+              ml={3}
+              size="xs"
+              onClick={() => handleMaximize()}
+            />
+          </Tooltip>
+          <Tooltip label="Fechar" hasArrow>
+            <IconButton
+              aria-label="Search database"
+              icon={<FiX />}
+              rounded="xl"
+              ml={3}
+              size="xs"
+              colorScheme="red"
+              onClick={() => handleCloseWindow()}
+            />
+          </Tooltip>
         </Flex>
       </Flex>
 
