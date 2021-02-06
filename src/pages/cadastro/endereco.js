@@ -110,7 +110,7 @@ export default function Endereco() {
         scrollBehavior="inside"
       >
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent maxW="50rem">
           <ModalHeader>Buscar Cliente</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={5}>

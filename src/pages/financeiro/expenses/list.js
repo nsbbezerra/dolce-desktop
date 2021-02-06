@@ -61,23 +61,31 @@ export default function ListExpenses() {
         <Thead fontWeight="700">
           <Tr>
             <Td>Identificação</Td>
-            <Td w="10%">Vencimento</Td>
+            <Td w="10%" textAlign="center">
+              Vencimento
+            </Td>
             <Td w="12%" isNumeric>
               Valor
             </Td>
-            <Td w="15%">Status Pagamento</Td>
-            <Td w="15%">Status Movimentação</Td>
+            <Td w="15%" textAlign="center">
+              Status Pagamento
+            </Td>
+            <Td w="15%" textAlign="center">
+              Status Movimentação
+            </Td>
             <Td w="15%"></Td>
           </Tr>
         </Thead>
         <Tbody>
           <Tr>
             <Td>Pagamento dos boletos de roupas</Td>
-            <Td w="10%">10/10/1010</Td>
+            <Td w="10%" textAlign="center">
+              10/10/1010
+            </Td>
             <Td w="12%" isNumeric>
               R$ 4000,00
             </Td>
-            <Td w="15%">
+            <Td w="15%" textAlign="center">
               <Tooltip label="Clique para alterar" hasArrow>
                 <Button
                   variant="link"
@@ -89,7 +97,7 @@ export default function ListExpenses() {
                 </Button>
               </Tooltip>
             </Td>
-            <Td w="15%">
+            <Td w="15%" textAlign="center">
               <Tooltip label="Clique para alterar" hasArrow>
                 <Button
                   variant="link"

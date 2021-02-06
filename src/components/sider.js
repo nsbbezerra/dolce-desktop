@@ -86,7 +86,12 @@ export default function Sider() {
           />
         </Tooltip>
         <MenuList>
-          <MenuItem icon={<FaUserFriends />}>Clientes</MenuItem>
+          <MenuItem
+            icon={<FaUserFriends />}
+            onClick={() => routing("/listclients")}
+          >
+            Clientes
+          </MenuItem>
           <MenuItem icon={<FaIdCard />}>Colaboradores</MenuItem>
           <MenuItem icon={<FaShoppingBag />}>Pedidos</MenuItem>
         </MenuList>

@@ -92,7 +92,7 @@ export default function Categoria() {
         scrollBehavior="inside"
       >
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent maxW="50rem">
           <ModalHeader>Buscar Departamento</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={5}>

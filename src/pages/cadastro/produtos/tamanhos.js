@@ -185,7 +185,7 @@ export default function Tamanhos({ id }) {
         scrollBehavior="inside"
       >
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent maxW="65rem">
           <ModalHeader>Selecione uma Cor</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -194,7 +194,6 @@ export default function Tamanhos({ id }) {
                 <WrapItem>
                   <Radio colorScheme={config.switchs} value="1">
                     <Flex
-                      borderWidth="1px"
                       rounded="md"
                       p={2}
                       align="center"
@@ -211,7 +210,6 @@ export default function Tamanhos({ id }) {
                 <WrapItem>
                   <Radio colorScheme={config.switchs} value="2">
                     <Flex
-                      borderWidth="1px"
                       rounded="md"
                       p={2}
                       align="center"
@@ -228,7 +226,6 @@ export default function Tamanhos({ id }) {
                 <WrapItem>
                   <Radio colorScheme={config.switchs} value="3">
                     <Flex
-                      borderWidth="1px"
                       rounded="md"
                       p={2}
                       align="center"
@@ -245,7 +242,6 @@ export default function Tamanhos({ id }) {
                 <WrapItem>
                   <Radio colorScheme={config.switchs} value="2">
                     <Flex
-                      borderWidth="1px"
                       rounded="md"
                       p={2}
                       align="center"

@@ -72,11 +72,14 @@ export default function Payments() {
               <Td w="10%" textAlign="center">
                 Vencimento
               </Td>
-              <Td w="12%" textAlign="center">
+              <Td w="10%" textAlign="center">
                 Status
               </Td>
-              <Td isNumeric w="12%">
+              <Td isNumeric w="10%">
                 Valor
+              </Td>
+              <Td textAlign="center" w="8%">
+                Atraso
               </Td>
               <Td w="10%"></Td>
             </Tr>
@@ -94,15 +97,18 @@ export default function Payments() {
               <Td w="10%" textAlign="center">
                 10/10/1010
               </Td>
-              <Td w="12%" textAlign="center">
+              <Td w="10%" textAlign="center">
                 <Tooltip label="Clique para alterar" hasArrow>
                   <Button variant="link" colorScheme="yellow" size="sm">
                     Aguardando
                   </Button>
                 </Tooltip>
               </Td>
-              <Td isNumeric w="12%">
+              <Td isNumeric w="10%">
                 R$ 4000,00
+              </Td>
+              <Td w="8%" textAlign="center">
+                180 Dias
               </Td>
               <Td w="10%">
                 <Menu>

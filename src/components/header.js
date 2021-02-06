@@ -277,6 +277,7 @@ export default function HeaderApp() {
               rounded="xl"
               ml={3}
               size="xs"
+              variant="ghost"
               onClick={() => handleMinimize()}
             />
           </Tooltip>
@@ -287,6 +288,7 @@ export default function HeaderApp() {
               rounded="xl"
               ml={3}
               size="xs"
+              variant="ghost"
               onClick={() => handleMaximize()}
             />
           </Tooltip>

@@ -128,7 +128,7 @@ export default function SaveClient() {
         size="xl"
       >
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent maxW="70rem">
           <ModalHeader>Cadastrar Endereço</ModalHeader>
           <ModalBody>
             <Grid templateColumns="1fr 100px" gap="15px">

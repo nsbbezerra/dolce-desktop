@@ -3,6 +3,9 @@ import { Route, Switch } from "react-router-dom";
 
 import Dashboard from "../pages/dashboard";
 
+/** ADMINISTRATIVO */
+import ListClients from "../pages/admin/clients/index";
+
 /** CADASTROS */
 import RegisterClientes from "../pages/cadastro/clientes";
 import RegisterAddress from "../pages/cadastro/endereco";
@@ -68,6 +71,9 @@ export default function Routers() {
       </Route>
       <Route path="/comissions">
         <Comissions />
+      </Route>
+      <Route path="/listclients">
+        <ListClients />
       </Route>
     </Switch>
   );
