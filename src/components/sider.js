@@ -211,7 +211,9 @@ export default function Sider() {
           />
         </Tooltip>
         <MenuList>
-          <MenuItem icon={<FaShoppingBag />}>Venda de Produtos</MenuItem>
+          <MenuItem icon={<FaShoppingBag />} onClick={() => routing("/pdv")}>
+            Venda de Produtos
+          </MenuItem>
           <MenuItem icon={<FaClipboardList />}>Orçamentos</MenuItem>
           <MenuItem icon={<FaTools />}>Gerenciar Pedidos</MenuItem>
         </MenuList>

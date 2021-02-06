@@ -16,6 +16,9 @@ import RegisterCategory from "../pages/cadastro/categoria";
 import RegisterEmployee from "../pages/cadastro/colaboradores";
 import RegisterProducts from "../pages/cadastro/produtos/produtos";
 
+/** PONTO DE VENDA */
+import Pdv from "../pages/pdv/pdv";
+
 /** FINANCEIRO */
 import BankAccount from "../pages/financeiro/bankAccount/index";
 import PlanAccount from "../pages/financeiro/planAccount/index";
@@ -82,6 +85,9 @@ export default function Routers() {
       </Route>
       <Route path="/listorders">
         <ListOrders />
+      </Route>
+      <Route path="/pdv">
+        <Pdv />
       </Route>
     </Switch>
   );
