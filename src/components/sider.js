@@ -30,7 +30,7 @@ import {
   FaMoneyCheck,
   FaBarcode,
   FaPercentage,
-  FaBalanceScale,
+  FaReceipt,
 } from "react-icons/fa";
 import {
   AiFillShop,
@@ -92,8 +92,18 @@ export default function Sider() {
           >
             Clientes
           </MenuItem>
-          <MenuItem icon={<FaIdCard />}>Colaboradores</MenuItem>
-          <MenuItem icon={<FaShoppingBag />}>Pedidos</MenuItem>
+          <MenuItem
+            icon={<FaIdCard />}
+            onClick={() => routing("/listemployee")}
+          >
+            Colaboradores
+          </MenuItem>
+          <MenuItem
+            icon={<FaShoppingBag />}
+            onClick={() => routing("/listorders")}
+          >
+            Pedidos
+          </MenuItem>
         </MenuList>
       </Menu>
 
@@ -288,7 +298,7 @@ export default function Sider() {
 
       <Tooltip label="Notas Fiscais" hasArrow placement="top-start">
         <IconButton
-          icon={<FaBalanceScale />}
+          icon={<FaReceipt />}
           size="lg"
           fontSize="2xl"
           onClick={() => routing("/")}

@@ -5,6 +5,8 @@ import Dashboard from "../pages/dashboard";
 
 /** ADMINISTRATIVO */
 import ListClients from "../pages/admin/clients/index";
+import ListEmployee from "../pages/admin/employee/index";
+import ListOrders from "../pages/admin/orders/index";
 
 /** CADASTROS */
 import RegisterClientes from "../pages/cadastro/clientes";
@@ -74,6 +76,12 @@ export default function Routers() {
       </Route>
       <Route path="/listclients">
         <ListClients />
+      </Route>
+      <Route path="/listemployee">
+        <ListEmployee />
+      </Route>
+      <Route path="/listorders">
+        <ListOrders />
       </Route>
     </Switch>
   );

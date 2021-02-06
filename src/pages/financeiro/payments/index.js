@@ -67,7 +67,7 @@ export default function Payments() {
               <Td>Cliente</Td>
               <Td>Forma de Pagamento</Td>
               <Td w="7%" textAlign="center">
-                Nº Venda
+                Nº Pedido
               </Td>
               <Td w="10%" textAlign="center">
                 Vencimento

@@ -52,7 +52,7 @@ export default function Comissions() {
             <Tr>
               <Td>Colaborador</Td>
               <Td w="10%" textAlign="center">
-                Nº Venda
+                Nº Pedido
               </Td>
               <Td w="10%" textAlign="center">
                 Data
