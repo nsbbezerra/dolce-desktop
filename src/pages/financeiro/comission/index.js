@@ -10,12 +10,10 @@ import {
   Tbody,
   Tr,
   Td,
-  Flex,
   Stat,
   StatLabel,
   StatNumber,
   StatHelpText,
-  Divider,
 } from "@chakra-ui/react";
 import HeaderApp from "../../../components/headerApp";
 import { FaPercentage, FaSearch } from "react-icons/fa";

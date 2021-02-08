@@ -5,141 +5,288 @@ import {
   Input,
   Button,
   HStack,
-  InputGroup,
-  InputRightElement,
   Table,
   Thead,
   Tbody,
   Tr,
   Td,
   Tooltip,
+  Flex,
+  IconButton,
+  Divider,
+  Text,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
+  ButtonGroup,
+  Center,
+  Heading,
+  FormControl,
+  FormLabel,
+  Image,
+  InputGroup,
   InputLeftAddon,
-  InputRightAddon,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
-import {
-  FaShoppingBag,
-  FaSearch,
-  FaTimes,
-  FaExchangeAlt,
-} from "react-icons/fa";
+import { FaShoppingBag, FaSearch, FaTimes, FaPlus } from "react-icons/fa";
 
 export default function Pdv() {
   return (
     <>
       <HeaderApp title="Ponto de Venda" icon={FaShoppingBag} />
 
-      <Box
-        shadow="md"
-        rounded="md"
-        borderWidth="1px"
-        p={3}
+      <Grid
+        templateRows="66.65vh 68px"
+        gap="15px"
         mt="25px"
-        w="100%"
-        h="90.5%"
+        h="76.65vh"
+        maxH="76.65vh"
       >
-        <Grid templateColumns="1fr 1fr" gap="15px">
-          <Box>
-            <HStack spacing={2}>
+        <Grid templateColumns="repeat(2, 1fr)" gap="15px" h="100%">
+          <Box
+            borderWidth="1px"
+            shadow="md"
+            rounded="md"
+            p={3}
+            h="100%"
+            minH="100%"
+            maxH="100%"
+            overflow="auto"
+          >
+            <Center rounded="md" p={2} bg="rgba(160, 174, 192, 0.1)" mb={3}>
+              <Heading fontSize="sm">Informações do Pedido</Heading>
+            </Center>
+            <HStack spacing={3}>
               <Input
-                focusBorderColor={config.inputs}
-                placeholder="Selecione o Cliente"
-              />
-              <Button leftIcon={<FaSearch />} colorScheme="blue">
-                Buscar
-              </Button>
-            </HStack>
-            <InputGroup size="sm" mt={2}>
-              <Input
-                type="Text"
-                placeholder="Endereço"
+                type="text"
+                placeholder="Nome do cliente"
                 focusBorderColor={config.inputs}
                 isReadOnly
-                pr="4.7rem"
               />
-              <InputRightElement width="4.7rem" mr={-3}>
-                <Tooltip label="Alterar Endereço" hasArrow>
-                  <Button h="1.75rem" size="sm">
-                    <FaExchangeAlt />
-                  </Button>
-                </Tooltip>
-              </InputRightElement>
-            </InputGroup>
+              <Tooltip label="Buscar Cliente" hasArrow>
+                <IconButton icon={<FaSearch />} colorScheme="blue" />
+              </Tooltip>
+            </HStack>
+            <HStack spacing={3} mt={3}>
+              <Input
+                size="sm"
+                placeholder="Endereço do cliente"
+                focusBorderColor={config.inputs}
+                w="70%"
+              />
+              <Input
+                size="sm"
+                placeholder="Contato"
+                focusBorderColor={config.inputs}
+                w="30%"
+              />
+            </HStack>
 
-            <Box borderWidth="1px" p={2} rounded="md" mt={3}>
-              <Table size="sm">
-                <Thead fontWeight="700">
-                  <Tr>
-                    <Td textAlign="center" w="2%">
-                      Qtd
-                    </Td>
-                    <Td isTruncated>Produto</Td>
-                    <Td textAlign="center" w="5%">
-                      Uni.
-                    </Td>
-                    <Td isNumeric w="15%">
-                      V. Uni.
-                    </Td>
-                    <Td isNumeric w="15%">
-                      V. Tot.
-                    </Td>
-                    <Td w="2%"></Td>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  <Tr>
-                    <Td textAlign="center" w="2%">
-                      1
-                    </Td>
-                    <Td isTruncated>Camiseta Masculina Tshirt</Td>
-                    <Td textAlign="center" w="5%">
-                      UN
-                    </Td>
-                    <Td isNumeric w="15%">
-                      R$ 150,00
-                    </Td>
-                    <Td isNumeric w="15%">
-                      R$ 150,00
-                    </Td>
-                    <Td w="2%">
-                      <Button
-                        size="sm"
-                        variant="link"
-                        colorScheme="red"
-                        rounded="full"
-                      >
-                        <FaTimes />
-                      </Button>
-                    </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-            </Box>
+            <Divider mt={3} mb={3} />
 
-            <Box borderWidth="1px" shadow="md" p={3} rounded="md" mt={2}>
-              <Grid templateColumns="repeat(2, 1fr)" gap="15px">
-                <InputGroup>
-                  <InputLeftAddon children="Sub Total" />
-                  <Input type="text" focusBorderColor={config.inputs} />
-                </InputGroup>
-                <InputGroup>
-                  <InputLeftAddon children="Desconto" />
-                  <Input type="text" focusBorderColor={config.inputs} />
-                  <InputRightAddon children="%" />
-                </InputGroup>
-              </Grid>
-              <Grid templateColumns="1fr" gap="15px" mt={"15px"}>
-                <InputGroup>
-                  <InputLeftAddon children="Total a Pagar" />
-                  <Input type="text" focusBorderColor={config.inputs} />
-                </InputGroup>
-              </Grid>
-            </Box>
+            <Table size="sm" maxW="100%">
+              <Thead fontWeight="700">
+                <Tr>
+                  <Td w="2%" textAlign="center">
+                    Qtd
+                  </Td>
+                  <Td isTruncated w="62%" maxW="62%">
+                    Produto
+                  </Td>
+                  <Td w="7%" textAlign="center">
+                    SKU
+                  </Td>
+                  <Td w="14%" isNumeric>
+                    V. Uni
+                  </Td>
+                  <Td w="14%" isNumeric>
+                    V. Tot
+                  </Td>
+                  <Td w="1%"></Td>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td w="2%" textAlign="center">
+                    10
+                  </Td>
+                  <Td isTruncated w="62%" maxW="62%">
+                    <Text fontSize="sm" isTruncated noOfLines={1} w="17vw">
+                      Camiseta Masculina Masculina Topper adasdasdasda
+                    </Text>
+                  </Td>
+                  <Td w="7%" textAlign="center">
+                    SJKD889
+                  </Td>
+                  <Td w="14%" isNumeric>
+                    400,00
+                  </Td>
+                  <Td w="14%" isNumeric>
+                    400,00
+                  </Td>
+                  <Td w="1%">
+                    <Tooltip label="Remover Item" hasArrow>
+                      <Popover>
+                        <PopoverTrigger>
+                          <IconButton
+                            colorScheme="red"
+                            icon={<FaTimes />}
+                            size="xs"
+                            variant="link"
+                          />
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <PopoverArrow />
+                          <PopoverCloseButton />
+                          <PopoverHeader>Confirmação!</PopoverHeader>
+                          <PopoverBody>Deseja remover este item?</PopoverBody>
+                          <PopoverFooter d="flex" justifyContent="flex-end">
+                            <ButtonGroup size="sm">
+                              <Button variant="outline">Não</Button>
+                              <Button colorScheme="blue">Sim</Button>
+                            </ButtonGroup>
+                          </PopoverFooter>
+                        </PopoverContent>
+                      </Popover>
+                    </Tooltip>
+                  </Td>
+                </Tr>
+              </Tbody>
+            </Table>
           </Box>
-          <Box></Box>
+          <Box
+            borderWidth="1px"
+            shadow="md"
+            rounded="md"
+            p={3}
+            h="100%"
+            minH="100%"
+            maxH="100%"
+            overflow="auto"
+          >
+            <Center rounded="md" p={2} bg="rgba(160, 174, 192, 0.1)" mb={3}>
+              <Heading fontSize="sm">Buscar Produtos</Heading>
+            </Center>
+            <Grid templateColumns="70px 1fr 130px 130px" gap="15px">
+              <FormControl>
+                <FormLabel fontSize="sm">Qtd</FormLabel>
+                <Input
+                  type="number"
+                  placeholder="Qtd"
+                  focusBorderColor={config.inputs}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel fontSize="sm">Buscar por nome</FormLabel>
+                <Input
+                  type="text"
+                  placeholder="Digite o nome"
+                  focusBorderColor={config.inputs}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel fontSize="sm">Cod. de Barras</FormLabel>
+                <Input
+                  type="text"
+                  placeholder="Cod. Barras"
+                  focusBorderColor={config.inputs}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel fontSize="sm">SKU</FormLabel>
+                <Input
+                  type="text"
+                  placeholder="SKU"
+                  focusBorderColor={config.inputs}
+                />
+              </FormControl>
+            </Grid>
+
+            <Divider mt={3} mb={3} />
+
+            <Grid
+              templateColumns="repeat(auto-fit, minmax(185px, 185px))"
+              gap="15px"
+              justifyContent="center"
+            >
+              <Box
+                borderWidth="1px"
+                p={2}
+                rounded="md"
+                cursor="pointer"
+                shadow="md"
+              >
+                <Image
+                  src="https://a-static.mlcdn.com.br/1500x1500/camiseta-branca-lisa-100-algodao-torres-confeccoes/torresconfeccoes/51-195/5c4ae4b9c47d84d3af9d9f67dea33f60.jpg"
+                  rounded="md"
+                />
+                <Text w="180px" isTruncated noOfLines={2} fontSize="sm" p={1}>
+                  Camiseta Masculina asdlaskdjlaskdjalskdjjasdl asdasd asd
+                  asdasdasdasds
+                </Text>
+                <HStack mt={2}>
+                  <Heading fontSize="lg" w="80%">
+                    R$ 20,00
+                  </Heading>
+                  <Tooltip label="Adicionar este item" hasArrow>
+                    <IconButton
+                      icon={<FaPlus />}
+                      size="sm"
+                      colorScheme="blue"
+                    />
+                  </Tooltip>
+                </HStack>
+              </Box>
+            </Grid>
+          </Box>
         </Grid>
-      </Box>
+
+        <Flex
+          h="68px"
+          borderWidth="1px"
+          shadow="md"
+          rounded="md"
+          align="center"
+        >
+          <Grid templateColumns="1fr 1fr" gap="15px">
+            <Grid templateColumns="repeat(3, 1fr)" gap="10px" pl={3} pr={3}>
+              <FormControl>
+                <FormLabel fontSize="xs" mb={0} fontWeight="700">
+                  Valor
+                </FormLabel>
+                <InputGroup>
+                  <InputLeftAddon>R$</InputLeftAddon>
+                  <Input focusBorderColor={config.inputs} />
+                </InputGroup>
+              </FormControl>
+              <FormControl>
+                <FormLabel fontSize="xs" mb={0} fontWeight="700">
+                  Desconto
+                </FormLabel>
+                <InputGroup>
+                  <InputLeftAddon>%</InputLeftAddon>
+                  <Input focusBorderColor={config.inputs} />
+                </InputGroup>
+              </FormControl>
+              <FormControl>
+                <FormLabel fontSize="xs" mb={0} fontWeight="700">
+                  Total a Pagar
+                </FormLabel>
+                <InputGroup>
+                  <InputLeftAddon>R$</InputLeftAddon>
+                  <Input focusBorderColor={config.inputs} />
+                </InputGroup>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Flex>
+      </Grid>
     </>
   );
 }
