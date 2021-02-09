@@ -10,13 +10,13 @@ import {
   Tbody,
   Tr,
   Td,
-  Badge,
   Tooltip,
   MenuItem,
   MenuDivider,
   Menu,
   MenuButton,
   MenuList,
+  Tag,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
 import {
@@ -60,7 +60,7 @@ export default function ListOrders() {
           <Thead fontWeight="700">
             <Tr>
               <Td w="6%" textAlign="center">
-                Nº Pedido
+                Nº
               </Td>
               <Td>Cliente</Td>
               <Td w="7%" textAlign="center">
@@ -109,7 +109,7 @@ export default function ListOrders() {
                 R$ 300,00
               </Td>
               <Td w="6%" textAlign="center">
-                <Badge colorScheme="blue">SITE</Badge>
+                <Tag colorScheme="blue">SITE</Tag>
               </Td>
               <Td w="11%" textAlign="center">
                 <Tooltip label="Clique para alterar" hasArrow>

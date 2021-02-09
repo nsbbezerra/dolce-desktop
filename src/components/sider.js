@@ -192,7 +192,12 @@ export default function Sider() {
           />
         </Tooltip>
         <MenuList>
-          <MenuItem icon={<FaCalculator />}>Movimentação de Caixa</MenuItem>
+          <MenuItem
+            icon={<FaCalculator />}
+            onClick={() => routing("/cashiermoviment")}
+          >
+            Movimentação de Caixa
+          </MenuItem>
           <MenuItem icon={<GiHistogram />}>Histórico de Caixa</MenuItem>
           <MenuItem icon={<FaFileAlt />}>Relatório de Caixa</MenuItem>
         </MenuList>
@@ -214,8 +219,15 @@ export default function Sider() {
           <MenuItem icon={<FaShoppingBag />} onClick={() => routing("/pdv")}>
             Venda de Produtos
           </MenuItem>
-          <MenuItem icon={<FaClipboardList />}>Orçamentos</MenuItem>
-          <MenuItem icon={<FaTools />}>Gerenciar Pedidos</MenuItem>
+          <MenuItem
+            icon={<FaClipboardList />}
+            onClick={() => routing("/budget")}
+          >
+            Orçamentos
+          </MenuItem>
+          <MenuItem icon={<FaTools />} onClick={() => routing("/listorders")}>
+            Gerenciar Pedidos
+          </MenuItem>
         </MenuList>
       </Menu>
 

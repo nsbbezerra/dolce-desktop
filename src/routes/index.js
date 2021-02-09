@@ -16,8 +16,13 @@ import RegisterCategory from "../pages/cadastro/categoria";
 import RegisterEmployee from "../pages/cadastro/colaboradores";
 import RegisterProducts from "../pages/cadastro/produtos/produtos";
 
+/** CAIXA */
+import CashierMoviment from "../pages/cashier/moviment";
+import Cashier from "../pages/cashier/cashier";
+
 /** PONTO DE VENDA */
 import Pdv from "../pages/pdv/pdv";
+import Budget from "../pages/pdv/budget";
 
 /** FINANCEIRO */
 import BankAccount from "../pages/financeiro/bankAccount/index";
@@ -88,6 +93,15 @@ export default function Routers() {
       </Route>
       <Route path="/pdv">
         <Pdv />
+      </Route>
+      <Route path="/budget">
+        <Budget />
+      </Route>
+      <Route path="/cashiermoviment">
+        <CashierMoviment />
+      </Route>
+      <Route path="/cashier">
+        <Cashier />
       </Route>
     </Switch>
   );

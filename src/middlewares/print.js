@@ -29,7 +29,7 @@ import Tonner from "../assets/tonner.png";
 
 export default function PrinterMiddleware() {
   const [modalPrint, setModalPrint] = useState(false);
-  const [printType, setPrintType] = useState("");
+  const [printType, setPrintType] = useState("normal");
 
   useEffect(() => {
     console.log(printType);
