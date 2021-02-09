@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Grid,
@@ -31,12 +31,39 @@ import {
   Image,
   InputGroup,
   InputLeftAddon,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuDivider,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
-import { FaShoppingBag, FaSearch, FaTimes, FaPlus } from "react-icons/fa";
+import {
+  FaShoppingBag,
+  FaSearch,
+  FaTimes,
+  FaPlus,
+  FaSearchPlus,
+  FaSave,
+  FaCheck,
+  FaTrash,
+  FaPrint,
+} from "react-icons/fa";
+import { MdKeyboardArrowUp } from "react-icons/md";
+
+import PaymentMiddleware from "../../middlewares/payment";
 
 export default function Pdv() {
+  const [modalPayment, setModalPayment] = useState(false);
+  const [modalPrint, setModalPrint] = useState(false);
+
   return (
     <>
       <HeaderApp title="Ponto de Venda" icon={FaShoppingBag} />
@@ -215,13 +242,7 @@ export default function Pdv() {
               gap="15px"
               justifyContent="center"
             >
-              <Box
-                borderWidth="1px"
-                p={2}
-                rounded="md"
-                cursor="pointer"
-                shadow="md"
-              >
+              <Box borderWidth="1px" p={2} rounded="md" shadow="md">
                 <Image
                   src="https://a-static.mlcdn.com.br/1500x1500/camiseta-branca-lisa-100-algodao-torres-confeccoes/torresconfeccoes/51-195/5c4ae4b9c47d84d3af9d9f67dea33f60.jpg"
                   rounded="md"
@@ -254,39 +275,95 @@ export default function Pdv() {
           rounded="md"
           align="center"
         >
-          <Grid templateColumns="1fr 1fr" gap="15px">
-            <Grid templateColumns="repeat(3, 1fr)" gap="10px" pl={3} pr={3}>
-              <FormControl>
-                <FormLabel fontSize="xs" mb={0} fontWeight="700">
-                  Valor
-                </FormLabel>
-                <InputGroup>
-                  <InputLeftAddon>R$</InputLeftAddon>
-                  <Input focusBorderColor={config.inputs} />
-                </InputGroup>
-              </FormControl>
-              <FormControl>
-                <FormLabel fontSize="xs" mb={0} fontWeight="700">
-                  Desconto
-                </FormLabel>
-                <InputGroup>
-                  <InputLeftAddon>%</InputLeftAddon>
-                  <Input focusBorderColor={config.inputs} />
-                </InputGroup>
-              </FormControl>
-              <FormControl>
-                <FormLabel fontSize="xs" mb={0} fontWeight="700">
-                  Total a Pagar
-                </FormLabel>
-                <InputGroup>
-                  <InputLeftAddon>R$</InputLeftAddon>
-                  <Input focusBorderColor={config.inputs} />
-                </InputGroup>
-              </FormControl>
+          <Grid templateColumns="2fr 1fr" gap="15px">
+            <Grid templateColumns="repeat(3, 1fr)" gap="10px" pl={3}>
+              <InputGroup>
+                <InputLeftAddon>Total Liquido</InputLeftAddon>
+                <Input focusBorderColor={config.inputs} />
+              </InputGroup>
+
+              <InputGroup>
+                <InputLeftAddon>Desconto</InputLeftAddon>
+                <Input focusBorderColor={config.inputs} />
+              </InputGroup>
+
+              <InputGroup>
+                <InputLeftAddon>Total a Pagar</InputLeftAddon>
+                <Input focusBorderColor={config.inputs} />
+              </InputGroup>
+            </Grid>
+            <Grid templateColumns="1fr 2fr" gap="15px" pr={3}>
+              <Menu>
+                <MenuButton
+                  isFullWidth
+                  as={Button}
+                  rightIcon={<MdKeyboardArrowUp />}
+                  colorScheme="blue"
+                >
+                  Opções
+                </MenuButton>
+                <MenuList>
+                  <MenuItem icon={<FaSearchPlus />}>Buscar Orçamento</MenuItem>
+                  <MenuDivider />
+                  <MenuItem icon={<FaSave />}>Salvar como Orçamento</MenuItem>
+                  <MenuItem
+                    icon={<FaPrint />}
+                    onClick={() => setModalPrint(true)}
+                  >
+                    Imprimir Pedido
+                  </MenuItem>
+                  <MenuItem icon={<FaTrash />}>Cancelar Pedido</MenuItem>
+                </MenuList>
+              </Menu>
+              <Button
+                leftIcon={<FaCheck />}
+                colorScheme="green"
+                onClick={() => setModalPayment(true)}
+              >
+                Finalizar Pedido
+              </Button>
             </Grid>
           </Grid>
         </Flex>
       </Grid>
+
+      <Modal
+        isOpen={modalPayment}
+        onClose={() => setModalPayment(false)}
+        isCentered
+        scrollBehavior="inside"
+      >
+        <ModalOverlay />
+        <ModalContent maxW="60rem" pb={4}>
+          <ModalHeader>Adicionar Forma de Pagamento</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {modalPayment === true && <PaymentMiddleware />}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={modalPrint}
+        onClose={() => setModalPrint(false)}
+        isCentered
+        scrollBehavior="inside"
+      >
+        <ModalOverlay />
+        <ModalContent maxW="95vw" pb={4} p={0} overflow="hidden">
+          <ModalCloseButton />
+          <ModalBody p={0} overflow="hidden">
+            <Box mr={"50px"} h="80vh">
+              <embed
+                src="http://www.jucerr.rr.gov.br/manuais/pdf-a.pdf"
+                width="100%"
+                height="100%"
+                type="application/pdf"
+              />
+            </Box>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 }
