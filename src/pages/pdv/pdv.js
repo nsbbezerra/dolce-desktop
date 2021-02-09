@@ -59,6 +59,7 @@ import {
 import { MdKeyboardArrowUp } from "react-icons/md";
 
 import PaymentMiddleware from "../../middlewares/payment";
+import PrintMiddleware from "../../middlewares/print";
 
 export default function Pdv() {
   const [modalPayment, setModalPayment] = useState(false);
@@ -202,7 +203,9 @@ export default function Pdv() {
             </Center>
             <Grid templateColumns="70px 1fr 130px 130px" gap="15px">
               <FormControl>
-                <FormLabel fontSize="sm">Qtd</FormLabel>
+                <FormLabel fontSize="sm" mb={0}>
+                  Qtd
+                </FormLabel>
                 <Input
                   type="number"
                   placeholder="Qtd"
@@ -210,7 +213,9 @@ export default function Pdv() {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="sm">Buscar por nome</FormLabel>
+                <FormLabel fontSize="sm" mb={0}>
+                  Buscar por nome
+                </FormLabel>
                 <Input
                   type="text"
                   placeholder="Digite o nome"
@@ -218,7 +223,9 @@ export default function Pdv() {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="sm">Cod. de Barras</FormLabel>
+                <FormLabel fontSize="sm" mb={0}>
+                  Cod. de Barras
+                </FormLabel>
                 <Input
                   type="text"
                   placeholder="Cod. Barras"
@@ -226,7 +233,9 @@ export default function Pdv() {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="sm">SKU</FormLabel>
+                <FormLabel fontSize="sm" mb={0}>
+                  SKU
+                </FormLabel>
                 <Input
                   type="text"
                   placeholder="SKU"
@@ -277,28 +286,29 @@ export default function Pdv() {
         >
           <Grid templateColumns="2fr 1fr" gap="15px">
             <Grid templateColumns="repeat(3, 1fr)" gap="10px" pl={3}>
-              <InputGroup>
-                <InputLeftAddon>Total Liquido</InputLeftAddon>
+              <InputGroup size="lg">
+                <InputLeftAddon>Total</InputLeftAddon>
                 <Input focusBorderColor={config.inputs} />
               </InputGroup>
 
-              <InputGroup>
+              <InputGroup size="lg">
                 <InputLeftAddon>Desconto</InputLeftAddon>
                 <Input focusBorderColor={config.inputs} />
               </InputGroup>
 
-              <InputGroup>
+              <InputGroup size="lg">
                 <InputLeftAddon>Total a Pagar</InputLeftAddon>
                 <Input focusBorderColor={config.inputs} />
               </InputGroup>
             </Grid>
             <Grid templateColumns="1fr 2fr" gap="15px" pr={3}>
-              <Menu>
+              <Menu placement="top">
                 <MenuButton
                   isFullWidth
                   as={Button}
                   rightIcon={<MdKeyboardArrowUp />}
                   colorScheme="blue"
+                  size="lg"
                 >
                   Opções
                 </MenuButton>
@@ -319,6 +329,7 @@ export default function Pdv() {
                 leftIcon={<FaCheck />}
                 colorScheme="green"
                 onClick={() => setModalPayment(true)}
+                size="lg"
               >
                 Finalizar Pedido
               </Button>
@@ -348,19 +359,14 @@ export default function Pdv() {
         onClose={() => setModalPrint(false)}
         isCentered
         scrollBehavior="inside"
+        size="lg"
       >
         <ModalOverlay />
-        <ModalContent maxW="95vw" pb={4} p={0} overflow="hidden">
+        <ModalContent>
+          <ModalHeader>Imprimir</ModalHeader>
           <ModalCloseButton />
-          <ModalBody p={0} overflow="hidden">
-            <Box mr={"50px"} h="80vh">
-              <embed
-                src="http://www.jucerr.rr.gov.br/manuais/pdf-a.pdf"
-                width="100%"
-                height="100%"
-                type="application/pdf"
-              />
-            </Box>
+          <ModalBody pb={4}>
+            {modalPrint === true && <PrintMiddleware />}
           </ModalBody>
         </ModalContent>
       </Modal>

@@ -135,8 +135,8 @@ export default function PaymentMiddleware() {
           </Box>
         </Box>
       </Grid>
-      <Divider mt={5} mb={5} />
-      <Flex justify="flex-end">
+
+      <Flex justify="flex-end" mt={5}>
         <HStack spacing={3}>
           <Button leftIcon={<FaCalculator />} colorScheme="blue">
             Calcular Pagamento
