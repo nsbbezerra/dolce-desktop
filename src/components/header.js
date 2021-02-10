@@ -201,7 +201,7 @@ export default function HeaderApp() {
   return (
     <>
       <Flex
-        h="9vh"
+        h="60px"
         bg={config.header.bg}
         justify="space-between"
         align="center"

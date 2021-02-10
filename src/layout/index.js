@@ -9,7 +9,7 @@ export default function Layout() {
   return (
     <Box w={"100vw"} h="100vh" maxH="100vh" maxW="100vw">
       <Header />
-      <Grid templateColumns="75px 1fr" w="100%" h="91vh">
+      <Grid templateColumns="60px 1fr" w="100%" h="91vh">
         <Box>
           <Sider />
         </Box>

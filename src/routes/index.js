@@ -16,6 +16,11 @@ import RegisterCategory from "../pages/cadastro/categoria";
 import RegisterEmployee from "../pages/cadastro/colaboradores";
 import RegisterProducts from "../pages/cadastro/produtos/produtos";
 
+/** ESTOQUE */
+import ListDepartment from "../pages/products/department";
+import ListCategory from "../pages/products/category";
+import ListProduct from "../pages/products/products";
+
 /** CAIXA */
 import CashierMoviment from "../pages/cashier/moviment";
 import Cashier from "../pages/cashier/cashier";
@@ -106,6 +111,15 @@ export default function Routers() {
       </Route>
       <Route path="/cashierreport">
         <CashierReport />
+      </Route>
+      <Route path="/listdepartment">
+        <ListDepartment />
+      </Route>
+      <Route path="/listcategory">
+        <ListCategory />
+      </Route>
+      <Route path="/listproduct">
+        <ListProduct />
       </Route>
     </Switch>
   );

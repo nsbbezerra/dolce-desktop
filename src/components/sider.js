@@ -31,6 +31,7 @@ import {
   FaBarcode,
   FaPercentage,
   FaReceipt,
+  FaFileImport,
 } from "react-icons/fa";
 import {
   AiFillShop,
@@ -51,7 +52,7 @@ export default function Sider() {
   return (
     <Flex
       h="100%"
-      w="75px"
+      w="60px"
       shadow="lg"
       borderRightWidth="1px"
       maxH="100%"
@@ -156,6 +157,12 @@ export default function Sider() {
           >
             Produtos
           </MenuItem>
+          <MenuItem
+            icon={<FaFileImport />}
+            onClick={() => routing("/registerProducts")}
+          >
+            Importar XML
+          </MenuItem>
         </MenuList>
       </Menu>
 
@@ -172,9 +179,20 @@ export default function Sider() {
           />
         </Tooltip>
         <MenuList>
-          <MenuItem icon={<AiFillShop />}>Departamentos</MenuItem>
-          <MenuItem icon={<FaTags />}>Categorias</MenuItem>
-          <MenuItem icon={<FaTag />}>Produtos</MenuItem>
+          <MenuItem
+            icon={<AiFillShop />}
+            onClick={() => routing("/listdepartment")}
+          >
+            Departamentos
+          </MenuItem>
+          <MenuItem icon={<FaTags />} onClick={() => routing("/listcategory")}>
+            Categorias
+          </MenuItem>
+          <MenuItem icon={<FaTag />} onClick={() => routing("/listproduct")}>
+            Produtos
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem icon={<FaBarcode />}>Etiquetas</MenuItem>
         </MenuList>
       </Menu>
 

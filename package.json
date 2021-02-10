@@ -19,6 +19,7 @@
     "react-input-mask": "^2.0.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "react-star-ratings": "^2.3.0",
     "recharts": "^2.0.0",
     "uniqid": "^5.2.0"
   },
