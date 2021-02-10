@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Box,
   Grid,
@@ -39,6 +39,13 @@ import {
   Divider,
   Text,
   Icon,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  AlertDialogCloseButton,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -52,11 +59,18 @@ import {
   FaSave,
   FaClipboardList,
   FaTrash,
+  FaPlus,
 } from "react-icons/fa";
 import { AiOutlineFall, AiOutlineRise } from "react-icons/ai";
+
 import PrintMiddleware from "../../middlewares/print";
+import PaymentMiddleware from "../../middlewares/payment";
+
+import { useHistory } from "react-router-dom";
 
 export default function Cashier() {
+  const cancelRef = useRef();
+  const { push } = useHistory();
   const [modalRevenue, setModalRevenue] = useState(false);
   const [modalExpense, setModalExpense] = useState(false);
   const [modalPrint, setModalPrint] = useState(false);
@@ -64,6 +78,22 @@ export default function Cashier() {
   const [modalPayments, setModalPayments] = useState(false);
   const [modalFinish, setModalFinish] = useState(false);
   const [modalMoviment, setModalMoviment] = useState(false);
+  const [modalCloseCashier, setModalCloseCashier] = useState(false);
+  const [modalClose, setModalClose] = useState(false);
+
+  function handlePayment() {
+    setModalPayments(false);
+    setModalPayment(true);
+  }
+
+  function handleCloseCashier() {
+    setModalClose(false);
+    setModalCloseCashier(true);
+  }
+
+  function routing(rt) {
+    push(rt);
+  }
 
   return (
     <>
@@ -141,6 +171,7 @@ export default function Cashier() {
                         icon={<FaBarcode />}
                         rounded="full"
                         size="sm"
+                        onClick={() => setModalPayments(true)}
                       />
                     </Tooltip>
                     <Tooltip label="Converter em Orçamento" hasArrow>
@@ -242,7 +273,12 @@ export default function Cashier() {
             >
               Movimentação do Caixa
             </Button>
-            <Button size="lg" colorScheme="blue" leftIcon={<FaLock />}>
+            <Button
+              size="lg"
+              colorScheme="blue"
+              leftIcon={<FaLock />}
+              onClick={() => setModalClose(true)}
+            >
               Fechar o Caixa
             </Button>
           </Grid>
@@ -648,6 +684,346 @@ export default function Cashier() {
           <ModalBody pb={4}>
             {modalPrint === true && <PrintMiddleware />}
           </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={modalPayments}
+        onClose={() => setModalPayments(false)}
+        isCentered
+        scrollBehavior="inside"
+        size="lg"
+      >
+        <ModalOverlay />
+        <ModalContent maxW="50rem">
+          <ModalHeader>Pagamentos</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Table size="sm">
+              <Thead fontWeight="700">
+                <Tr>
+                  <Td>Descrição</Td>
+                  <Td w="12%" textAlign="center">
+                    Vencimento
+                  </Td>
+                  <Td w="12%" textAlign="center">
+                    Status
+                  </Td>
+                  <Td w="16%" isNumeric>
+                    Valor
+                  </Td>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td>Dinheiro</Td>
+                  <Td w="12%" textAlign="center">
+                    10/10/1010
+                  </Td>
+                  <Td w="12%" textAlign="center">
+                    <Button variant="link" size="sm" colorScheme="green">
+                      Confirmado
+                    </Button>
+                  </Td>
+                  <Td w="16%" isNumeric>
+                    R$ 400,00
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td>Dinheiro</Td>
+                  <Td w="12%" textAlign="center">
+                    10/10/1010
+                  </Td>
+                  <Td w="12%" textAlign="center">
+                    <Button variant="link" size="sm" colorScheme="green">
+                      Confirmado
+                    </Button>
+                  </Td>
+                  <Td w="16%" isNumeric>
+                    R$ 400,00
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td>Dinheiro</Td>
+                  <Td w="12%" textAlign="center">
+                    10/10/1010
+                  </Td>
+                  <Td w="12%" textAlign="center">
+                    <Button variant="link" size="sm" colorScheme="green">
+                      Confirmado
+                    </Button>
+                  </Td>
+                  <Td w="20%" isNumeric>
+                    R$ 400,00
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td>Dinheiro</Td>
+                  <Td w="12%" textAlign="center">
+                    10/10/1010
+                  </Td>
+                  <Td w="12%" textAlign="center">
+                    <Button variant="link" size="sm" colorScheme="green">
+                      Confirmado
+                    </Button>
+                  </Td>
+                  <Td w="16%" isNumeric>
+                    R$ 400,00
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td>Dinheiro</Td>
+                  <Td w="12%" textAlign="center">
+                    10/10/1010
+                  </Td>
+                  <Td w="12%" textAlign="center">
+                    <Button variant="link" size="sm" colorScheme="green">
+                      Confirmado
+                    </Button>
+                  </Td>
+                  <Td w="20%" isNumeric>
+                    R$ 400,00
+                  </Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </ModalBody>
+          <ModalFooter>
+            <Popover placement="left">
+              <PopoverTrigger>
+                <Button leftIcon={<FaPlus />} colorScheme="blue">
+                  Nova Forma de Pagamento
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <PopoverHeader>Confirmação!</PopoverHeader>
+                <PopoverBody>
+                  Estes pagamentos serão excluídos e adicionados os novos ao
+                  pedido, deseja continuar?
+                </PopoverBody>
+                <PopoverFooter d="flex" justifyContent="flex-end">
+                  <ButtonGroup size="sm">
+                    <Button variant="outline">Não</Button>
+                    <Button colorScheme="blue" onClick={() => handlePayment()}>
+                      Sim
+                    </Button>
+                  </ButtonGroup>
+                </PopoverFooter>
+              </PopoverContent>
+            </Popover>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={modalPayment}
+        onClose={() => setModalPayment(false)}
+        isCentered
+        scrollBehavior="inside"
+      >
+        <ModalOverlay />
+        <ModalContent maxW="60rem" pb={4}>
+          <ModalHeader>Adicionar Forma de Pagamento</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {modalPayment === true && <PaymentMiddleware />}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      <AlertDialog
+        motionPreset="slideInBottom"
+        leastDestructiveRef={cancelRef}
+        onClose={() => setModalClose(false)}
+        isOpen={modalClose}
+        isCentered
+      >
+        <AlertDialogOverlay />
+
+        <AlertDialogContent>
+          <AlertDialogHeader>Fechar o Caixa</AlertDialogHeader>
+          <AlertDialogCloseButton />
+          <AlertDialogBody>
+            Após o fechamento do caixa, não será mais possível fazer
+            movimentações ou utilizá-lo, deseja prosseguir?
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <Button onClick={() => setModalClose(false)}>Não</Button>
+            <Button
+              colorScheme="blue"
+              ml={3}
+              ref={cancelRef}
+              onClick={() => handleCloseCashier()}
+            >
+              Sim
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Modal
+        isOpen={modalCloseCashier}
+        onClose={() => setModalCloseCashier(false)}
+        isCentered
+        scrollBehavior="inside"
+      >
+        <ModalOverlay />
+        <ModalContent maxW="50rem">
+          <ModalHeader>Fechamento de Caixa</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Grid templateColumns="repeat(1, 1fr)" gap="15px">
+              <Box borderWidth="1px" rounded="md" h="min-content">
+                <Flex p={2} align="center">
+                  <Icon as={AiOutlineRise} mr={3} />
+                  <Text fontWeight="700">Depósitos</Text>
+                </Flex>
+                <Divider />
+                <Table size="sm">
+                  <Thead fontWeight="700">
+                    <Tr>
+                      <Td w="80%">Descrição</Td>
+                      <Td textAlign="center">Data</Td>
+                      <Td isNumeric>Valor</Td>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    <Tr>
+                      <Td w="80%">Descrição</Td>
+                      <Td textAlign="center">Data</Td>
+                      <Td isNumeric>Valor</Td>
+                    </Tr>
+                  </Tbody>
+                </Table>
+              </Box>
+
+              <Box borderWidth="1px" rounded="md" h="min-content">
+                <Flex p={2} align="center">
+                  <Icon as={AiOutlineFall} mr={3} />
+                  <Text fontWeight="700">Retiradas</Text>
+                </Flex>
+                <Divider />
+                <Table size="sm">
+                  <Thead fontWeight="700">
+                    <Tr>
+                      <Td w="80%">Descrição</Td>
+                      <Td textAlign="center">Data</Td>
+                      <Td isNumeric>Valor</Td>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    <Tr>
+                      <Td w="80%">Descrição</Td>
+                      <Td textAlign="center">10/10/1000</Td>
+                      <Td isNumeric>R$ 3000,00</Td>
+                    </Tr>
+                  </Tbody>
+                </Table>
+              </Box>
+            </Grid>
+
+            <Box borderWidth="1px" rounded="md" h="min-content" mt="15px">
+              <Flex p={2} align="center">
+                <Icon as={AiOutlineFall} mr={3} />
+                <Text fontWeight="700">Resumo das Movimentações de Caixa</Text>
+              </Flex>
+              <Divider />
+              <Table size="sm">
+                <Tbody>
+                  <Tr>
+                    <Td fontWeight="700" w="70%">
+                      Valor de Abertura
+                    </Td>
+                    <Td isNumeric>R$ 4000,00</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="700" w="70%">
+                      Total das Entradas
+                    </Td>
+                    <Td isNumeric color="green.400">
+                      R$ 4000,00
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="700" w="70%">
+                      Total das Saídas
+                    </Td>
+                    <Td isNumeric color="red.400">
+                      R$ 4000,00
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="700" w="70%">
+                      Valor de Fechamento
+                    </Td>
+                    <Td isNumeric>R$ 4000,00</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </Box>
+
+            <Box borderWidth="1px" rounded="md" h="min-content" mt="15px">
+              <Flex p={2} align="center">
+                <Icon as={AiOutlineFall} mr={3} />
+                <Text fontWeight="700">Resumo dos Pagamentos</Text>
+              </Flex>
+              <Divider />
+              <Table size="sm">
+                <Tbody>
+                  <Tr>
+                    <Td fontWeight="700" w="70%">
+                      Total em Dinheiro
+                    </Td>
+                    <Td isNumeric>R$ 4000,00</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="700" w="70%">
+                      Total em Cartão de Crédito
+                    </Td>
+                    <Td isNumeric>R$ 4000,00</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="700" w="70%">
+                      Total em Cartão de Débito
+                    </Td>
+                    <Td isNumeric>R$ 4000,00</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="700" w="70%">
+                      Total em Cheque
+                    </Td>
+                    <Td isNumeric>R$ 4000,00</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="700" w="70%">
+                      Total em Duplicata
+                    </Td>
+                    <Td isNumeric>R$ 4000,00</Td>
+                  </Tr>
+                  <Tr>
+                    <Td fontWeight="700" w="70%">
+                      Total em Transferências
+                    </Td>
+                    <Td isNumeric>R$ 4000,00</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </Box>
+          </ModalBody>
+          <ModalFooter>
+            <Button leftIcon={<FaPrint />} mr={3}>
+              Imprimir Relatório
+            </Button>
+            <Button
+              leftIcon={<FaCheck />}
+              colorScheme="blue"
+              onClick={() => routing("/cashiermoviment")}
+            >
+              Concluir
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </>

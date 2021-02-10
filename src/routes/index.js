@@ -19,6 +19,7 @@ import RegisterProducts from "../pages/cadastro/produtos/produtos";
 /** CAIXA */
 import CashierMoviment from "../pages/cashier/moviment";
 import Cashier from "../pages/cashier/cashier";
+import CashierReport from "../pages/cashier/report";
 
 /** PONTO DE VENDA */
 import Pdv from "../pages/pdv/pdv";
@@ -102,6 +103,9 @@ export default function Routers() {
       </Route>
       <Route path="/cashier">
         <Cashier />
+      </Route>
+      <Route path="/cashierreport">
+        <CashierReport />
       </Route>
     </Switch>
   );

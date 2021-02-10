@@ -38,7 +38,6 @@ import {
   AiOutlineRise,
   AiOutlineFall,
 } from "react-icons/ai";
-import { GiHistogram } from "react-icons/gi";
 import { MdDashboard } from "react-icons/md";
 import config from "../configs";
 
@@ -198,8 +197,12 @@ export default function Sider() {
           >
             Movimentação de Caixa
           </MenuItem>
-          <MenuItem icon={<GiHistogram />}>Histórico de Caixa</MenuItem>
-          <MenuItem icon={<FaFileAlt />}>Relatório de Caixa</MenuItem>
+          <MenuItem
+            icon={<FaFileAlt />}
+            onClick={() => routing("/cashierreport")}
+          >
+            Relatório de Caixa
+          </MenuItem>
         </MenuList>
       </Menu>
 
