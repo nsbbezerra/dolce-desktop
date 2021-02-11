@@ -21,6 +21,7 @@
     "react-scripts": "3.4.1",
     "react-star-ratings": "^2.3.0",
     "recharts": "^2.0.0",
+    "swr": "^0.4.2",
     "uniqid": "^5.2.0",
     "yup": "^0.32.8"
   },
