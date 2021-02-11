@@ -4,6 +4,7 @@ import theme from "./style/theme";
 import LayoutApp from "./layout/index";
 import { MemoryRouter as Router } from "react-router-dom";
 import "./style/calendar.css";
+import "react-datepicker/dist/react-datepicker.css";
 
 function App() {
   return (

@@ -31,6 +31,7 @@ import {
   Image,
   InputGroup,
   InputLeftAddon,
+  InputRightElement,
   Menu,
   MenuButton,
   MenuList,
@@ -56,18 +57,24 @@ import {
   FaCheck,
   FaTrash,
   FaPrint,
+  FaCalendarAlt,
+  FaUser,
 } from "react-icons/fa";
 import { MdKeyboardArrowUp } from "react-icons/md";
-
+import DatePicker, { registerLocale } from "react-datepicker";
 import Hotkeys from "react-hot-keys";
+import pt_br from "date-fns/locale/pt-BR";
 
 import PaymentMiddleware from "../../middlewares/payment";
 import PrintMiddleware from "../../middlewares/print";
+
+registerLocale("pt_br", pt_br);
 
 export default function Pdv() {
   const [modalPayment, setModalPayment] = useState(false);
   const [modalPrint, setModalPrint] = useState(false);
   const [qtd, setQtd] = useState(1);
+  const [startDate, setStartDate] = useState(new Date());
 
   useEffect(() => {
     console.log(qtd);
@@ -110,6 +117,14 @@ export default function Pdv() {
     }
   }
 
+  const CustomInputPicker = ({ value, onClick }) => (
+    <InputGroup>
+      <InputLeftAddon>Data</InputLeftAddon>
+      <Input focusBorderColor={config.inputs} value={value} onClick={onClick} />
+      <InputRightElement pointerEvents="none" children={<FaCalendarAlt />} />
+    </InputGroup>
+  );
+
   return (
     <>
       <Hotkeys
@@ -123,12 +138,34 @@ export default function Pdv() {
         <HeaderApp title="Ponto de Venda" icon={FaShoppingBag} />
 
         <Grid
-          templateRows="66.65vh 68px"
+          templateRows="62px 57vh 68px"
           gap="15px"
           mt="25px"
           h="76.65vh"
           maxH="76.65vh"
         >
+          <Flex
+            h="62px"
+            p={2}
+            shadow="md"
+            borderWidth="1px"
+            rounded="md"
+            align="center"
+            justify="flex-end"
+          >
+            <InputGroup mr={3}>
+              <InputLeftAddon>Vendedor</InputLeftAddon>
+              <Input focusBorderColor={config.inputs} />
+              <InputRightElement pointerEvents="none" children={<FaUser />} />
+            </InputGroup>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              customInput={<CustomInputPicker />}
+              locale="pt_br"
+              dateFormat="dd/MM/yyyy"
+            />
+          </Flex>
           <Grid templateColumns="repeat(2, 1fr)" gap="15px" h="100%">
             <Box
               borderWidth="1px"
@@ -309,7 +346,7 @@ export default function Pdv() {
               <Divider mt={3} mb={3} />
 
               <Grid
-                templateColumns="repeat(auto-fit, minmax(185px, 185px))"
+                templateColumns="repeat(auto-fit, minmax(165px, 165px))"
                 gap="15px"
                 justifyContent="center"
               >
@@ -318,7 +355,7 @@ export default function Pdv() {
                     src="https://a-static.mlcdn.com.br/1500x1500/camiseta-branca-lisa-100-algodao-torres-confeccoes/torresconfeccoes/51-195/5c4ae4b9c47d84d3af9d9f67dea33f60.jpg"
                     rounded="md"
                   />
-                  <Text w="180px" isTruncated noOfLines={2} fontSize="sm" p={1}>
+                  <Text w="160px" isTruncated noOfLines={2} fontSize="sm" p={1}>
                     Camiseta Masculina asdlaskdjlaskdjalskdjjasdl asdasd asd
                     asdasdasdasds
                   </Text>

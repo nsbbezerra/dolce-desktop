@@ -51,9 +51,13 @@ import { GiShop } from "react-icons/gi";
 import Icone from "../assets/icon-black.png";
 import Logo from "../assets/name-slug.png";
 
+import { useHistory } from "react-router-dom";
+
 const remote = window.require("electron").remote;
 
 export default function HeaderApp() {
+  const { push } = useHistory();
+
   const { setColorMode } = useColorMode();
   const cancelRef = useRef();
   const [modalTheme, setModalTheme] = useState(false);
@@ -245,6 +249,7 @@ export default function HeaderApp() {
                 icon={<FaCog />}
                 rounded="xl"
                 ml={3}
+                onClick={() => push("/configapp")}
               />
             </Tooltip>
 

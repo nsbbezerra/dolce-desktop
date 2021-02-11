@@ -40,6 +40,9 @@ import Revenues from "../pages/financeiro/revenues/index";
 import Payments from "../pages/financeiro/payments/index";
 import Comissions from "../pages/financeiro/comission/index";
 
+/** CONFIGURAÇÕES */
+import ConfigApp from "../pages/configs/app";
+
 export default function Routers() {
   return (
     <Switch>
@@ -120,6 +123,9 @@ export default function Routers() {
       </Route>
       <Route path="/listproduct">
         <ListProduct />
+      </Route>
+      <Route path="/configapp">
+        <ConfigApp />
       </Route>
     </Switch>
   );
