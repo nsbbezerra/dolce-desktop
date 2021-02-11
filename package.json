@@ -8,10 +8,10 @@
     "@chakra-ui/react": "^1.0.3",
     "@emotion/react": "^11.1.2",
     "@emotion/styled": "^11.0.0",
+    "axios": "^0.21.1",
     "cross-env": "^7.0.3",
     "electron-is-dev": "^1.2.0",
     "framer-motion": "^2.9.5",
-    "hotkeys-js": "^3.8.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-hot-keys": "^2.6.2",
@@ -21,7 +21,8 @@
     "react-scripts": "3.4.1",
     "react-star-ratings": "^2.3.0",
     "recharts": "^2.0.0",
-    "uniqid": "^5.2.0"
+    "uniqid": "^5.2.0",
+    "yup": "^0.32.8"
   },
   "scripts": {
     "dev": "yarn react-scripts start",
