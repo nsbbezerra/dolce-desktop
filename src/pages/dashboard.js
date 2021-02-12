@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   Box,
   Grid,
@@ -34,7 +34,7 @@ const Tooltip = Recharts.Tooltip;
 const Legend = Recharts.Legend;
 const Responsive = Recharts.ResponsiveContainer;
 
-export default function Dashboard() {
+function Dashboard() {
   const data = [
     {
       name: "Janeiro 2021",
@@ -403,3 +403,5 @@ export default function Dashboard() {
     </>
   );
 }
+
+export default memo(Dashboard);

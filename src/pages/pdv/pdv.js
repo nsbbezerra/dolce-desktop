@@ -216,11 +216,12 @@ export default function Pdv() {
                     <Td w="2%" textAlign="center">
                       Qtd
                     </Td>
-                    <Td isTruncated w="62%" maxW="62%">
-                      Produto
+                    <Td isTruncated>Produto</Td>
+                    <Td w="7%" textAlign="center">
+                      Cor
                     </Td>
                     <Td w="7%" textAlign="center">
-                      SKU
+                      Tamanho
                     </Td>
                     <Td w="14%" isNumeric>
                       V. Uni
@@ -236,13 +237,21 @@ export default function Pdv() {
                     <Td w="2%" textAlign="center">
                       10
                     </Td>
-                    <Td isTruncated w="62%" maxW="62%">
-                      <Text fontSize="sm" isTruncated noOfLines={1} w="17vw">
-                        Camiseta Masculina Masculina Topper adasdasdasda
-                      </Text>
+                    <Td isTruncated>
+                      <Tooltip
+                        label="Camiseta Masculina Masculina Topper adasdasdasda"
+                        hasArrow
+                      >
+                        <Text fontSize="sm" isTruncated noOfLines={1} w="10vw">
+                          Camiseta Masculina Masculina Topper adasdasdasda
+                        </Text>
+                      </Tooltip>
                     </Td>
                     <Td w="7%" textAlign="center">
-                      SJKD889
+                      <Box w="100%" h="20px" bg="yellow.400" rounded="md" />
+                    </Td>
+                    <Td w="7%" textAlign="center">
+                      PP
                     </Td>
                     <Td w="14%" isNumeric>
                       400,00

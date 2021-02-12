@@ -6,13 +6,18 @@ import { MemoryRouter as Router } from "react-router-dom";
 import "./style/calendar.css";
 import "react-datepicker/dist/react-datepicker.css";
 
+/** HOOKS */
+import EmployeeProvider from "./context/Employee";
+
 function App() {
   return (
-    <Router>
-      <ChakraProvider theme={theme} resetCSS={true}>
-        <LayoutApp />
-      </ChakraProvider>
-    </Router>
+    <EmployeeProvider>
+      <Router>
+        <ChakraProvider theme={theme} resetCSS={true}>
+          <LayoutApp />
+        </ChakraProvider>
+      </Router>
+    </EmployeeProvider>
   );
 }
 
