@@ -88,12 +88,12 @@ export default function SaveClient() {
     inpt.focus();
   }
 
-  function showToast(message) {
+  function showToast(message, status, title) {
     toast({
-      title: "Sucesso",
+      title: title,
       description: message,
-      status: "success",
-      position: "top",
+      status: status,
+      position: "top-right",
     });
   }
 
@@ -155,10 +155,9 @@ export default function SaveClient() {
         },
         { headers: { "x-access-token": employee.token } }
       );
-      console.log(response.data);
       setIdClient(response.data.client._id);
       setLoading(false);
-      showToast(response.data.message);
+      showToast(response.data.message, "success", "Sucesso");
       setModalAddress(true);
     } catch (error) {
       setLoading(false);
@@ -166,14 +165,12 @@ export default function SaveClient() {
       const typeError =
         error.response.data.message || "Ocorreu um erro ao salvar";
       const errorMesg = error.response.data.errorMessage || statusCode;
-      setModalErroMessage(errorMesg);
-      setModalMessage(typeError);
-      if (statusCode === 401) {
-        setModalTitle("Erro de Autorização");
-      } else {
-        setModalTitle("Erro no cadastro");
-      }
-      setModalCaution(true);
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
     }
   }
 
@@ -239,14 +236,12 @@ export default function SaveClient() {
       const typeError =
         error.response.data.message || "Ocorreu um erro ao salvar";
       const errorMesg = error.response.data.errorMessage || statusCode;
-      setModalErroMessage(errorMesg);
-      setModalMessage(typeError);
-      if (statusCode === 401) {
-        setModalTitle("Erro de Autorização");
-      } else {
-        setModalTitle("Erro no cadastro");
-      }
-      setModalCaution(true);
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
     }
   }
 
