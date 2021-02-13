@@ -22,19 +22,19 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { FaUserFriends, FaSave } from "react-icons/fa";
 import config from "../../configs";
 import HeaderApp from "../../components/headerApp";
 import InputMask from "react-input-mask";
-import * as yup from "yup";
 
 import { useEmployee } from "../../context/Employee";
 import api from "../../configs/axios";
 
 export default function SaveClient() {
   const { employee } = useEmployee();
-
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [loadingAddress, setLoadingAddress] = useState(false);
   const [modalAddress, setModalAddress] = useState(false);
@@ -51,6 +51,7 @@ export default function SaveClient() {
   const [contact, setContact] = useState("");
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+  const [idClient, setIdClient] = useState("");
 
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState("");
@@ -74,59 +75,72 @@ export default function SaveClient() {
     setCep("");
     setCity("");
     setState();
+    setIdClient("");
+    setPassword("");
   }
-  const schemaClient = yup.object().shape({
-    name: yup.string().required("O Nome é obrigatório"),
-    cpf: yup.string().required("O CPF é obrigatório"),
-    gender: yup.string().required("O Gênero é obrigatório"),
-    email: yup.string().email("Digite um email válido"),
-    contact: yup.string().required("O Telefone é obrigatório"),
-    user: yup.string().required("O nome de usuário é obrigatório"),
-    password: yup.string().required("A senha é obrigatória"),
-  });
 
-  const schemaAddress = yup.object().shape({
-    street: yup.string().required("O nome da Rua/Avenida é obrigatório"),
-    number: yup.string().required("O número é obrigatório"),
-    comp: yup.string(),
-    bairro: yup.string().required("O bairro é obrigatório"),
-    cep: yup.string().required("O Cep é obrigatório"),
-    city: yup.string().required("A Cidade é obrigatória"),
-    state: yup.string().required("O estado é obrigatório"),
-  });
+  function handleValidator(path, message) {
+    let val = [];
+    let info = { path: path, message: message };
+    val.push(info);
+    setValidators(val);
+    const inpt = document.getElementById(path);
+    inpt.focus();
+  }
+
+  function showToast(message) {
+    toast({
+      title: "Sucesso",
+      description: message,
+      status: "success",
+      position: "top",
+    });
+  }
 
   async function register() {
+    if (name === "" || !name) {
+      handleValidator("name", "O Nome é obrigatório");
+      return false;
+    }
+    if (cpf === "" || !cpf) {
+      handleValidator("cpf", "O CPF é obrigatório");
+      return false;
+    }
+    if (cpf.includes("_")) {
+      handleValidator("cpf", "Digite um CFP válido");
+      return false;
+    }
+    if (gender === "" || !gender) {
+      handleValidator("gender", "o Gênero é obrigatório");
+      return false;
+    }
+    if (
+      (email.length && !email.includes("@")) ||
+      (email.length && !email.includes("."))
+    ) {
+      handleValidator(
+        "email",
+        "Digite um email válido, deve conter um (@) e um (.)"
+      );
+      return false;
+    }
+    if (contact === "" || !contact) {
+      handleValidator("contact", "O Telefone é obrigatório");
+      return false;
+    }
+    if (contact.includes("_")) {
+      handleValidator("contact", "Digite um Telefone válido");
+      return false;
+    }
+    if (user === "" || !user) {
+      handleValidator("user", "O Número de usuário é obrigatório");
+      return false;
+    }
+    if (password === "" || !password) {
+      handleValidator("password", "A Senha é obrigatória");
+      return false;
+    }
     setLoading(true);
-    await schemaClient
-      .validate(
-        {
-          name: name,
-          cpf: cpf,
-          gender: gender,
-          email: email,
-          contact: contact,
-          user: user,
-          password: password,
-        },
-        { abortEarly: false }
-      )
-      .catch(function (err) {
-        var val = [];
-        err.inner.forEach((e) => {
-          const info = { path: e.path, message: e.message };
-          val.push(info);
-        });
-        console.log("INNER", err.inner.length);
-        setValidators(val);
-        if (err.inner.length === 0) {
-          saveClient();
-          return false;
-        }
-        setLoading(false);
-      });
-  }
-
-  async function saveClient() {
     try {
       const response = await api.post(
         "/clients",
@@ -137,26 +151,112 @@ export default function SaveClient() {
           email,
           contact,
           user,
+          password,
         },
         { headers: { "x-access-token": employee.token } }
       );
       console.log(response.data);
+      setIdClient(response.data.client._id);
       setLoading(false);
+      showToast(response.data.message);
+      setModalAddress(true);
     } catch (error) {
       setLoading(false);
-      console.log(error);
-      console.log(error.response.data);
+      const statusCode = error.response.status || 400;
       const typeError =
         error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      setModalErroMessage(errorMesg);
+      setModalMessage(typeError);
+      if (statusCode === 401) {
+        setModalTitle("Erro de Autorização");
+      } else {
+        setModalTitle("Erro no cadastro");
+      }
+      setModalCaution(true);
     }
   }
 
   async function registerAddress() {
+    if (idClient === "" || !idClient) {
+      setModalErroMessage("Cod: 400");
+      setModalMessage("Nenhum cliente selecionado");
+      setModalTitle("Erro no cadastro");
+      setModalCaution(true);
+      return false;
+    }
+    if (street === "" || !street) {
+      handleValidator("street", "O nome da Rua/Avenida é obrigatório");
+      return false;
+    }
+    if (number === "" || !number) {
+      handleValidator("number", "Obrigatório");
+      return false;
+    }
+    if (bairro === "" || !bairro) {
+      handleValidator("bairro", "O Bairro é obrigatório");
+      return false;
+    }
+    if (cep === "" || !cep) {
+      handleValidator("cep", "O CEP é obrigatório");
+      return false;
+    }
+    if (cep.includes("_")) {
+      handleValidator("cep", "Digite um CEP válido");
+      return false;
+    }
+    if (city === "" || !city) {
+      handleValidator("city", "O nome da Cidade é obrigatório");
+      return false;
+    }
+    if (state === "" || !state) {
+      handleValidator("state", "Obrigatório");
+      return false;
+    }
     setLoadingAddress(true);
-    setTimeout(() => {
-      setLoadingAddress(false);
+    try {
+      const response = await api.post(
+        "/address",
+        {
+          client: idClient,
+          street,
+          number,
+          comp,
+          bairro,
+          cep,
+          city,
+          state,
+        },
+        { headers: { "x-access-token": employee.token } }
+      );
+      showToast(response.data.message);
       setModalAddress(false);
-    }, 3000);
+      setLoadingAddress(false);
+      clear();
+    } catch (error) {
+      setLoadingAddress(false);
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      setModalErroMessage(errorMesg);
+      setModalMessage(typeError);
+      if (statusCode === 401) {
+        setModalTitle("Erro de Autorização");
+      } else {
+        setModalTitle("Erro no cadastro");
+      }
+      setModalCaution(true);
+    }
+  }
+
+  function capitalizeFirstLetter(string) {
+    let splited = string.split(" ");
+    let toJoin = splited.map((e) => {
+      return e.charAt(0).toUpperCase() + e.slice(1);
+    });
+    let joined = toJoin.join(" ");
+    return joined;
   }
 
   return (
@@ -166,7 +266,6 @@ export default function SaveClient() {
       <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
         <Grid templateColumns="1fr 1fr 250px" gap="15px">
           <FormControl
-            id="first-name"
             isRequired
             isInvalid={
               validators.find((obj) => obj.path === "name") ? true : false
@@ -177,7 +276,8 @@ export default function SaveClient() {
               placeholder="Nome completo"
               focusBorderColor={config.inputs}
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setName(capitalizeFirstLetter(e.target.value))}
+              id="name"
             />
             <FormErrorMessage>
               {validators.find((obj) => obj.path === "name")
@@ -186,7 +286,6 @@ export default function SaveClient() {
             </FormErrorMessage>
           </FormControl>
           <FormControl
-            id="cpf"
             isRequired
             isInvalid={
               validators.find((obj) => obj.path === "cpf") ? true : false
@@ -194,6 +293,7 @@ export default function SaveClient() {
           >
             <FormLabel>CPF</FormLabel>
             <InputMask
+              id="cpf"
               mask="999.999.999-99"
               className="mask-chakra"
               placeholder="CPF"
@@ -215,6 +315,7 @@ export default function SaveClient() {
           >
             <FormLabel>Genero</FormLabel>
             <Select
+              id="gender"
               placeholder="Selecione"
               variant="outline"
               focusBorderColor={config.inputs}
@@ -233,13 +334,13 @@ export default function SaveClient() {
         </Grid>
         <Grid templateColumns="1fr 1fr" gap="15px" mt={3}>
           <FormControl
-            id="email"
             isInvalid={
               validators.find((obj) => obj.path === "email") ? true : false
             }
           >
             <FormLabel>Email</FormLabel>
             <Input
+              id="email"
               placeholder="Email"
               focusBorderColor={config.inputs}
               type="email"
@@ -253,7 +354,6 @@ export default function SaveClient() {
             </FormErrorMessage>
           </FormControl>
           <FormControl
-            id="phone"
             isRequired
             isInvalid={
               validators.find((obj) => obj.path === "contact") ? true : false
@@ -261,6 +361,7 @@ export default function SaveClient() {
           >
             <FormLabel>Telefone</FormLabel>
             <InputMask
+              id="contact"
               mask="(99) 99999-9999"
               className="mask-chakra"
               placeholder="Telefone"
@@ -277,7 +378,6 @@ export default function SaveClient() {
 
         <Grid templateColumns="1fr 1fr" gap="15px" mt={3}>
           <FormControl
-            id="user"
             isRequired
             isInvalid={
               validators.find((obj) => obj.path === "user") ? true : false
@@ -285,10 +385,11 @@ export default function SaveClient() {
           >
             <FormLabel>Usuário</FormLabel>
             <Input
+              id="user"
               placeholder="Usuário"
               focusBorderColor={config.inputs}
               value={user}
-              onChange={(e) => setUser(e.target.value)}
+              onChange={(e) => setUser(e.target.value.toLowerCase())}
             />
             <FormErrorMessage>
               {validators.find((obj) => obj.path === "user")
@@ -297,7 +398,6 @@ export default function SaveClient() {
             </FormErrorMessage>
           </FormControl>
           <FormControl
-            id="pass"
             isRequired
             isInvalid={
               validators.find((obj) => obj.path === "password") ? true : false
@@ -305,6 +405,7 @@ export default function SaveClient() {
           >
             <FormLabel>Senha</FormLabel>
             <Input
+              id="password"
               placeholder="Usuário"
               type="password"
               focusBorderColor={config.inputs}
@@ -343,7 +444,6 @@ export default function SaveClient() {
           <ModalBody>
             <Grid templateColumns="1fr 100px" gap="15px">
               <FormControl
-                id="avenue"
                 isRequired
                 isInvalid={
                   validators.find((obj) => obj.path === "street") ? true : false
@@ -354,7 +454,10 @@ export default function SaveClient() {
                   placeholder="Logradouro"
                   focusBorderColor={config.inputs}
                   value={street}
-                  onChange={(e) => setStreet(e.target.value)}
+                  onChange={(e) =>
+                    setStreet(capitalizeFirstLetter(e.target.value))
+                  }
+                  id="street"
                 />
                 <FormErrorMessage>
                   {validators.find((obj) => obj.path === "street")
@@ -363,7 +466,6 @@ export default function SaveClient() {
                 </FormErrorMessage>
               </FormControl>
               <FormControl
-                id="number"
                 isRequired
                 isInvalid={
                   validators.find((obj) => obj.path === "number") ? true : false
@@ -375,7 +477,8 @@ export default function SaveClient() {
                   focusBorderColor={config.inputs}
                   type="text"
                   value={number}
-                  onChange={(e) => setNumber(e.target.value)}
+                  onChange={(e) => setNumber(e.target.value.toUpperCase())}
+                  id="number"
                 />
                 <FormErrorMessage>
                   {validators.find((obj) => obj.path === "number")
@@ -391,11 +494,12 @@ export default function SaveClient() {
                   placeholder="Complemento"
                   focusBorderColor={config.inputs}
                   value={comp}
-                  onChange={(e) => setComp(e.target.value)}
+                  onChange={(e) =>
+                    setComp(capitalizeFirstLetter(e.target.value))
+                  }
                 />
               </FormControl>
               <FormControl
-                id="bairro"
                 isRequired
                 isInvalid={
                   validators.find((obj) => obj.path === "bairro") ? true : false
@@ -403,10 +507,13 @@ export default function SaveClient() {
               >
                 <FormLabel>Bairro</FormLabel>
                 <Input
+                  id="bairro"
                   placeholder="Bairro"
                   focusBorderColor={config.inputs}
                   value={bairro}
-                  onChange={(e) => setBairro(e.target.value)}
+                  onChange={(e) =>
+                    setBairro(capitalizeFirstLetter(e.target.value))
+                  }
                 />
                 <FormErrorMessage>
                   {validators.find((obj) => obj.path === "bairro")
@@ -417,7 +524,6 @@ export default function SaveClient() {
             </Grid>
             <Grid templateColumns="1fr 1fr 100px" gap="15px" mt={3}>
               <FormControl
-                id="cep"
                 isRequired
                 isInvalid={
                   validators.find((obj) => obj.path === "cep") ? true : false
@@ -430,6 +536,7 @@ export default function SaveClient() {
                   placeholder="CEP"
                   value={cep}
                   onChange={(e) => setCep(e.target.value)}
+                  id="cep"
                 />
                 <FormErrorMessage>
                   {validators.find((obj) => obj.path === "cep")
@@ -438,7 +545,6 @@ export default function SaveClient() {
                 </FormErrorMessage>
               </FormControl>
               <FormControl
-                id="city"
                 isRequired
                 isInvalid={
                   validators.find((obj) => obj.path === "city") ? true : false
@@ -450,7 +556,10 @@ export default function SaveClient() {
                   focusBorderColor={config.inputs}
                   type="text"
                   value={city}
-                  onChange={(e) => setCity(e.target.value)}
+                  onChange={(e) =>
+                    setCity(capitalizeFirstLetter(e.target.value))
+                  }
+                  id="city"
                 />
                 <FormErrorMessage>
                   {validators.find((obj) => obj.path === "city")
@@ -459,7 +568,6 @@ export default function SaveClient() {
                 </FormErrorMessage>
               </FormControl>
               <FormControl
-                id="uf"
                 isRequired
                 isInvalid={
                   validators.find((obj) => obj.path === "state") ? true : false
@@ -472,6 +580,7 @@ export default function SaveClient() {
                   focusBorderColor={config.inputs}
                   value={state}
                   onChange={(e) => setState(e.target.value)}
+                  id="state"
                 >
                   <option value="AC">AC</option>
                   <option value="AL">AL</option>
@@ -536,7 +645,7 @@ export default function SaveClient() {
 
             <AlertDialogBody>
               <Text>{modalMessage}</Text>
-              <Text color="red.500">
+              <Text color="red.500" mt={3}>
                 {modalErroMessage || modalErroMessage !== ""
                   ? `Erro: ${modalErroMessage}`
                   : ""}

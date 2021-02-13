@@ -51,7 +51,7 @@ const remote = window.require("electron").remote;
 export default function Layout() {
   const initialRef = useRef();
 
-  const { employee, setEmployee } = useEmployee();
+  const { setEmployee } = useEmployee();
 
   const [modalRoute, setModalRoute] = useState(false);
   const [modalConfirmeRoute, setModalConfirmeRoute] = useState(false);
@@ -73,6 +73,14 @@ export default function Layout() {
   const [modalMessage, setModalMessage] = useState("");
   const [showCloseButton, setShowCloseButton] = useState(false);
   const [typeRoute, setTypeRoute] = useState("https");
+
+  useEffect(() => {
+    setWrongUser(false);
+  }, [user]);
+
+  useEffect(() => {
+    setWrongPass(false);
+  }, [pass]);
 
   async function findRoute() {
     const tp = await localStorage.getItem("typert");
@@ -171,23 +179,13 @@ export default function Layout() {
       if (typeError === "Senha Inválida") {
         setWrongPassMessage(typeError);
         setWrongPass(true);
-        setTimeout(() => {
-          setWrongPass(false);
-          setUser("");
-          setPass("");
-          const input = document.getElementById("user");
-          input.focus();
-        }, 4000);
+        const input = document.getElementById("pass");
+        input.focus();
       } else {
         setWrongUserMessage(typeError);
         setWrongUser(true);
-        setTimeout(() => {
-          setWrongUser(false);
-          setUser("");
-          setPass("");
-          const input = document.getElementById("user");
-          input.focus();
-        }, 4000);
+        const input = document.getElementById("user");
+        input.focus();
       }
       setLoadingAuth(false);
     }
@@ -355,6 +353,7 @@ export default function Layout() {
                       value={pass}
                       onChange={(e) => setPass(e.target.value)}
                       focusBorderColor={config.inputs}
+                      id="pass"
                     />
                     <InputRightElement
                       children={
