@@ -30,12 +30,18 @@ import {
   IconButton,
   FormErrorMessage,
   Kbd,
+  Icon,
 } from "@chakra-ui/react";
 import Sider from "../components/sider";
 import Header from "../components/header";
 import { FaSave, FaUser, FaKey } from "react-icons/fa";
-import { AiOutlineLogin, AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
-import Lottie from "react-lottie";
+import {
+  AiOutlineLogin,
+  AiFillEyeInvisible,
+  AiFillEye,
+  AiOutlineEnter,
+} from "react-icons/ai";
+import Lottie from "../components/lottie";
 import serverAnimation from "../animations/server.json";
 import authAnimation from "../animations/auth.json";
 import config from "../configs/index";
@@ -133,24 +139,6 @@ export default function Layout() {
     findRoute();
   }, []);
 
-  const serverAnimationOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: serverAnimation,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-
-  const authAnimationOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: authAnimation,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-
   async function handleAuth(e) {
     e.preventDefault();
     if (user === "" || !user) {
@@ -228,14 +216,7 @@ export default function Layout() {
           <ModalContent maxW="40rem">
             <ModalBody>
               <Flex align="center" justify="center">
-                {modalRoute && (
-                  <Lottie
-                    options={serverAnimationOptions}
-                    height={200}
-                    width={200}
-                    isClickToPauseDisabled={true}
-                  />
-                )}
+                <Lottie animation={serverAnimation} height={200} width={200} />
               </Flex>
               <Center>
                 <Text textAlign="center" color="red.500">
@@ -311,15 +292,7 @@ export default function Layout() {
             <ModalBody pb={4}>
               <form onSubmit={handleAuth}>
                 <Flex align="center" justify="center" mb={5}>
-                  {modalAuth && (
-                    <Lottie
-                      options={authAnimationOptions}
-                      height={120}
-                      width={120}
-                      style={{ background: "transparent" }}
-                      isClickToPauseDisabled={true}
-                    />
-                  )}
+                  <Lottie animation={authAnimation} height={120} width={120} />
                 </Flex>
 
                 <FormControl isInvalid={wrongUser}>
@@ -384,7 +357,7 @@ export default function Layout() {
                   >
                     Login
                     <Kbd ml={3} color="ButtonText">
-                      Enter
+                      <Icon as={AiOutlineEnter} />
                     </Kbd>
                   </Button>
                 </Flex>
