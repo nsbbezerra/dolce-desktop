@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -32,6 +32,7 @@ import HeaderApp from "../../components/headerApp";
 import InputMask from "react-input-mask";
 import { AiOutlineEnter } from "react-icons/ai";
 import Hotkeys from "react-hot-keys";
+import axios from "axios";
 
 import { useEmployee } from "../../context/Employee";
 import api from "../../configs/axios";
@@ -55,7 +56,7 @@ export default function SaveClient() {
   const [contact, setContact] = useState("");
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
-  const [idClient, setIdClient] = useState("");
+  const [idClient, setIdClient] = useState(null);
 
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState("");
@@ -79,7 +80,7 @@ export default function SaveClient() {
     setCep("");
     setCity("");
     setState();
-    setIdClient("");
+    setIdClient(null);
     setPassword("");
   }
 
@@ -102,7 +103,9 @@ export default function SaveClient() {
   }
 
   async function register(e) {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     if (name === "" || !name) {
       handleValidator("name", "O Nome é obrigatório");
       return false;
@@ -117,6 +120,10 @@ export default function SaveClient() {
     }
     if (gender === "" || !gender) {
       handleValidator("gender", "o Gênero é obrigatório");
+      return false;
+    }
+    if (email === "" || !email) {
+      handleValidator("user", "O Email é obrigatório");
       return false;
     }
     if (
@@ -137,12 +144,12 @@ export default function SaveClient() {
       handleValidator("contact", "Digite um Telefone válido");
       return false;
     }
-    if (user === "" || !user) {
-      handleValidator("user", "O Nome de usuário é obrigatório");
-      return false;
-    }
     if (password === "" || !password) {
       handleValidator("password", "A Senha é obrigatória");
+      return false;
+    }
+    if (user === "" || !user) {
+      handleValidator("user", "O Nome de usuário é obrigatório");
       return false;
     }
     setLoading(true);
@@ -160,7 +167,7 @@ export default function SaveClient() {
         },
         { headers: { "x-access-token": employee.token } }
       );
-      setIdClient(response.data.client._id);
+      setIdClient(response.data.client);
       setLoading(false);
       showToast(response.data.message, "success", "Sucesso");
       setModalAddress(true);
@@ -180,7 +187,7 @@ export default function SaveClient() {
   }
 
   async function registerAddress() {
-    if (idClient === "" || !idClient) {
+    if (idClient === null || !idClient) {
       setModalErroMessage("Cod: 400");
       setModalMessage("Nenhum cliente selecionado");
       setModalTitle("Erro no cadastro");
@@ -231,7 +238,7 @@ export default function SaveClient() {
         },
         { headers: { "x-access-token": employee.token } }
       );
-      showToast(response.data.message);
+      showToast(response.data.message, "success", "Sucesso");
       setModalAddress(false);
       setLoadingAddress(false);
       clear();
@@ -265,9 +272,37 @@ export default function SaveClient() {
     }
   }
 
+  useEffect(() => {
+    handleCep(cep);
+  }, [cep]);
+
+  async function handleCep(value) {
+    const parse = value.replace(/([\u0300-\u036f]|[^0-9a-zA-Z])/g, "");
+    if (parse.length === 8) {
+      try {
+        const response = await axios.get(
+          `https://brasilapi.com.br/api/cep/v1/${parse}`
+        );
+        setValidators([]);
+        setCity(response.data.city);
+        setState(response.data.state);
+      } catch (error) {
+        const err = error.response.data.errors[0].message || "CEP Inválido";
+        handleValidator("cep", err);
+      }
+    }
+  }
+
   return (
     <>
-      <Hotkeys keyName="return, enter" onKeyDown={onKeyDown} allowRepeat>
+      <Hotkeys
+        keyName="return, enter"
+        onKeyDown={onKeyDown}
+        allowRepeat
+        filter={(event) => {
+          return true;
+        }}
+      >
         <HeaderApp title="Cadastro de Clientes" icon={FaUserFriends} />
 
         <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
@@ -344,6 +379,7 @@ export default function SaveClient() {
               isInvalid={
                 validators.find((obj) => obj.path === "email") ? true : false
               }
+              isRequired
             >
               <FormLabel>Email</FormLabel>
               <Input

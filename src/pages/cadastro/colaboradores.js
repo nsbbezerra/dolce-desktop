@@ -72,7 +72,7 @@ export default function Colaboradores() {
       title: title,
       description: message,
       status: status,
-      position: "top-right",
+      position: "bottom-right",
     });
   }
 
@@ -106,7 +106,9 @@ export default function Colaboradores() {
   }
 
   async function register(e) {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     if (name === "" || !name) {
       handleValidator("name", "O Nome é obrigatório");
       return false;
@@ -179,14 +181,21 @@ export default function Colaboradores() {
   }
 
   function onKeyDown(keyName, e, handle) {
-    if (keyName === "return") {
+    if (keyName === "return" || keyName === "enter") {
       register(e);
     }
   }
 
   return (
     <>
-      <Hotkeys keyName="return, enter" onKeyDown={onKeyDown} allowRepeat>
+      <Hotkeys
+        keyName="return, enter"
+        onKeyDown={onKeyDown}
+        allowRepeat
+        filter={(event) => {
+          return true;
+        }}
+      >
         <HeaderApp title="Cadastro de Colaboradores" icon={FaIdCard} />
 
         <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
