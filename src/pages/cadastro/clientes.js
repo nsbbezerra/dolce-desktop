@@ -227,7 +227,7 @@ export default function SaveClient() {
       const response = await api.post(
         "/address",
         {
-          client: idClient,
+          client_id: idClient,
           street,
           number,
           comp,
