@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Tabs,
@@ -45,7 +45,22 @@ import Imgs from "./imagens";
 
 export default function Produtos() {
   const { colorMode } = useColorMode();
+
   const [modalAdv, setModalAdv] = useState(true);
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const handleTabsChange = (index) => {
+    setTabIndex(index);
+  };
+
+  function handleTabIndex() {
+    if (tabIndex >= 7) {
+      setTabIndex(0);
+    } else {
+      setTabIndex(tabIndex + 1);
+    }
+  }
+
   return (
     <>
       <HeaderApp title="Cadastro de Produtos" icon={FaTag} />
@@ -62,7 +77,9 @@ export default function Produtos() {
               />
             </FormControl>
             <FormControl>
-              <FormLabel color="transparent">o</FormLabel>
+              <FormLabel color="transparent" userSelect="none">
+                o
+              </FormLabel>
               <Button isFullWidth>Buscar Departamento</Button>
             </FormControl>
           </HStack>
@@ -76,7 +93,9 @@ export default function Produtos() {
               />
             </FormControl>
             <FormControl>
-              <FormLabel color="transparent">o</FormLabel>
+              <FormLabel color="transparent" userSelect="none">
+                o
+              </FormLabel>
               <Button isFullWidth>Buscar Categoria</Button>
             </FormControl>
           </HStack>
@@ -85,7 +104,12 @@ export default function Produtos() {
         <Divider mt={5} mb={5} />
 
         <Box>
-          <Tabs variant="enclosed" colorScheme={config.tabs}>
+          <Tabs
+            variant="enclosed"
+            colorScheme={config.tabs}
+            index={tabIndex}
+            onChange={handleTabsChange}
+          >
             <TabList>
               <Tab>Informações</Tab>
               <Tab>Tributação</Tab>
@@ -99,15 +123,18 @@ export default function Produtos() {
               {/** INFORMAÇÕES */}
               <TabPanel>
                 <Grid templateColumns="280px 1fr" gap="15px">
-                  <Box>
-                    <InputFile alt={310} lar={280} cor={colorMode}>
-                      <File type="file" />
-                      <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
-                      <Text>
-                        Insira uma imagem 280x310 pixels, de até 500kb
-                      </Text>
-                    </InputFile>
-                  </Box>
+                  <FormControl isRequired>
+                    <FormLabel>Imagem</FormLabel>
+                    <Box>
+                      <InputFile alt={310} lar={280} cor={colorMode}>
+                        <File type="file" />
+                        <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
+                        <Text>
+                          Insira uma imagem 280x310 pixels, de até 500kb
+                        </Text>
+                      </InputFile>
+                    </Box>
+                  </FormControl>
                   <Box>
                     <Grid templateColumns="1fr 200px 200px" gap="15px">
                       <FormControl isRequired mr={3}>
@@ -126,7 +153,7 @@ export default function Produtos() {
                         />
                       </FormControl>
 
-                      <FormControl mr={3} isRequired>
+                      <FormControl mr={3}>
                         <FormLabel>Cod. SKU</FormLabel>
                         <Input
                           placeholder="Código SKU"
@@ -153,6 +180,7 @@ export default function Produtos() {
                   leftIcon={<FaArrowRight />}
                   colorScheme="blue"
                   size="lg"
+                  onClick={() => handleTabIndex()}
                 >
                   Próximo
                 </Button>
@@ -451,6 +479,7 @@ export default function Produtos() {
                   leftIcon={<FaArrowRight />}
                   colorScheme="blue"
                   size="lg"
+                  onClick={() => handleTabIndex()}
                 >
                   Próximo
                 </Button>
@@ -534,7 +563,12 @@ export default function Produtos() {
                   </FormControl>
                 </Grid>
                 <Divider mt={5} mb={5} />
-                <Button leftIcon={<FaSave />} colorScheme="blue" size="lg">
+                <Button
+                  leftIcon={<FaSave />}
+                  colorScheme="blue"
+                  size="lg"
+                  onClick={() => handleTabIndex()}
+                >
                   Salvar e Continuar
                 </Button>
               </TabPanel>

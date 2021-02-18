@@ -77,55 +77,53 @@ export default function ConfigsApp() {
     <>
       <HeaderApp title="Configurações do Sistema" icon={FaCog} />
 
-      <Box borderWidth="1px" shadow="md" rounded="md" p={3} mt="25px">
-        <Grid templateColumns="repeat(3, 1fr)" gap="15px">
-          <Box borderWidth="1px" rounded="md">
-            <Center p={2}>
-              <Heading fontSize="sm">Conexão com o Servidor</Heading>
-            </Center>
-            <Divider />
-            <Box p={3}>
+      <Grid templateColumns="repeat(3, 1fr)" gap="15px" mt="25px">
+        <Box borderWidth="1px" rounded="md" shadow="md">
+          <Center p={2}>
+            <Heading fontSize="sm">Conexão com o Servidor</Heading>
+          </Center>
+          <Divider />
+          <Box p={3}>
+            <FormControl>
+              <FormLabel>Rota (url):</FormLabel>
+              <Input
+                focusBorderColor={config.inputs}
+                value={route}
+                onChange={(e) => setRoute(e.target.value)}
+              />
+            </FormControl>
+            <Grid templateColumns="1fr 1fr" mt={3} gap="15px">
               <FormControl>
-                <FormLabel>Rota (url):</FormLabel>
+                <FormLabel>Protocolo</FormLabel>
+                <Select
+                  value={typeUrl}
+                  onChange={(e) => setTypeUrl(e.target.value)}
+                  focusBorderColor={config.inputs}
+                >
+                  <option value="http">http</option>
+                  <option value="https">https</option>
+                </Select>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Porta</FormLabel>
                 <Input
                   focusBorderColor={config.inputs}
-                  value={route}
-                  onChange={(e) => setRoute(e.target.value)}
+                  value={port}
+                  onChange={(e) => setPort(e.target.value)}
                 />
               </FormControl>
-              <Grid templateColumns="1fr 1fr" mt={3} gap="15px">
-                <FormControl>
-                  <FormLabel>Protocolo</FormLabel>
-                  <Select
-                    value={typeUrl}
-                    onChange={(e) => setTypeUrl(e.target.value)}
-                    focusBorderColor={config.inputs}
-                  >
-                    <option value="http">http</option>
-                    <option value="https">https</option>
-                  </Select>
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Porta</FormLabel>
-                  <Input
-                    focusBorderColor={config.inputs}
-                    value={port}
-                    onChange={(e) => setPort(e.target.value)}
-                  />
-                </FormControl>
-              </Grid>
-              <Button
-                leftIcon={<FaSave />}
-                mt={3}
-                colorScheme="blue"
-                onClick={() => saveRoute()}
-              >
-                Salvar
-              </Button>
-            </Box>
+            </Grid>
+            <Button
+              leftIcon={<FaSave />}
+              mt={3}
+              colorScheme="blue"
+              onClick={() => saveRoute()}
+            >
+              Salvar
+            </Button>
           </Box>
-        </Grid>
-      </Box>
+        </Box>
+      </Grid>
 
       <AlertDialog
         isOpen={modalConfirmeRoute}
