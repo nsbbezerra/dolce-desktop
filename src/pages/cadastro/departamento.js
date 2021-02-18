@@ -85,6 +85,7 @@ export default function Departamento() {
       description: message,
       status: status,
       position: "bottom-right",
+      duration: 8000,
     });
   }
 

@@ -99,6 +99,7 @@ export default function SaveClient() {
       description: message,
       status: status,
       position: "bottom-right",
+      duration: 8000,
     });
   }
 
