@@ -32,12 +32,15 @@ import {
   FaPercentage,
   FaReceipt,
   FaFileImport,
+  FaImages,
+  FaRulerCombined,
 } from "react-icons/fa";
 import {
   AiFillShop,
   AiFillBank,
   AiOutlineRise,
   AiOutlineFall,
+  AiOutlineBgColors,
 } from "react-icons/ai";
 import { MdDashboard } from "react-icons/md";
 import config from "../configs";
@@ -107,7 +110,7 @@ export default function Sider() {
         </MenuList>
       </Menu>
 
-      <Menu placement="right">
+      <Menu placement="right-start">
         <Tooltip label="Cadastros" hasArrow placement="top-start">
           <MenuButton
             mt={3}
@@ -157,6 +160,22 @@ export default function Sider() {
           >
             Produtos
           </MenuItem>
+          <MenuItem
+            icon={<AiOutlineBgColors />}
+            onClick={() => routing("/colors")}
+          >
+            Cores
+          </MenuItem>
+          <MenuItem
+            icon={<FaRulerCombined />}
+            onClick={() => routing("/sizes")}
+          >
+            Tamanhos
+          </MenuItem>
+          <MenuItem icon={<FaImages />} onClick={() => routing("/images")}>
+            Imagens
+          </MenuItem>
+          <MenuDivider />
           <MenuItem
             icon={<FaFileImport />}
             onClick={() => routing("/registerProducts")}

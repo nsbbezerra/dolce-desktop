@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Box,
   Tabs,
@@ -19,12 +19,28 @@ import {
   Tooltip,
   Text,
   useColorMode,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
+  Stack,
+  Skeleton,
   ModalBody,
+  ModalCloseButton,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Td,
+  IconButton,
+  FormErrorMessage,
+  Flex,
+  Image,
 } from "@chakra-ui/react";
 import HeaderApp from "../../../components/headerApp";
 import {
@@ -33,32 +49,184 @@ import {
   FaArrowRight,
   FaCalculator,
   FaImage,
+  FaCheck,
+  FaSearch,
 } from "react-icons/fa";
+import { AiOutlineClose, AiOutlineEnter } from "react-icons/ai";
 import { File, InputFile } from "../../../style/uploader";
 import config from "../../../configs";
-
 import dataTrib from "../../../data/data";
-
-import Cores from "./cores";
-import Tamanhos from "./tamanhos";
-import Imgs from "./imagens";
+import { useEmployee } from "../../../context/Employee";
+import useFetch from "../../../hooks/useFetch";
 
 export default function Produtos() {
   const { colorMode } = useColorMode();
+  const { employee } = useEmployee();
+  const { data, error } = useFetch("/findDependents");
+  const initialRef = useRef();
 
-  const [modalAdv, setModalAdv] = useState(true);
   const [tabIndex, setTabIndex] = useState(0);
+  const [modalCategories, setModalCategories] = useState(false);
+  const [modalDepartments, setModalDepartments] = useState(false);
+  const [validators, setValidators] = useState([]);
+  const [findCategories, setFindCategories] = useState("");
+  const [findDepartments, setFindDepartments] = useState("");
+
+  useEffect(() => {
+    if (data) {
+      setDepartments(data.departments);
+      setCategories(data.categories);
+    }
+  }, [data]);
+
+  /** STATES PRIMEIRA TAB */
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [barcode, setBarcode] = useState("");
+  const [sku, setSku] = useState("");
+  const [thumbnail, setThumbnail] = useState(null);
+
+  /** STATES SEGUNDA TAB */
+  const [icmsRate, setIcmsRate] = useState(0);
+  const [icmsCst, setIcmsCst] = useState("");
+  const [pisRate, setPisRate] = useState(0);
+  const [pisCst, setPisCst] = useState("");
+  const [cofinsRate, setCofinsRate] = useState(0);
+  const [cofinsCst, setCofinsCst] = useState("");
+  const [icsmOrigin, setIcmsOrigin] = useState("");
+  const [icmsStRate, setIcmsStRate] = useState(0);
+  const [icmsMVA, setIcmsMVA] = useState(0);
+  const [icmsStModBc, setIcmsStModBc] = useState("");
+  const [fcpRate, setFcpRate] = useState(0);
+  const [fcpStRate, setFcpStRate] = useState(0);
+  const [ipiRate, setIpiRate] = useState(0);
+  const [ipiCode, setIpiCode] = useState("");
+  const [ipiCst, setIpiCst] = useState("");
+
+  /** STATES TERCEIRA TAB */
+  const [margeLucro, setMargeLucro] = useState(0);
+  const [costValue, setCostValue] = useState(0);
+  const [otherCost, setOtherCost] = useState(0);
+  const [saleValue, setSaleValue] = useState(0);
+  const [productHeight, setProductHeight] = useState(0);
+  const [productWidth, setProductWidht] = useState(0);
+  const [productDiameter, setProductDiameter] = useState(0);
+  const [productLength, setProductLength] = useState(0);
+  const [productWeight, setProductWeight] = useState(0);
+
+  const [departmentName, setDepartmentName] = useState("");
+  const [departmentId, setDepartmentId] = useState(null);
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryId, setCategoryId] = useState(null);
+  const [departments, setDepartments] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  function clear() {
+    setDepartmentName("");
+    setDepartmentId(null);
+    setCategoryName("");
+    setCategoryId(null);
+    setTabIndex(0);
+    setName("");
+    setDescription("");
+    setBarcode("");
+    setSku("");
+    setThumbnail(null);
+    setIcmsRate(0);
+    setIcmsCst("");
+    setPisRate(0);
+    setPisCst("");
+    setCofinsRate(0);
+    setCofinsCst("");
+    setIcmsOrigin("");
+    setIcmsStRate(0);
+    setIcmsMVA(0);
+    setIcmsStModBc("");
+    setFcpRate(0);
+    setFcpStRate(0);
+    setIpiRate(0);
+    setIpiCode("");
+    setIpiCst("");
+    setMargeLucro(0);
+    setCostValue(0);
+    setOtherCost(0);
+    setSaleValue(0);
+    setProductWeight(0);
+    setProductWidht(0);
+    setProductHeight(0);
+    setProductDiameter(0);
+    setProductLength(0);
+  }
+
+  const previewThumbnail = useMemo(() => {
+    return thumbnail ? URL.createObjectURL(thumbnail) : null;
+  }, [thumbnail]);
+
+  async function removeThumbnail() {
+    await URL.revokeObjectURL(thumbnail);
+    setThumbnail(null);
+    setValidators([]);
+  }
 
   const handleTabsChange = (index) => {
     setTabIndex(index);
   };
 
   function handleTabIndex() {
-    if (tabIndex >= 7) {
+    if (tabIndex >= 4) {
       setTabIndex(0);
     } else {
       setTabIndex(tabIndex + 1);
     }
+  }
+
+  useEffect(() => {
+    finderCategorieBySource(findCategories);
+  }, [findCategories]);
+
+  async function finderCategorieBySource(text) {
+    if (text === "") {
+      if (data) {
+        await setCategories(data.categories);
+      }
+    } else {
+      let termos = await text.split(" ");
+      let frasesFiltradas = await categories.filter((frase) => {
+        return termos.reduce((resultadoAnterior, termoBuscado) => {
+          return resultadoAnterior && frase.name.includes(termoBuscado);
+        }, true);
+      });
+      await setCategories(frasesFiltradas);
+    }
+  }
+
+  useEffect(() => {
+    finderDepartmentsBySource(findDepartments);
+  }, [findDepartments]);
+
+  async function finderDepartmentsBySource(text) {
+    if (text === "") {
+      if (data) {
+        await setDepartments(data.departments);
+      }
+    } else {
+      let termos = await text.split(" ");
+      let frasesFiltradas = await departments.filter((frase) => {
+        return termos.reduce((resultadoAnterior, termoBuscado) => {
+          return resultadoAnterior && frase.name.includes(termoBuscado);
+        }, true);
+      });
+      await setDepartments(frasesFiltradas);
+    }
+  }
+
+  function capitalizeAllFirstLetter(string) {
+    let splited = string.split(" ");
+    let toJoin = splited.map((e) => {
+      return e.charAt(0).toUpperCase() + e.slice(1);
+    });
+    let joined = toJoin.join(" ");
+    return joined;
   }
 
   return (
@@ -80,7 +248,13 @@ export default function Produtos() {
               <FormLabel color="transparent" userSelect="none">
                 o
               </FormLabel>
-              <Button isFullWidth>Buscar Departamento</Button>
+              <Button
+                isFullWidth
+                leftIcon={<FaSearch />}
+                onClick={() => setModalDepartments(true)}
+              >
+                Buscar Departamento
+              </Button>
             </FormControl>
           </HStack>
           <HStack spacing="5px">
@@ -96,7 +270,13 @@ export default function Produtos() {
               <FormLabel color="transparent" userSelect="none">
                 o
               </FormLabel>
-              <Button isFullWidth>Buscar Categoria</Button>
+              <Button
+                isFullWidth
+                leftIcon={<FaSearch />}
+                onClick={() => setModalCategories(true)}
+              >
+                Buscar Categoria
+              </Button>
             </FormControl>
           </HStack>
         </Grid>
@@ -114,26 +294,58 @@ export default function Produtos() {
               <Tab>Informações</Tab>
               <Tab>Tributação</Tab>
               <Tab>Preço e Frete</Tab>
-              <Tab>Cores</Tab>
-              <Tab>Tamanhos</Tab>
-              <Tab>Imagens</Tab>
             </TabList>
 
             <TabPanels>
               {/** INFORMAÇÕES */}
               <TabPanel>
                 <Grid templateColumns="280px 1fr" gap="15px">
-                  <FormControl isRequired>
+                  <FormControl
+                    isRequired
+                    isInvalid={
+                      validators.find((obj) => obj.path === "image")
+                        ? true
+                        : false
+                    }
+                  >
                     <FormLabel>Imagem</FormLabel>
-                    <Box>
-                      <InputFile alt={310} lar={280} cor={colorMode}>
-                        <File type="file" />
-                        <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
-                        <Text>
-                          Insira uma imagem 280x310 pixels, de até 500kb
-                        </Text>
-                      </InputFile>
+                    <Box w="280px" h="310px">
+                      {thumbnail ? (
+                        <Box rounded="md" borderWidth="1px" overflow="hidden">
+                          <Image src={previewThumbnail} w="280px" h="310px" />
+                          <Flex justify="center" mt="-30px">
+                            <Tooltip label="Remover Imagem" hasArrow>
+                              <IconButton
+                                icon={<AiOutlineClose />}
+                                colorScheme="red"
+                                rounded="full"
+                                size="sm"
+                                shadow="md"
+                                onClick={() => removeThumbnail()}
+                              />
+                            </Tooltip>
+                          </Flex>
+                        </Box>
+                      ) : (
+                        <InputFile alt={310} lar={280} cor={colorMode}>
+                          <File
+                            type="file"
+                            onChange={(event) =>
+                              setThumbnail(event.target.files[0])
+                            }
+                          />
+                          <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
+                          <Text>
+                            Insira uma imagem 280x310 pixels, de até 500kb
+                          </Text>
+                        </InputFile>
+                      )}
                     </Box>
+                    <FormErrorMessage>
+                      {validators.find((obj) => obj.path === "image")
+                        ? validators.find((obj) => obj.path === "image").message
+                        : ""}
+                    </FormErrorMessage>
                   </FormControl>
                   <Box>
                     <Grid templateColumns="1fr 200px 200px" gap="15px">
@@ -197,11 +409,17 @@ export default function Produtos() {
                     <Grid templateColumns="1fr 1fr" gap="10px" p={2}>
                       <FormControl mr={3}>
                         <FormLabel>Alíquota</FormLabel>
-                        <Input
-                          placeholder="Alíquota"
-                          type="number"
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
                           focusBorderColor={config.inputs}
-                        />
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
                       </FormControl>
                       <FormControl mr={3}>
                         <FormLabel>CSOSN</FormLabel>
@@ -255,11 +473,17 @@ export default function Produtos() {
                     <Grid templateColumns="1fr 1fr" gap="10px" p={2}>
                       <FormControl mr={3}>
                         <FormLabel>Alíquota</FormLabel>
-                        <Input
-                          placeholder="Alíquota"
-                          type="number"
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
                           focusBorderColor={config.inputs}
-                        />
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
                       </FormControl>
                       <FormControl mr={3}>
                         <FormLabel>CST</FormLabel>
@@ -280,11 +504,17 @@ export default function Produtos() {
                     <Grid templateColumns="1fr 1fr" gap="10px" p={2}>
                       <FormControl mr={3}>
                         <FormLabel>Alíquota</FormLabel>
-                        <Input
-                          placeholder="Alíquota"
-                          type="number"
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
                           focusBorderColor={config.inputs}
-                        />
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
                       </FormControl>
                       <FormControl mr={3}>
                         <FormLabel>CST</FormLabel>
@@ -347,11 +577,17 @@ export default function Produtos() {
                           label="Alíquota de Substituição Tributária"
                           hasArrow
                         >
-                          <Input
-                            placeholder="Alíquota"
-                            type="number"
+                          <NumberInput
+                            precision={2}
+                            step={0.01}
                             focusBorderColor={config.inputs}
-                          />
+                          >
+                            <NumberInputField />
+                            <NumberInputStepper>
+                              <NumberIncrementStepper />
+                              <NumberDecrementStepper />
+                            </NumberInputStepper>
+                          </NumberInput>
                         </Tooltip>
                       </FormControl>
                       <FormControl mr={3}>
@@ -361,11 +597,17 @@ export default function Produtos() {
                           label="Alíquota ST Margem de Valor Adicionada"
                           hasArrow
                         >
-                          <Input
-                            placeholder="Alíquota MVA"
-                            type="number"
+                          <NumberInput
+                            precision={2}
+                            step={0.01}
                             focusBorderColor={config.inputs}
-                          />
+                          >
+                            <NumberInputField />
+                            <NumberInputStepper>
+                              <NumberIncrementStepper />
+                              <NumberDecrementStepper />
+                            </NumberInputStepper>
+                          </NumberInput>
                         </Tooltip>
                       </FormControl>
                     </Grid>
@@ -395,11 +637,17 @@ export default function Produtos() {
                         <FormLabel>% FCP</FormLabel>
 
                         <Tooltip label="Alíquota FCP" hasArrow>
-                          <Input
-                            placeholder="Alíquota"
-                            type="number"
+                          <NumberInput
+                            precision={2}
+                            step={0.01}
                             focusBorderColor={config.inputs}
-                          />
+                          >
+                            <NumberInputField />
+                            <NumberInputStepper>
+                              <NumberIncrementStepper />
+                              <NumberDecrementStepper />
+                            </NumberInputStepper>
+                          </NumberInput>
                         </Tooltip>
                       </FormControl>
                       <FormControl mr={3}>
@@ -409,11 +657,17 @@ export default function Produtos() {
                           label="Alíquota FCP de Substituição Tributária"
                           hasArrow
                         >
-                          <Input
-                            placeholder="Alíquota MVA"
-                            type="number"
+                          <NumberInput
+                            precision={2}
+                            step={0.01}
                             focusBorderColor={config.inputs}
-                          />
+                          >
+                            <NumberInputField />
+                            <NumberInputStepper>
+                              <NumberIncrementStepper />
+                              <NumberDecrementStepper />
+                            </NumberInputStepper>
+                          </NumberInput>
                         </Tooltip>
                       </FormControl>
                     </Grid>
@@ -427,11 +681,17 @@ export default function Produtos() {
                     <Grid templateColumns="1fr 1fr 1fr" gap="10px" p={2}>
                       <FormControl mr={3}>
                         <FormLabel>Alíquota</FormLabel>
-                        <Input
-                          placeholder="Alíquota"
-                          type="number"
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
                           focusBorderColor={config.inputs}
-                        />
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
                       </FormControl>
                       <FormControl mr={3}>
                         <FormLabel>Código</FormLabel>
@@ -490,19 +750,31 @@ export default function Produtos() {
                 <Grid templateColumns="repeat(4, 1fr)" gap="15px">
                   <FormControl isRequired mr={3}>
                     <FormLabel>Margem de Lucro %</FormLabel>
-                    <Input
-                      placeholder="Margem de Lucro"
-                      type="number"
+                    <NumberInput
+                      precision={2}
+                      step={0.01}
                       focusBorderColor={config.inputs}
-                    />
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                   </FormControl>
                   <FormControl isRequired mr={3}>
                     <FormLabel>Valor de Custo</FormLabel>
-                    <Input
-                      placeholder="Valor de Custo"
-                      type="number"
+                    <NumberInput
+                      precision={2}
+                      step={0.01}
                       focusBorderColor={config.inputs}
-                    />
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                   </FormControl>
                   <FormControl mr={3}>
                     <FormLabel>Outros Custos</FormLabel>
@@ -514,52 +786,99 @@ export default function Produtos() {
                   </FormControl>
                   <FormControl isRequired mr={3}>
                     <FormLabel>Valor de Venda</FormLabel>
-                    <Input
-                      placeholder="Valor de Venda"
-                      type="number"
+                    <NumberInput
+                      precision={2}
+                      step={0.01}
                       focusBorderColor={config.inputs}
-                    />
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                   </FormControl>
                 </Grid>
                 <Button leftIcon={<FaCalculator />} mt={3}>
                   Calcular Preço de Venda
                 </Button>
+
                 <Divider mt={5} mb={5} />
+
                 <Text fontSize="sm" color="red.400" mb={3}>
                   Preencha cada campo com a quantidade referente a 1 (um) item.
                 </Text>
-                <Grid templateColumns="repeat(4, 1fr)" gap="15px">
+
+                <Grid templateColumns="repeat(5, 1fr)" gap="15px">
                   <FormControl isRequired mr={3}>
                     <FormLabel>Altura</FormLabel>
-                    <Input
-                      placeholder="Altura"
-                      type="number"
+                    <NumberInput
+                      precision={2}
+                      step={0.01}
                       focusBorderColor={config.inputs}
-                    />
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                   </FormControl>
                   <FormControl isRequired mr={3}>
                     <FormLabel>Largura</FormLabel>
-                    <Input
-                      placeholder="Largura"
-                      type="number"
+                    <NumberInput
+                      precision={2}
+                      step={0.01}
                       focusBorderColor={config.inputs}
-                    />
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                   </FormControl>
                   <FormControl isRequired mr={3}>
                     <FormLabel>Comprimento</FormLabel>
-                    <Input
-                      placeholder="Comprimento"
-                      type="number"
+                    <NumberInput
+                      precision={2}
+                      step={0.01}
                       focusBorderColor={config.inputs}
-                    />
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                  </FormControl>
+                  <FormControl isRequired mr={3}>
+                    <FormLabel>Diâmetro</FormLabel>
+                    <NumberInput
+                      precision={2}
+                      step={0.01}
+                      focusBorderColor={config.inputs}
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                   </FormControl>
                   <FormControl isRequired mr={3}>
                     <FormLabel>Peso</FormLabel>
-                    <Input
-                      placeholder="Peso"
-                      type="number"
+                    <NumberInput
+                      precision={2}
+                      step={0.01}
                       focusBorderColor={config.inputs}
-                    />
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                   </FormControl>
                 </Grid>
                 <Divider mt={5} mb={5} />
@@ -569,20 +888,8 @@ export default function Produtos() {
                   size="lg"
                   onClick={() => handleTabIndex()}
                 >
-                  Salvar e Continuar
+                  Salvar
                 </Button>
-              </TabPanel>
-
-              <TabPanel>
-                <Cores id="1200" />
-              </TabPanel>
-
-              <TabPanel>
-                <Tamanhos id="1200" />
-              </TabPanel>
-
-              <TabPanel>
-                <Imgs id="1200" />
               </TabPanel>
             </TabPanels>
           </Tabs>
@@ -590,38 +897,121 @@ export default function Produtos() {
       </Box>
 
       <Modal
-        isOpen={modalAdv}
-        onClose={() => setModalAdv(false)}
-        closeOnEsc={false}
-        closeOnOverlayClick={false}
+        isOpen={modalCategories}
+        onClose={() => setModalCategories(false)}
+        size="xl"
+        scrollBehavior="inside"
         isCentered
+        initialFocusRef={initialRef}
       >
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Atençao</ModalHeader>
-
+        <ModalContent pb={4}>
+          <ModalHeader>Categorias</ModalHeader>
+          <ModalCloseButton />
           <ModalBody>
-            <Text>
-              O cadastro de produtos deve ocorrer sem interrupções desde o
-              início até o final, caso saia da tela de cadastro sem completar o
-              cadastro, o cadastramento incompleto fará com que toda a aplicação
-              não se comporte como o esperado.
-            </Text>
-            <Text fontWeight="700" color="red.400">
-              É indispensável completar o cadastro, passe por todos os passos
-              (INFORMAÇÕES, TRIBUTAÇÃO, VALORES, CORES, TAMANHOS E IMAGENS).
-            </Text>
-          </ModalBody>
+            <Input
+              placeholder="Digite para Buscar"
+              focusBorderColor={config.inputs}
+              value={findCategories}
+              onChange={(e) =>
+                setFindCategories(capitalizeAllFirstLetter(e.target.value))
+              }
+              ref={initialRef}
+            />
 
-          <ModalFooter>
-            <Button
-              colorScheme="green"
-              mr={3}
-              onClick={() => setModalAdv(false)}
-            >
-              Concordo
-            </Button>
-          </ModalFooter>
+            {!!categories.length ? (
+              <Table size="sm" mt={3}>
+                <Thead fontWeight="700">
+                  <Tr>
+                    <Td>Categoria</Td>
+                    <Td w="10%" isNumeric></Td>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {categories.map((cat) => (
+                    <Tr key={cat.id}>
+                      <Td>{cat.name}</Td>
+                      <Td w="10%" isNumeric>
+                        <IconButton
+                          aria-label="Search database"
+                          icon={<FaCheck />}
+                          size="xs"
+                          isRound
+                          colorScheme="blue"
+                        />
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            ) : (
+              <Stack mt={3}>
+                <Skeleton height="30px" />
+                <Skeleton height="30px" />
+                <Skeleton height="30px" />
+                <Skeleton height="30px" />
+              </Stack>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={modalDepartments}
+        onClose={() => setModalDepartments(false)}
+        size="xl"
+        scrollBehavior="inside"
+        isCentered
+        initialFocusRef={initialRef}
+      >
+        <ModalOverlay />
+        <ModalContent pb={4}>
+          <ModalHeader>Departamentos</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              placeholder="Digite para Buscar"
+              focusBorderColor={config.inputs}
+              value={findDepartments}
+              onChange={(e) =>
+                setFindDepartments(capitalizeAllFirstLetter(e.target.value))
+              }
+              ref={initialRef}
+            />
+            {!!departments.length ? (
+              <Table size="sm" mt={3}>
+                <Thead fontWeight="700">
+                  <Tr>
+                    <Td>Departamento</Td>
+                    <Td w="10%" isNumeric></Td>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {departments.map((dep) => (
+                    <Tr key={dep.id}>
+                      <Td>{dep.name}</Td>
+                      <Td w="10%" isNumeric>
+                        <IconButton
+                          aria-label="Search database"
+                          icon={<FaCheck />}
+                          size="xs"
+                          isRound
+                          colorScheme="blue"
+                        />
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            ) : (
+              <Stack mt={3}>
+                <Skeleton height="30px" />
+                <Skeleton height="30px" />
+                <Skeleton height="30px" />
+                <Skeleton height="30px" />
+              </Stack>
+            )}
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>
