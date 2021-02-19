@@ -82,10 +82,28 @@ export default function Categoria() {
     setDepartments(data);
   }, [data]);
 
+  useEffect(() => {
+    if (thumbnail) {
+      let size = thumbnail.size / 1024;
+      let thumbname = thumbnail.name;
+      if (thumbname.includes(" ")) {
+        handleValidator("image", "Nome da imagem não pode conter espaços");
+      }
+      if (size > 500) {
+        handleValidator(
+          "image",
+          "Imagem maior que 500kb, insira uma imagem menor"
+        );
+      }
+    } else {
+      setValidators([]);
+    }
+  }, [thumbnail]);
+
   if (error) {
     const statusCode = error.response.status || 400;
     const typeError =
-      error.response.data.message || "Ocorreu um erro ao salvar";
+      error.response.data.message || "Ocorreu um erro ao buscar";
     const errorMesg = error.response.data.errorMessage || statusCode;
     const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
     showToast(
@@ -176,6 +194,7 @@ export default function Categoria() {
         "image",
         "Imagem maior que 500kb, insira uma imagem menor"
       );
+      return false;
     }
     if (!name || name === "") {
       handleValidator("name", "Insira um nome para a categoria");

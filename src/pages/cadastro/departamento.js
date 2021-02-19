@@ -107,6 +107,7 @@ export default function Departamento() {
         "image",
         "Imagem maior que 500kb, insira uma imagem menor"
       );
+      return false;
     }
     if (!name || name === "") {
       handleValidator("name", "Insira um nome para este departamento");

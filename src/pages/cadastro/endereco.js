@@ -149,7 +149,7 @@ export default function Endereco() {
   if (error) {
     const statusCode = error.response.status || 400;
     const typeError =
-      error.response.data.message || "Ocorreu um erro ao salvar";
+      error.response.data.message || "Ocorreu um erro ao buscar";
     const errorMesg = error.response.data.errorMessage || statusCode;
     const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
     showToast(
