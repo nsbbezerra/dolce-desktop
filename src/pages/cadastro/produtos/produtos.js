@@ -62,6 +62,8 @@ import { useEmployee } from "../../../context/Employee";
 import useFetch from "../../../hooks/useFetch";
 import Hotkeys from "react-hot-keys";
 import api from "../../../configs/axios";
+import marge from "../../../data/marge";
+import InputMask from "react-input-mask";
 
 export default function Produtos() {
   const { colorMode } = useColorMode();
@@ -113,7 +115,7 @@ export default function Produtos() {
   const [cest, setCest] = useState("");
 
   /** STATES TERCEIRA TAB */
-  const [margeLucro, setMargeLucro] = useState(0);
+  const [margeLucro, setMargeLucro] = useState(1.15);
   const [costValue, setCostValue] = useState(0);
   const [otherCost, setOtherCost] = useState(0);
   const [saleValue, setSaleValue] = useState(0);
@@ -161,7 +163,7 @@ export default function Produtos() {
     setIpiRate(0);
     setIpiCode("");
     setIpiCst("");
-    setMargeLucro(0);
+    setMargeLucro(1.15);
     setCostValue(0);
     setOtherCost(0);
     setSaleValue(0);
@@ -394,31 +396,31 @@ export default function Produtos() {
       data.append("barcode", barcode);
       data.append("cfop", cfop);
       data.append("ncm", ncm);
-      data.append("icms_rate", icmsRate);
+      data.append("icms_rate", parseFloat(icmsRate));
       data.append("icms_origin", icmsOrigin);
       data.append("icms_csosn", icmsCst);
-      data.append("icms_st_rate", icmsStRate);
-      data.append("icms_marg_val_agregate", icmsMVA);
+      data.append("icms_st_rate", parseFloat(icmsStRate));
+      data.append("icms_marg_val_agregate", parseFloat(icmsMVA));
       data.append("icms_st_mod_bc", icmsStModBc);
-      data.append("fcp_rate", fcpRate);
-      data.append("fcp_st_rate", fcpStRate);
-      data.append("fcp_ret_rate", fcpRetRate);
+      data.append("fcp_rate", parseFloat(fcpRate));
+      data.append("fcp_st_rate", parseFloat(fcpStRate));
+      data.append("fcp_ret_rate", parseFloat(fcpRetRate));
       data.append("ipi_cst", ipiCst);
-      data.append("ipi_rate", ipiRate);
+      data.append("ipi_rate", parseFloat(ipiRate));
       data.append("ipi_code", ipiCode);
       data.append("pis_cst", pisCst);
-      data.append("pis_rate", pisRate);
+      data.append("pis_rate", parseFloat(pisRate));
       data.append("cofins_cst", cofinsCst);
-      data.append("cofins_rate", cofinsRate);
+      data.append("cofins_rate", parseFloat(cofinsRate));
       data.append("cest", cest);
-      data.append("cost_value", costValue);
-      data.append("other_cost", otherCost);
-      data.append("sale_value", saleValue);
-      data.append("freight_weight", productWeight);
-      data.append("freight_width", productWidth);
-      data.append("freight_height", productHeight);
-      data.append("freight_diameter", productDiameter);
-      data.append("freight_length", productLength);
+      data.append("cost_value", parseFloat(costValue));
+      data.append("other_cost", parseFloat(otherCost));
+      data.append("sale_value", parseFloat(saleValue));
+      data.append("freight_weight", parseFloat(productWeight));
+      data.append("freight_width", parseFloat(productWidth));
+      data.append("freight_height", parseFloat(productHeight));
+      data.append("freight_diameter", parseFloat(productDiameter));
+      data.append("freight_length", parseFloat(productLength));
       data.append("departments_id", departmentId);
       data.append("categories_id", categoryId);
 
@@ -441,6 +443,11 @@ export default function Produtos() {
         statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
       );
     }
+  }
+
+  function calcSalePrice() {
+    let cost = parseFloat(costValue) + parseFloat(otherCost);
+    setSaleValue(cost * margeLucro);
   }
 
   function onKeyDown(keyName, e, handle) {
@@ -724,24 +731,30 @@ export default function Produtos() {
                   <Grid mb={3} gap="15px" templateColumns="repeat(3, 1fr)">
                     <FormControl>
                       <FormLabel>CFOP</FormLabel>
-                      <Input
-                        focusBorderColor={config.inputs}
+                      <InputMask
+                        mask="9999"
+                        className="mask-chakra"
+                        placeholder="CFOP"
                         value={cfop}
                         onChange={(e) => setCfop(e.target.value)}
                       />
                     </FormControl>
                     <FormControl>
                       <FormLabel>NCM</FormLabel>
-                      <Input
-                        focusBorderColor={config.inputs}
+                      <InputMask
+                        mask="9999.99.99"
+                        className="mask-chakra"
+                        placeholder="NCM"
                         value={ncm}
                         onChange={(e) => setNcm(e.target.value)}
                       />
                     </FormControl>
                     <FormControl>
                       <FormLabel>CEST</FormLabel>
-                      <Input
-                        focusBorderColor={config.inputs}
+                      <InputMask
+                        mask="99.999.99"
+                        className="mask-chakra"
+                        placeholder="CEST"
                         value={cest}
                         onChange={(e) => setCest(e.target.value)}
                       />
@@ -1164,20 +1177,18 @@ export default function Produtos() {
                       }
                     >
                       <FormLabel>Margem de Lucro %</FormLabel>
-                      <NumberInput
-                        id="marge"
-                        precision={2}
-                        step={0.01}
-                        focusBorderColor={config.inputs}
+                      <Select
                         value={margeLucro}
-                        onChange={(e) => setMargeLucro(e)}
+                        onChange={(e) =>
+                          setMargeLucro(parseFloat(e.target.value))
+                        }
+                        focusBorderColor={config.inputs}
                       >
-                        <NumberInputField />
-                        <NumberInputStepper>
-                          <NumberIncrementStepper />
-                          <NumberDecrementStepper />
-                        </NumberInputStepper>
-                      </NumberInput>
+                        {marge.map((mar) => (
+                          <option value={mar.value}>{mar.text}</option>
+                        ))}
+                      </Select>
+
                       <FormErrorMessage>
                         {validators.find((obj) => obj.path === "marge")
                           ? validators.find((obj) => obj.path === "marge")
@@ -1266,7 +1277,11 @@ export default function Produtos() {
                       </FormErrorMessage>
                     </FormControl>
                   </Grid>
-                  <Button leftIcon={<FaCalculator />} mt={3}>
+                  <Button
+                    leftIcon={<FaCalculator />}
+                    mt={3}
+                    onClick={() => calcSalePrice()}
+                  >
                     Calcular Preço de Venda
                   </Button>
 
