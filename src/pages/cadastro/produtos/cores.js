@@ -14,7 +14,6 @@ import {
   Text,
   Center,
   IconButton,
-  Tooltip,
   useToast,
   Modal,
   ModalOverlay,
