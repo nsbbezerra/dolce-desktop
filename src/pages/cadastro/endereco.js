@@ -84,6 +84,14 @@ export default function Endereco() {
     handleCep(cep);
   }, [cep]);
 
+  function handleToastMessage() {
+    showToast(
+      "Sem conexão com o servidor, verifique sua conexão com a internet",
+      "error",
+      "Conexão com o Servidor"
+    );
+  }
+
   async function handleCep(value) {
     const parse = value.replace(/([\u0300-\u036f]|[^0-9a-zA-Z])/g, "");
     if (parse.length === 8) {
@@ -95,6 +103,10 @@ export default function Endereco() {
         setCity(response.data.city);
         setState(response.data.state);
       } catch (error) {
+        if (error.message === "Network Error") {
+          handleToastMessage();
+          return false;
+        }
         const err = error.response.data.errors[0].message || "CEP Inválido";
         handleValidator("cep", err);
       }
@@ -235,6 +247,10 @@ export default function Endereco() {
       setLoadingAddress(false);
       clear();
     } catch (error) {
+      if (error.message === "Network Error") {
+        handleToastMessage();
+        return false;
+      }
       setLoadingAddress(false);
       const statusCode = error.response.status || 400;
       const typeError =

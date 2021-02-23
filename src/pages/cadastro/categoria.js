@@ -171,6 +171,14 @@ export default function Categoria() {
     }
   }
 
+  function handleToastMessage() {
+    showToast(
+      "Sem conexão com o servidor, verifique sua conexão com a internet",
+      "error",
+      "Conexão com o Servidor"
+    );
+  }
+
   async function register(e) {
     if (e) {
       e.preventDefault();
@@ -225,6 +233,10 @@ export default function Categoria() {
       setDescription("");
       setThumbnail(null);
     } catch (error) {
+      if (error.message === "Network Error") {
+        handleToastMessage();
+        return false;
+      }
       setLoading(false);
       const statusCode = error.response.status || 400;
       const typeError =

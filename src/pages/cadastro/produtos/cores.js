@@ -117,6 +117,14 @@ export default function Cores({ id }) {
   }
 
   if (error) {
+    if (error.message === "Network Error") {
+      showToast(
+        "Sem conexão com o servidor, verifique sua conexão com a internet",
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+      return false;
+    }
     const statusCode = error.response.status || 400;
     const typeError =
       error.response.data.message || "Ocorreu um erro ao buscar";
@@ -144,7 +152,6 @@ export default function Cores({ id }) {
   }
 
   async function removeColor(id) {
-    console.log("ID", id);
     setSkel(true);
     try {
       const responseColor = await api.delete(`/colors/${id}`, {
@@ -154,6 +161,10 @@ export default function Cores({ id }) {
       remove(id);
       setSkel(false);
     } catch (error) {
+      if (error.message === "Network Error") {
+        handleToastMessage();
+        return false;
+      }
       setSkel(false);
       const statusCode = error.response.status || 400;
       const typeError =
@@ -168,6 +179,14 @@ export default function Cores({ id }) {
     }
   }
 
+  function handleToastMessage() {
+    showToast(
+      "Sem conexão com o servidor, verifique sua conexão com a internet",
+      "error",
+      "Conexão com o Servidor"
+    );
+  }
+
   async function handleProduct(id) {
     setSkel(true);
     const result = await products.find((obj) => obj.id === id);
@@ -175,6 +194,10 @@ export default function Cores({ id }) {
       const response = await api.get(`/colorsGet/${result.id}`);
       setColors(response.data);
     } catch (error) {
+      if (error.message === "Network Error") {
+        handleToastMessage();
+        return false;
+      }
       const statusCode = error.response.status || 400;
       const typeError =
         error.response.data.message || "Ocorreu um erro ao buscar";
@@ -238,6 +261,10 @@ export default function Cores({ id }) {
       clear();
       setLoading(false);
     } catch (error) {
+      if (error.message === "Network Error") {
+        handleToastMessage();
+        return false;
+      }
       setLoading(false);
       const statusCode = error.response.status || 400;
       const typeError =

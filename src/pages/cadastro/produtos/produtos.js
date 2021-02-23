@@ -184,7 +184,19 @@ export default function Produtos() {
     });
   }
 
+  function handleToastMessage() {
+    showToast(
+      "Sem conexão com o servidor, verifique sua conexão com a internet",
+      "error",
+      "Conexão com o Servidor"
+    );
+  }
+
   if (error) {
+    if (error.message === "Network Error") {
+      handleToastMessage();
+      return false;
+    }
     const statusCode = error.response.status || 400;
     const typeError =
       error.response.data.message || "Ocorreu um erro ao buscar";
@@ -432,6 +444,10 @@ export default function Produtos() {
       setLoading(false);
     } catch (error) {
       setLoading(false);
+      if (error.message === "Network Error") {
+        handleToastMessage();
+        return false;
+      }
       const statusCode = error.response.status || 400;
       const typeError =
         error.response.data.message || "Ocorreu um erro ao salvar";

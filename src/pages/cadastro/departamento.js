@@ -89,6 +89,14 @@ export default function Departamento() {
     });
   }
 
+  function handleToastMessage() {
+    showToast(
+      "Sem conexão com o servidor, verifique sua conexão com a internet",
+      "error",
+      "Conexão com o Servidor"
+    );
+  }
+
   async function register(e) {
     if (e) {
       e.preventDefault();
@@ -136,6 +144,10 @@ export default function Departamento() {
       setThumbnail(null);
       setValidators([]);
     } catch (error) {
+      if (error.message === "Network Error") {
+        handleToastMessage();
+        return false;
+      }
       setLoading(false);
       const statusCode = error.response.status || 400;
       const typeError =
