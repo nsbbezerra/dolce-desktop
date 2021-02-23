@@ -138,15 +138,20 @@ export default function Cores({ id }) {
     return joined;
   }
 
+  function remove(id) {
+    const index = colors.filter((item) => item.id !== id);
+    setColors(index);
+  }
+
   async function removeColor(id) {
+    console.log("ID", id);
     setSkel(true);
     try {
       const responseColor = await api.delete(`/colors/${id}`, {
         headers: { "x-access-token": employee.token },
       });
       showToast(responseColor.data.message, "success", "Sucesso");
-      const response = await api.get(`/colorsGet/${idProduct}`);
-      setColors(response.data);
+      remove(id);
       setSkel(false);
     } catch (error) {
       setSkel(false);

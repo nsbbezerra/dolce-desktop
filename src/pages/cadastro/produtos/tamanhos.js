@@ -38,6 +38,7 @@ import {
   Skeleton,
   Stack,
   FormErrorMessage,
+  ButtonGroup,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
 import {
@@ -168,6 +169,29 @@ export default function Tamanhos() {
   function removeSize(id) {
     const index = sizes.filter((item) => item.id !== id);
     setSizes(index);
+  }
+
+  async function deleteSize(id) {
+    setSkel(true);
+    try {
+      const response = await api.delete(`/sizes/${id}`, {
+        headers: { "x-access-token": employee.token },
+      });
+      showToast(response.data.message, "success", "Sucesso");
+      removeSize(id);
+    } catch (error) {
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+    setSkel(false);
   }
 
   async function handleColor(id) {
@@ -442,16 +466,36 @@ export default function Tamanhos() {
                           </FormControl>
                         </Grid>
                         <Center mt={3} mb={1}>
-                          <Tooltip label="Remover Tamanho" hasArrow>
-                            <IconButton
-                              aria-label="Search database"
-                              variant="link"
-                              colorScheme="red"
-                              icon={<FaTimes />}
-                              ml={1}
-                              onClick={() => removeSize(clr.id)}
-                            />
-                          </Tooltip>
+                          <Popover>
+                            <PopoverTrigger>
+                              <IconButton
+                                aria-label="Search database"
+                                variant="link"
+                                colorScheme="red"
+                                icon={<FaTimes />}
+                                ml={1}
+                              />
+                            </PopoverTrigger>
+                            <PopoverContent>
+                              <PopoverArrow />
+                              <PopoverCloseButton />
+                              <PopoverHeader>Confirmação!</PopoverHeader>
+                              <PopoverBody>
+                                Deseja remover este tamanho?
+                              </PopoverBody>
+                              <PopoverFooter d="flex" justifyContent="flex-end">
+                                <ButtonGroup size="sm">
+                                  <Button variant="outline">Não</Button>
+                                  <Button
+                                    colorScheme="blue"
+                                    onClick={() => deleteSize(clr.id)}
+                                  >
+                                    Sim
+                                  </Button>
+                                </ButtonGroup>
+                              </PopoverFooter>
+                            </PopoverContent>
+                          </Popover>
                         </Center>
                       </Box>
                     </WrapItem>

@@ -52,11 +52,13 @@ import Icone from "../assets/icon-black.png";
 import Logo from "../assets/name-slug.png";
 
 import { useHistory } from "react-router-dom";
+import { useEmployee } from "../context/Employee";
 
 const remote = window.require("electron").remote;
 
 export default function HeaderApp() {
   const { push } = useHistory();
+  const { employee } = useEmployee();
 
   const { setColorMode } = useColorMode();
   const cancelRef = useRef();
@@ -231,6 +233,7 @@ export default function HeaderApp() {
                 rounded="xl"
                 w="300px"
                 readOnly
+                value={JSON.stringify(employee) !== "{}" ? employee.name : ""}
               />
             </InputGroup>
             <Tooltip label="Configurações do Tema" hasArrow>

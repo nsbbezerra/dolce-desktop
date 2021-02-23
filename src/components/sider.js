@@ -88,7 +88,7 @@ export default function Sider() {
             variant="ghost"
           />
         </Tooltip>
-        <MenuList>
+        <MenuList shadow="lg">
           <MenuItem
             icon={<FaUserFriends />}
             onClick={() => routing("/listclients")}
@@ -122,7 +122,7 @@ export default function Sider() {
             variant="ghost"
           />
         </Tooltip>
-        <MenuList>
+        <MenuList shadow="lg">
           <MenuItem
             icon={<FaUserFriends />}
             onClick={() => routing("/registerClient")}
@@ -197,7 +197,7 @@ export default function Sider() {
             variant="ghost"
           />
         </Tooltip>
-        <MenuList>
+        <MenuList shadow="lg">
           <MenuItem
             icon={<AiFillShop />}
             onClick={() => routing("/listdepartment")}
@@ -227,7 +227,7 @@ export default function Sider() {
             variant="ghost"
           />
         </Tooltip>
-        <MenuList>
+        <MenuList shadow="lg">
           <MenuItem
             icon={<FaCalculator />}
             onClick={() => routing("/cashiermoviment")}
@@ -255,7 +255,7 @@ export default function Sider() {
             variant="ghost"
           />
         </Tooltip>
-        <MenuList>
+        <MenuList shadow="lg">
           <MenuItem icon={<FaShoppingBag />} onClick={() => routing("/pdv")}>
             Venda de Produtos
           </MenuItem>
@@ -283,7 +283,7 @@ export default function Sider() {
             variant="ghost"
           />
         </Tooltip>
-        <MenuList>
+        <MenuList shadow="lg">
           <MenuItem
             icon={<AiFillBank />}
             onClick={() => routing("/bankAccount")}
@@ -341,7 +341,7 @@ export default function Sider() {
             variant="ghost"
           />
         </Tooltip>
-        <MenuList>
+        <MenuList shadow="lg">
           <MenuItem icon={<FaCashRegister />}>Fluxo de Caixa</MenuItem>
           <MenuItem icon={<FaBarcode />}>Pagamentos</MenuItem>
           <MenuItem icon={<FaSave />}>Cadastros</MenuItem>
