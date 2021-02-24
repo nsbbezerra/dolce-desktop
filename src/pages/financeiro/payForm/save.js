@@ -86,7 +86,7 @@ export default function PayFormSave() {
         </FormControl>
       </Grid>
       <Divider mb={5} mt={5} />
-      <Button leftIcon={<FaSave />} size="lg" colorScheme="blue">
+      <Button leftIcon={<FaSave />} size="lg" colorScheme={config.buttons}>
         Salvar
       </Button>
     </>

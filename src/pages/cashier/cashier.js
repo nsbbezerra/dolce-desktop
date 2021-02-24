@@ -164,6 +164,8 @@ export default function Cashier() {
                         rounded="full"
                         size="sm"
                         onClick={() => setModalPrint(true)}
+                        colorScheme={config.buttons}
+                        variant="ghost"
                       />
                     </Tooltip>
                     <Tooltip label="Visualizar Pagamentos" hasArrow>
@@ -172,6 +174,8 @@ export default function Cashier() {
                         rounded="full"
                         size="sm"
                         onClick={() => setModalPayments(true)}
+                        colorScheme={config.buttons}
+                        variant="ghost"
                       />
                     </Tooltip>
                     <Tooltip label="Converter em Orçamento" hasArrow>
@@ -181,6 +185,8 @@ export default function Cashier() {
                             icon={<FaClipboardList />}
                             size="sm"
                             rounded="full"
+                            colorScheme={config.buttons}
+                            variant="ghost"
                           />
                         </PopoverTrigger>
                         <PopoverContent>
@@ -192,8 +198,13 @@ export default function Cashier() {
                           </PopoverBody>
                           <PopoverFooter d="flex" justifyContent="flex-end">
                             <ButtonGroup size="sm">
-                              <Button variant="outline">Não</Button>
-                              <Button colorScheme="blue">Sim</Button>
+                              <Button
+                                variant="outline"
+                                colorScheme={config.buttons}
+                              >
+                                Não
+                              </Button>
+                              <Button colorScheme={config.buttons}>Sim</Button>
                             </ButtonGroup>
                           </PopoverFooter>
                         </PopoverContent>
@@ -207,6 +218,7 @@ export default function Cashier() {
                             icon={<FaTrash />}
                             size="sm"
                             rounded="full"
+                            variant="ghost"
                           />
                         </PopoverTrigger>
                         <PopoverContent>
@@ -218,8 +230,13 @@ export default function Cashier() {
                           </PopoverBody>
                           <PopoverFooter d="flex" justifyContent="flex-end">
                             <ButtonGroup size="sm">
-                              <Button variant="outline">Não</Button>
-                              <Button colorScheme="blue">Sim</Button>
+                              <Button
+                                variant="outline"
+                                colorScheme={config.buttons}
+                              >
+                                Não
+                              </Button>
+                              <Button colorScheme={config.buttons}>Sim</Button>
                             </ButtonGroup>
                           </PopoverFooter>
                         </PopoverContent>
@@ -227,7 +244,7 @@ export default function Cashier() {
                     </Tooltip>
                     <Button
                       leftIcon={<FaCheck />}
-                      colorScheme="green"
+                      colorScheme={config.buttons}
                       size="sm"
                       onClick={() => setModalFinish(true)}
                     >
@@ -310,7 +327,7 @@ export default function Cashier() {
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaSave />} colorScheme="blue">
+            <Button leftIcon={<FaSave />} colorScheme={config.buttons}>
               Salvar
             </Button>
           </ModalFooter>
@@ -342,7 +359,7 @@ export default function Cashier() {
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaSave />} colorScheme="blue">
+            <Button leftIcon={<FaSave />} colorScheme={config.buttons}>
               Salvar
             </Button>
           </ModalFooter>
@@ -557,7 +574,7 @@ export default function Cashier() {
             </Grid>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaCheck />} colorScheme="blue">
+            <Button leftIcon={<FaCheck />} colorScheme={config.buttons}>
               Faturar
             </Button>
           </ModalFooter>
@@ -663,7 +680,7 @@ export default function Cashier() {
             </Box>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaPrint />} colorScheme="blue">
+            <Button leftIcon={<FaPrint />} colorScheme={config.buttons}>
               Imprimir
             </Button>
           </ModalFooter>
@@ -791,7 +808,7 @@ export default function Cashier() {
           <ModalFooter>
             <Popover placement="left">
               <PopoverTrigger>
-                <Button leftIcon={<FaPlus />} colorScheme="blue">
+                <Button leftIcon={<FaPlus />} colorScheme={config.buttons}>
                   Nova Forma de Pagamento
                 </Button>
               </PopoverTrigger>
@@ -805,8 +822,13 @@ export default function Cashier() {
                 </PopoverBody>
                 <PopoverFooter d="flex" justifyContent="flex-end">
                   <ButtonGroup size="sm">
-                    <Button variant="outline">Não</Button>
-                    <Button colorScheme="blue" onClick={() => handlePayment()}>
+                    <Button variant="outline" colorScheme={config.buttons}>
+                      Não
+                    </Button>
+                    <Button
+                      colorScheme={config.buttons}
+                      onClick={() => handlePayment()}
+                    >
                       Sim
                     </Button>
                   </ButtonGroup>
@@ -850,9 +872,15 @@ export default function Cashier() {
             movimentações ou utilizá-lo, deseja prosseguir?
           </AlertDialogBody>
           <AlertDialogFooter>
-            <Button onClick={() => setModalClose(false)}>Não</Button>
             <Button
-              colorScheme="blue"
+              onClick={() => setModalClose(false)}
+              colorScheme={config.buttons}
+              variant="outline"
+            >
+              Não
+            </Button>
+            <Button
+              colorScheme={config.buttons}
               ml={3}
               ref={cancelRef}
               onClick={() => handleCloseCashier()}
@@ -1013,12 +1041,17 @@ export default function Cashier() {
             </Box>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaPrint />} mr={3}>
+            <Button
+              leftIcon={<FaPrint />}
+              mr={3}
+              colorScheme={config.buttons}
+              variant="outline"
+            >
               Imprimir Relatório
             </Button>
             <Button
               leftIcon={<FaCheck />}
-              colorScheme="blue"
+              colorScheme={config.buttons}
               onClick={() => routing("/cashiermoviment")}
             >
               Concluir

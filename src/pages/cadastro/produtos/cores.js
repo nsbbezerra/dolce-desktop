@@ -308,6 +308,8 @@ export default function Cores({ id }) {
               isFullWidth
               leftIcon={<FaSearch />}
               onClick={() => setModalProducts(true)}
+              colorScheme={config.buttons}
+              variant="outline"
             >
               Buscar Produto
               <Kbd ml={3}>F3</Kbd>
@@ -418,9 +420,14 @@ export default function Cores({ id }) {
                                   justifyContent="flex-end"
                                 >
                                   <ButtonGroup size="sm">
-                                    <Button variant="outline">Não</Button>
                                     <Button
-                                      colorScheme="blue"
+                                      variant="outline"
+                                      colorScheme={config.buttons}
+                                    >
+                                      Não
+                                    </Button>
+                                    <Button
+                                      colorScheme={config.buttons}
                                       onClick={() => removeColor(clr.id)}
                                     >
                                       Sim
@@ -442,7 +449,7 @@ export default function Cores({ id }) {
           <Divider mt={5} mb={5} />
           <Button
             leftIcon={<FaSave />}
-            colorScheme="blue"
+            colorScheme={config.buttons}
             size="lg"
             onClick={() => register()}
             isLoading={loading}
@@ -494,7 +501,7 @@ export default function Cores({ id }) {
                             icon={<FaCheck />}
                             size="xs"
                             isRound
-                            colorScheme="blue"
+                            colorScheme={config.buttons}
                             onClick={() => handleProduct(pro.id)}
                           />
                         </Td>

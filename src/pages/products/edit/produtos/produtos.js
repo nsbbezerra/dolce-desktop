@@ -399,7 +399,12 @@ export default function Produtos() {
                 />
               </FormControl>
             </Grid>
-            <Button leftIcon={<FaCalculator />} mt={3}>
+            <Button
+              leftIcon={<FaCalculator />}
+              mt={3}
+              colorScheme={config.buttons}
+              variant="outline"
+            >
               Calcular Preço de Venda
             </Button>
             <Divider mt={5} mb={5} />

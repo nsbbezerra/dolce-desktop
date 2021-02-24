@@ -78,7 +78,13 @@ export default function Budget() {
             focusBorderColor={config.inputs}
           />
 
-          <Button leftIcon={<FaSearch />}>Buscar</Button>
+          <Button
+            leftIcon={<FaSearch />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
+            Buscar
+          </Button>
         </Grid>
 
         <Table size="sm" mt="25px">
@@ -134,6 +140,7 @@ export default function Budget() {
                     as={Button}
                     rightIcon={<MdKeyboardArrowDown />}
                     size="sm"
+                    colorScheme={config.buttons}
                   >
                     Opções
                   </MenuButton>
@@ -162,7 +169,7 @@ export default function Budget() {
 
         <Button
           leftIcon={<FaShoppingBag />}
-          colorScheme="blue"
+          colorScheme={config.buttons}
           size="lg"
           mt={5}
           onClick={() => setModalPdv(true)}
@@ -274,7 +281,7 @@ export default function Budget() {
               <Grid templateColumns="1fr" gap="15px" pr={3}>
                 <Button
                   leftIcon={<FaCheck />}
-                  colorScheme="green"
+                  colorScheme={config.buttons}
                   onClick={() => handleFinalize()}
                   size="lg"
                 >

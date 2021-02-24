@@ -57,7 +57,13 @@ export default function ListCheck() {
           focusBorderColor={config.inputs}
         />
 
-        <Button leftIcon={<FaSearch />}>Buscar</Button>
+        <Button
+          leftIcon={<FaSearch />}
+          colorScheme={config.buttons}
+          variant="outline"
+        >
+          Buscar
+        </Button>
       </Grid>
 
       <Table size="sm" mt="25px">
@@ -99,7 +105,7 @@ export default function ListCheck() {
                   isTruncated
                   noOfLines={1}
                   variant="link"
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   size="sm"
                   onClick={() => setModalType(true)}
                 >
@@ -119,6 +125,7 @@ export default function ListCheck() {
                   as={Button}
                   rightIcon={<MdKeyboardArrowDown />}
                   size="sm"
+                  colorScheme={config.buttons}
                 >
                   Opções
                 </MenuButton>
@@ -164,7 +171,7 @@ export default function ListCheck() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>
@@ -244,7 +251,7 @@ export default function ListCheck() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>
@@ -276,7 +283,7 @@ export default function ListCheck() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>

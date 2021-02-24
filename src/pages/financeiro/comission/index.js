@@ -42,7 +42,13 @@ export default function Comissions() {
             focusBorderColor={config.inputs}
           />
 
-          <Button leftIcon={<FaSearch />}>Buscar</Button>
+          <Button
+            leftIcon={<FaSearch />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
+            Buscar
+          </Button>
         </Grid>
 
         <Table size="sm" mt="25px">

@@ -399,6 +399,8 @@ export default function ImagesSave() {
                 isFullWidth
                 leftIcon={<FaSearch />}
                 onClick={() => setModalProducts(true)}
+                colorScheme={config.buttons}
+                variant="outline"
               >
                 Buscar Produto
               </Button>
@@ -442,6 +444,8 @@ export default function ImagesSave() {
                 isFullWidth
                 leftIcon={<FaSearch />}
                 onClick={() => setModalColor(true)}
+                colorScheme={config.buttons}
+                variant="outline"
               >
                 Buscar Cor
               </Button>
@@ -496,7 +500,7 @@ export default function ImagesSave() {
             </FormControl>
             <Button
               leftIcon={<FaSave />}
-              colorScheme="blue"
+              colorScheme={config.buttons}
               size="lg"
               mt={3}
               isFullWidth
@@ -556,9 +560,14 @@ export default function ImagesSave() {
                             </PopoverBody>
                             <PopoverFooter d="flex" justifyContent="flex-end">
                               <ButtonGroup size="sm">
-                                <Button variant="outline">Não</Button>
                                 <Button
-                                  colorScheme="blue"
+                                  variant="outline"
+                                  colorScheme={config.buttons}
+                                >
+                                  Não
+                                </Button>
+                                <Button
+                                  colorScheme={config.buttons}
                                   onClick={() => deleteImages(img.id)}
                                 >
                                   Sim
@@ -624,7 +633,7 @@ export default function ImagesSave() {
                             icon={<FaCheck />}
                             size="xs"
                             isRound
-                            colorScheme="blue"
+                            colorScheme={config.buttons}
                             onClick={() => handleColor(cor.id)}
                           />
                         </Tooltip>
@@ -685,7 +694,7 @@ export default function ImagesSave() {
                           icon={<FaCheck />}
                           size="xs"
                           isRound
-                          colorScheme="blue"
+                          colorScheme={config.buttons}
                           onClick={() => handleProduct(pro.id)}
                         />
                       </Td>

@@ -410,7 +410,8 @@ export default function HeaderApp() {
           <ModalFooter>
             <Button
               leftIcon={<FaTimes />}
-              colorScheme="red"
+              colorScheme={config.buttons}
+              variant="outline"
               mr={3}
               onClick={() => setModalTheme(false)}
             >
@@ -418,7 +419,7 @@ export default function HeaderApp() {
             </Button>
             <Button
               leftIcon={<FaSave />}
-              colorScheme="blue"
+              colorScheme={config.buttons}
               onClick={() => setColor()}
             >
               Salvar
@@ -445,14 +446,15 @@ export default function HeaderApp() {
 
             <AlertDialogFooter>
               <Button
-                colorScheme="red"
+                colorScheme={config.buttons}
+                variant="outline"
                 onClick={() => setAlert(false)}
                 leftIcon={<AiOutlineStop />}
               >
                 Agora Não
               </Button>
               <Button
-                colorScheme="blue"
+                colorScheme={config.buttons}
                 onClick={() => closeWindow()}
                 ml={3}
                 leftIcon={<AiOutlineReload />}
@@ -479,14 +481,15 @@ export default function HeaderApp() {
 
             <AlertDialogFooter>
               <Button
-                colorScheme="red"
+                colorScheme={config.buttons}
+                variant="outline"
                 onClick={() => setAlertLogout(false)}
                 leftIcon={<AiOutlineStop />}
               >
                 Não
               </Button>
               <Button
-                colorScheme="blue"
+                colorScheme={config.buttons}
                 onClick={() => closeWindow()}
                 ml={3}
                 leftIcon={<AiOutlineCheck />}

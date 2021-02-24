@@ -50,7 +50,13 @@ export default function ListClients() {
             focusBorderColor={config.inputs}
           />
 
-          <Button leftIcon={<FaSearch />}>Buscar</Button>
+          <Button
+            leftIcon={<FaSearch />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
+            Buscar
+          </Button>
         </Grid>
 
         <Table size="sm" mt="25px">
@@ -98,7 +104,7 @@ export default function ListClients() {
               <Td w="10%" textAlign="center">
                 <Button
                   leftIcon={<FaSearch />}
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   size="sm"
                   isFullWidth
                   onClick={() => setModalAddress(true)}

@@ -77,7 +77,13 @@ export default function CategoryList() {
             focusBorderColor={config.inputs}
           />
 
-          <Button leftIcon={<FaSearch />}>Buscar</Button>
+          <Button
+            leftIcon={<FaSearch />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
+            Buscar
+          </Button>
         </Grid>
 
         <Table size="sm" mt="25px">
@@ -138,6 +144,7 @@ export default function CategoryList() {
                     as={Button}
                     rightIcon={<MdKeyboardArrowDown />}
                     size="sm"
+                    colorScheme={config.buttons}
                   >
                     Opções
                   </MenuButton>
@@ -187,7 +194,7 @@ export default function CategoryList() {
           <ModalBody>{modalInfo === true && <Products />}</ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>
@@ -269,7 +276,7 @@ export default function CategoryList() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>

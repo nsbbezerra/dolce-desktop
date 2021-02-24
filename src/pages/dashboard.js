@@ -23,7 +23,7 @@ import {
   AiOutlineZoomIn,
 } from "react-icons/ai";
 import { FaBarcode, FaGlobe } from "react-icons/fa";
-import {} from "react-icons/md";
+import config from "../configs/index";
 
 const LineChart = Recharts.LineChart;
 const Line = Recharts.Line;
@@ -239,7 +239,11 @@ function Dashboard() {
           </Box>
 
           <Flex p={2} justify="flex-end" w="100%">
-            <Button size="sm" leftIcon={<AiOutlineZoomIn />}>
+            <Button
+              size="sm"
+              colorScheme={config.buttons}
+              leftIcon={<AiOutlineZoomIn />}
+            >
               Veja Mais
             </Button>
           </Flex>
@@ -303,7 +307,11 @@ function Dashboard() {
           </Box>
 
           <Flex p={2} justify="flex-end" w="100%">
-            <Button size="sm" leftIcon={<AiOutlineZoomIn />}>
+            <Button
+              size="sm"
+              colorScheme={config.buttons}
+              leftIcon={<AiOutlineZoomIn />}
+            >
               Veja Mais
             </Button>
           </Flex>

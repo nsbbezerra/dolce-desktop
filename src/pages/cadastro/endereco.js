@@ -296,6 +296,8 @@ export default function Endereco() {
             <Button
               leftIcon={<FaSearch />}
               onClick={() => setModalClient(true)}
+              colorScheme={config.buttons}
+              variant="outline"
             >
               Buscar Cliente{" "}
               <Kbd ml={3} color="ButtonText">
@@ -495,7 +497,7 @@ export default function Endereco() {
           <Divider mt={5} mb={5} />
           <Button
             leftIcon={<FaSave />}
-            colorScheme="blue"
+            colorScheme={config.buttons}
             size="lg"
             isLoading={loadingAddress}
             onClick={() => registerAddress()}
@@ -551,7 +553,7 @@ export default function Endereco() {
                                     icon={<FaCheck />}
                                     size="xs"
                                     isRound
-                                    colorScheme="blue"
+                                    colorScheme={config.buttons}
                                     onClick={() => handleFindClient(client.id)}
                                   />
                                 </Tooltip>
@@ -592,7 +594,7 @@ export default function Endereco() {
 
               <AlertDialogFooter>
                 <Button
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   onClick={() => setModalCaution(false)}
                   ml={3}
                 >

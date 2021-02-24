@@ -66,7 +66,13 @@ export default function MovimentCashier() {
             focusBorderColor={config.inputs}
           />
 
-          <Button leftIcon={<FaSearch />}>Buscar</Button>
+          <Button
+            leftIcon={<FaSearch />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
+            Buscar
+          </Button>
         </Grid>
 
         <Table size="sm" mt="25px">
@@ -113,7 +119,7 @@ export default function MovimentCashier() {
               <Td w="12%">
                 <Button
                   leftIcon={<FaCashRegister />}
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   size="sm"
                   onClick={() => routing("/cashier")}
                 >
@@ -129,7 +135,7 @@ export default function MovimentCashier() {
         <Button
           leftIcon={<FaBookOpen />}
           size="lg"
-          colorScheme="blue"
+          colorScheme={config.buttons}
           onClick={() => setModalOpen(true)}
         >
           Abrir novo Caixa
@@ -151,7 +157,7 @@ export default function MovimentCashier() {
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaLockOpen />} colorScheme="blue">
+            <Button leftIcon={<FaLockOpen />} colorScheme={config.buttons}>
               Abrir
             </Button>
           </ModalFooter>

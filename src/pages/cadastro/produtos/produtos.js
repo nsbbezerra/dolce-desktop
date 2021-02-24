@@ -520,6 +520,8 @@ export default function Produtos() {
                   isFullWidth
                   leftIcon={<FaSearch />}
                   onClick={() => setModalDepartments(true)}
+                  colorScheme={config.buttons}
+                  variant="outline"
                 >
                   Buscar Departamento{" "}
                   <Kbd ml={3} color="ButtonText">
@@ -561,6 +563,8 @@ export default function Produtos() {
                   isFullWidth
                   leftIcon={<FaSearch />}
                   onClick={() => setModalCategories(true)}
+                  colorScheme={config.buttons}
+                  variant="outline"
                 >
                   Buscar Categoria{" "}
                   <Kbd ml={3} color="ButtonText">
@@ -1326,6 +1330,8 @@ export default function Produtos() {
                     leftIcon={<FaCalculator />}
                     mt={3}
                     onClick={() => calcSalePrice()}
+                    colorScheme={config.buttons}
+                    variant="outline"
                   >
                     Calcular Preço de Venda
                   </Button>
@@ -1498,7 +1504,7 @@ export default function Produtos() {
                   <Divider mt={5} mb={5} />
                   <Button
                     leftIcon={<FaSave />}
-                    colorScheme="blue"
+                    colorScheme={config.buttons}
                     size="lg"
                     onClick={() => register()}
                     isLoading={loading}
@@ -1557,7 +1563,7 @@ export default function Produtos() {
                             icon={<FaCheck />}
                             size="xs"
                             isRound
-                            colorScheme="blue"
+                            colorScheme={config.buttons}
                             onClick={() => handleCategoryId(cat.id)}
                           />
                         </Td>
@@ -1619,7 +1625,7 @@ export default function Produtos() {
                             icon={<FaCheck />}
                             size="xs"
                             isRound
-                            colorScheme="blue"
+                            colorScheme={config.buttons}
                             onClick={() => handleDepartmentId(dep.id)}
                           />
                         </Td>

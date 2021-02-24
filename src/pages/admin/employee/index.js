@@ -53,7 +53,13 @@ export default function ListEmployee() {
             focusBorderColor={config.inputs}
           />
 
-          <Button leftIcon={<FaSearch />}>Buscar</Button>
+          <Button
+            leftIcon={<FaSearch />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
+            Buscar
+          </Button>
         </Grid>
 
         <Table size="sm" mt="25px">
@@ -92,7 +98,7 @@ export default function ListEmployee() {
               </Td>
               <Td w="6%" textAlign="center" isNumeric>
                 <Tooltip label="Clique para alterar" hasArrow>
-                  <Button size="sm" variant="link" colorScheme="blue">
+                  <Button size="sm" variant="link" colorScheme={config.buttons}>
                     0.5%
                   </Button>
                 </Tooltip>
@@ -134,7 +140,7 @@ export default function ListEmployee() {
               <Td w="13%">
                 <Button
                   size="sm"
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   leftIcon={<FaSearchPlus />}
                   isFullWidth
                   onClick={() => setModalEdit(true)}
@@ -189,7 +195,7 @@ export default function ListEmployee() {
             </Grid>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaSave />} colorScheme="blue">
+            <Button leftIcon={<FaSave />} colorScheme={config.buttons}>
               Salvar
             </Button>
           </ModalFooter>

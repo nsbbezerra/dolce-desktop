@@ -188,7 +188,11 @@ export default function Pdv() {
                   isReadOnly
                 />
                 <Tooltip label="Buscar Cliente" hasArrow>
-                  <Button leftIcon={<FaSearch />} colorScheme="blue">
+                  <Button
+                    leftIcon={<FaSearch />}
+                    colorScheme={config.buttons}
+                    variant="outline"
+                  >
                     <Kbd color="ButtonText">F2</Kbd>
                   </Button>
                 </Tooltip>
@@ -277,8 +281,15 @@ export default function Pdv() {
                             <PopoverBody>Deseja remover este item?</PopoverBody>
                             <PopoverFooter d="flex" justifyContent="flex-end">
                               <ButtonGroup size="sm">
-                                <Button variant="outline">Não</Button>
-                                <Button colorScheme="blue">Sim</Button>
+                                <Button
+                                  variant="outline"
+                                  colorScheme={config.buttons}
+                                >
+                                  Não
+                                </Button>
+                                <Button colorScheme={config.buttons}>
+                                  Sim
+                                </Button>
                               </ButtonGroup>
                             </PopoverFooter>
                           </PopoverContent>
@@ -376,7 +387,7 @@ export default function Pdv() {
                       <IconButton
                         icon={<FaPlus />}
                         size="sm"
-                        colorScheme="blue"
+                        colorScheme={config.buttons}
                       />
                     </Tooltip>
                   </HStack>
@@ -419,8 +430,9 @@ export default function Pdv() {
                     isFullWidth
                     as={Button}
                     rightIcon={<MdKeyboardArrowUp />}
-                    colorScheme="blue"
+                    colorScheme={config.buttons}
                     size="lg"
+                    variant="outline"
                   >
                     Opções
                   </MenuButton>
@@ -446,7 +458,7 @@ export default function Pdv() {
                 </Menu>
                 <Button
                   leftIcon={<FaCheck />}
-                  colorScheme="green"
+                  colorScheme={config.buttons}
                   onClick={() => setModalPayment(true)}
                   size="lg"
                 >

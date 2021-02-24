@@ -27,7 +27,12 @@ export default function SaveCheck() {
               focusBorderColor={config.inputs}
               isReadOnly
             />
-            <Button leftIcon={<FaSearch />} colorScheme="blue" w="110px">
+            <Button
+              leftIcon={<FaSearch />}
+              colorScheme={config.buttons}
+              variant="outline"
+              w="110px"
+            >
               Buscar
             </Button>
           </HStack>
@@ -112,7 +117,7 @@ export default function SaveCheck() {
 
       <Divider mb={5} mt={5} />
 
-      <Button size="lg" colorScheme="blue" leftIcon={<FaSave />}>
+      <Button size="lg" colorScheme={config.buttons} leftIcon={<FaSave />}>
         Salvar
       </Button>
     </>

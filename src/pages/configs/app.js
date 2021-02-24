@@ -116,7 +116,7 @@ export default function ConfigsApp() {
             <Button
               leftIcon={<FaSave />}
               mt={3}
-              colorScheme="blue"
+              colorScheme={config.buttons}
               onClick={() => saveRoute()}
             >
               Salvar
@@ -140,7 +140,7 @@ export default function ConfigsApp() {
             <AlertDialogBody>{modalMessage}</AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button colorScheme="blue" onClick={() => closeApp()}>
+              <Button colorScheme={config.buttons} onClick={() => closeApp()}>
                 Reiniciar Aplicação
               </Button>
             </AlertDialogFooter>

@@ -33,7 +33,7 @@ export default function SaveBankAccount() {
         </FormControl>
       </Grid>
       <Divider mt={5} mb={5} />
-      <Button leftIcon={<FaSave />} colorScheme="blue" size="lg">
+      <Button leftIcon={<FaSave />} colorScheme={config.buttons} size="lg">
         Cadastrar
       </Button>
     </>

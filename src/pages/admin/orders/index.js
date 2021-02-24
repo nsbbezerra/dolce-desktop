@@ -53,7 +53,13 @@ export default function ListOrders() {
             focusBorderColor={config.inputs}
           />
 
-          <Button leftIcon={<FaSearch />}>Buscar</Button>
+          <Button
+            leftIcon={<FaSearch />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
+            Buscar
+          </Button>
         </Grid>
 
         <Table size="sm" mt="25px">
@@ -139,6 +145,7 @@ export default function ListOrders() {
                     as={Button}
                     rightIcon={<MdKeyboardArrowDown />}
                     size="sm"
+                    colorScheme={config.buttons}
                   >
                     Opções
                   </MenuButton>

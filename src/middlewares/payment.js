@@ -138,10 +138,14 @@ export default function PaymentMiddleware() {
 
       <Flex justify="flex-end" mt={5}>
         <HStack spacing={3}>
-          <Button leftIcon={<FaCalculator />} colorScheme="blue">
+          <Button
+            leftIcon={<FaCalculator />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
             Calcular Pagamento
           </Button>
-          <Button leftIcon={<FaSave />} colorScheme="green">
+          <Button leftIcon={<FaSave />} colorScheme={config.buttons}>
             Salvar
           </Button>
         </HStack>

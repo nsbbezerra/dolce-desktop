@@ -285,7 +285,7 @@ export default function Departamento() {
               <Flex justify="flex-end">
                 <Button
                   leftIcon={<FaSave />}
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   size="lg"
                   isLoading={loading}
                   onClick={() => register()}

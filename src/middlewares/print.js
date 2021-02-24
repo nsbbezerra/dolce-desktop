@@ -50,9 +50,9 @@ export default function PrinterMiddleware() {
           borderWidth="1px"
           borderRadius="md"
           _checked={{
-            bg: "gray.200",
-            color: "gray.800",
-            borderColor: "gray.200",
+            bg: config.print.bg,
+            color: config.print.color,
+            borderColor: config.print.border,
           }}
           _focus={{
             boxShadow: "outline",
@@ -152,7 +152,7 @@ export default function PrinterMiddleware() {
         <Flex justify="flex-end" mt={5}>
           <Button
             leftIcon={<FaPrint />}
-            colorScheme="blue"
+            colorScheme={config.buttons}
             onClick={() => setModalPrint(true)}
           >
             Imprimir

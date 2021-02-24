@@ -286,6 +286,8 @@ export default function Categoria() {
             <Button
               leftIcon={<FaSearch />}
               onClick={() => setModalDepartment(true)}
+              colorScheme={config.buttons}
+              variant="outline"
             >
               Buscar Departamento{" "}
               <Kbd ml={3} color="ButtonText">
@@ -397,7 +399,7 @@ export default function Categoria() {
               <Flex justify="flex-end">
                 <Button
                   leftIcon={<FaSave />}
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   size="lg"
                   isLoading={loading}
                   onClick={() => register()}
@@ -462,7 +464,7 @@ export default function Categoria() {
                                     icon={<FaCheck />}
                                     size="xs"
                                     isRound
-                                    colorScheme="blue"
+                                    colorScheme={config.buttons}
                                     onClick={() => handleDepartment(dep.id)}
                                   />
                                 </Tooltip>

@@ -273,7 +273,7 @@ export default function Layout() {
 
             <ModalFooter>
               <Button
-                colorScheme="blue"
+                colorScheme={config.buttons}
                 leftIcon={<FaSave />}
                 onClick={() => {
                   saveRoute();
@@ -356,7 +356,7 @@ export default function Layout() {
                 </FormControl>
                 <Flex justify="flex-end" mt={5}>
                   <Button
-                    colorScheme="blue"
+                    colorScheme={config.buttons}
                     leftIcon={<AiOutlineLogin />}
                     size="lg"
                     isLoading={loadingAuth}
@@ -389,12 +389,15 @@ export default function Layout() {
 
               <AlertDialogFooter>
                 {showCloseButton === true ? (
-                  <Button colorScheme="blue" onClick={() => closeApp()}>
+                  <Button
+                    colorScheme={config.buttons}
+                    onClick={() => closeApp()}
+                  >
                     Reiniciar Aplicação
                   </Button>
                 ) : (
                   <Button
-                    colorScheme="blue"
+                    colorScheme={config.buttons}
                     onClick={() => setModalConfirmeRoute(false)}
                   >
                     OK

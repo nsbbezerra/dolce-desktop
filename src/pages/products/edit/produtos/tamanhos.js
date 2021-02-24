@@ -79,6 +79,8 @@ export default function Tamanhos({ id }) {
             isFullWidth
             leftIcon={<FaSearch />}
             onClick={() => setModalColor(true)}
+            colorScheme={config.buttons}
+            variant="outline"
           >
             Buscar Cor
           </Button>
@@ -113,6 +115,8 @@ export default function Tamanhos({ id }) {
             isFullWidth
             leftIcon={<FaPlus />}
             onClick={() => handleSize()}
+            colorScheme={config.buttons}
+            variant="outline"
           >
             Adicionar Tamanho
           </Button>
@@ -170,7 +174,7 @@ export default function Tamanhos({ id }) {
       <Divider mt={5} mb={5} />
       <Button
         leftIcon={<FaSave />}
-        colorScheme="blue"
+        colorScheme={config.buttons}
         size="lg"
         disabled={sizes.length ? false : true}
       >
@@ -261,7 +265,7 @@ export default function Tamanhos({ id }) {
 
           <ModalFooter>
             <Button
-              colorScheme="blue"
+              colorScheme={config.buttons}
               mr={3}
               onClick={() => setModalColor(false)}
               leftIcon={<FaCheck />}

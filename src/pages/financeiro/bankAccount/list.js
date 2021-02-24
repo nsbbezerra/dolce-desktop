@@ -78,7 +78,13 @@ export default function ListBankAccount() {
           focusBorderColor={config.inputs}
         />
 
-        <Button leftIcon={<FaSearch />}>Buscar</Button>
+        <Button
+          leftIcon={<FaSearch />}
+          colorScheme={config.buttons}
+          variant="outline"
+        >
+          Buscar
+        </Button>
       </Grid>
 
       <Table size="sm" mt="25px">
@@ -104,6 +110,7 @@ export default function ListBankAccount() {
                   as={Button}
                   rightIcon={<MdKeyboardArrowDown />}
                   size="sm"
+                  colorScheme={config.buttons}
                 >
                   Opções
                 </MenuButton>
@@ -138,6 +145,7 @@ export default function ListBankAccount() {
                   as={Button}
                   rightIcon={<MdKeyboardArrowDown />}
                   size="sm"
+                  colorScheme={config.buttons}
                 >
                   Opções
                 </MenuButton>
@@ -172,6 +180,7 @@ export default function ListBankAccount() {
                   as={Button}
                   rightIcon={<MdKeyboardArrowDown />}
                   size="sm"
+                  colorScheme={config.buttons}
                 >
                   Opções
                 </MenuButton>
@@ -230,7 +239,11 @@ export default function ListBankAccount() {
           </ModalBody>
 
           <ModalFooter>
-            <Button variant="solid" colorScheme="blue" leftIcon={<FaSave />}>
+            <Button
+              variant="solid"
+              colorScheme={config.buttons}
+              leftIcon={<FaSave />}
+            >
               Salvar Alteração
             </Button>
           </ModalFooter>
@@ -321,7 +334,12 @@ export default function ListBankAccount() {
                   <FormLabel color="transparent" userSelect="none">
                     Ano
                   </FormLabel>
-                  <Button isFullWidth leftIcon={<FaSearch />}>
+                  <Button
+                    isFullWidth
+                    leftIcon={<FaSearch />}
+                    colorScheme={config.buttons}
+                    variant="outline"
+                  >
                     Buscar
                   </Button>
                 </FormControl>

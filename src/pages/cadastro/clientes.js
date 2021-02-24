@@ -527,7 +527,7 @@ export default function SaveClient() {
           <Divider mt={5} mb={5} />
           <Button
             leftIcon={<FaSave />}
-            colorScheme="blue"
+            colorScheme={config.buttons}
             size="lg"
             isLoading={loading}
             onClick={() => register()}
@@ -755,7 +755,7 @@ export default function SaveClient() {
             <ModalFooter>
               <Button
                 leftIcon={<FaSave />}
-                colorScheme="blue"
+                colorScheme={config.buttons}
                 isLoading={loadingAddress}
                 onClick={() => registerAddress()}
               >
@@ -787,7 +787,7 @@ export default function SaveClient() {
 
               <AlertDialogFooter>
                 <Button
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   onClick={() => setModalCaution(false)}
                   ml={3}
                 >

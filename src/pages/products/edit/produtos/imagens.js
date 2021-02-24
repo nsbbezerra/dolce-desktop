@@ -56,6 +56,8 @@ export default function Images({ id }) {
             isFullWidth
             leftIcon={<FaSearch />}
             onClick={() => setModalColor(true)}
+            colorScheme={config.buttons}
+            variant="outline"
           >
             Buscar Cor
           </Button>
@@ -73,7 +75,7 @@ export default function Images({ id }) {
           </InputFile>
           <Button
             leftIcon={<FaSave />}
-            colorScheme="blue"
+            colorScheme={config.buttons}
             size="lg"
             mt={3}
             isFullWidth
@@ -202,7 +204,7 @@ export default function Images({ id }) {
 
           <ModalFooter>
             <Button
-              colorScheme="blue"
+              colorScheme={config.buttons}
               mr={3}
               onClick={() => setModalColor(false)}
               leftIcon={<FaCheck />}

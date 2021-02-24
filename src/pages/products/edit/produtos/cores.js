@@ -83,6 +83,8 @@ export default function Cores({ id }) {
             isFullWidth
             leftIcon={<FaPlus />}
             onClick={() => handleColor()}
+            colorScheme={config.buttons}
+            variant="outline"
           >
             Adicionar Cor
           </Button>
@@ -124,7 +126,7 @@ export default function Cores({ id }) {
       <Divider mt={5} mb={5} />
       <Button
         leftIcon={<FaSave />}
-        colorScheme="blue"
+        colorScheme={config.buttons}
         size="lg"
         disabled={colors.length ? false : true}
       >

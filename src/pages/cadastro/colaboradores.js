@@ -443,7 +443,7 @@ export default function Colaboradores() {
           <Divider mt={5} mb={5} />
           <Button
             leftIcon={<FaSave />}
-            colorScheme="blue"
+            colorScheme={config.buttons}
             size="lg"
             onClick={() => register()}
             isLoading={loading}

@@ -52,7 +52,13 @@ export default function ReportCashier() {
             focusBorderColor={config.inputs}
           />
 
-          <Button leftIcon={<FaSearch />}>Buscar</Button>
+          <Button
+            leftIcon={<FaSearch />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
+            Buscar
+          </Button>
         </Grid>
 
         <Table size="sm" mt="25px">
@@ -99,7 +105,7 @@ export default function ReportCashier() {
               <Td w="10%">
                 <Button
                   size="sm"
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   leftIcon={<FaSearchPlus />}
                   onClick={() => setModalCloseCashier(true)}
                 >
@@ -261,7 +267,7 @@ export default function ReportCashier() {
             </Box>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaPrint />} colorScheme="blue">
+            <Button leftIcon={<FaPrint />} colorScheme={config.buttons}>
               Imprimir Relatório
             </Button>
           </ModalFooter>

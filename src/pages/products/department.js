@@ -63,7 +63,13 @@ export default function DepartmentList() {
             focusBorderColor={config.inputs}
           />
 
-          <Button leftIcon={<FaSearch />}>Buscar</Button>
+          <Button
+            leftIcon={<FaSearch />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
+            Buscar
+          </Button>
         </Grid>
 
         <Table size="sm" mt="25px">
@@ -95,6 +101,7 @@ export default function DepartmentList() {
                     as={Button}
                     rightIcon={<MdKeyboardArrowDown />}
                     size="sm"
+                    colorScheme={config.buttons}
                   >
                     Opções
                   </MenuButton>
@@ -141,7 +148,7 @@ export default function DepartmentList() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>
@@ -181,7 +188,7 @@ export default function DepartmentList() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>

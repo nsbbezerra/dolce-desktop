@@ -378,6 +378,8 @@ export default function Tamanhos() {
                   isFullWidth
                   leftIcon={<FaSearch />}
                   onClick={() => setModalProducts(true)}
+                  colorScheme={config.buttons}
+                  variant="outline"
                 >
                   Buscar Produto
                   <Kbd ml={3} color="ButtonText">
@@ -424,6 +426,8 @@ export default function Tamanhos() {
                   isFullWidth
                   leftIcon={<FaSearch />}
                   onClick={() => setModalColor(true)}
+                  colorScheme={config.buttons}
+                  variant="outline"
                 >
                   Buscar Cor
                   <Kbd ml={3} color="ButtonText">
@@ -537,6 +541,7 @@ export default function Tamanhos() {
                                   colorScheme="red"
                                   icon={<FaTimes />}
                                   ml={1}
+                                  colorScheme={config.buttons}
                                 />
                               </PopoverTrigger>
                               <PopoverContent>
@@ -551,9 +556,14 @@ export default function Tamanhos() {
                                   justifyContent="flex-end"
                                 >
                                   <ButtonGroup size="sm">
-                                    <Button variant="outline">Não</Button>
                                     <Button
-                                      colorScheme="blue"
+                                      variant="outline"
+                                      colorScheme={config.buttons}
+                                    >
+                                      Não
+                                    </Button>
+                                    <Button
+                                      colorScheme={config.buttons}
                                       onClick={() => deleteSize(clr.id)}
                                     >
                                       Sim
@@ -574,7 +584,7 @@ export default function Tamanhos() {
           <Divider mt={5} mb={5} />
           <Button
             leftIcon={<FaSave />}
-            colorScheme="blue"
+            colorScheme={config.buttons}
             size="lg"
             isLoading={loading}
             onClick={() => register()}
@@ -626,7 +636,7 @@ export default function Tamanhos() {
                             icon={<FaCheck />}
                             size="xs"
                             isRound
-                            colorScheme="blue"
+                            colorScheme={config.buttons}
                             onClick={() => handleProduct(pro.id)}
                           />
                         </Td>
@@ -686,7 +696,7 @@ export default function Tamanhos() {
                               icon={<FaCheck />}
                               size="xs"
                               isRound
-                              colorScheme="blue"
+                              colorScheme={config.buttons}
                               onClick={() => handleColor(cor.id)}
                             />
                           </Tooltip>

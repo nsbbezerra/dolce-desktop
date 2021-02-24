@@ -25,10 +25,16 @@ const config = {
   },
   inputs: `${destak}.400`,
   switchs: destak,
+  buttons: destak,
   tabs: destak,
   headerapp: {
     dark: "gray.700",
     light: "gray.100",
+  },
+  print: {
+    bg: `${destak}.200`,
+    color: `${destak}.800`,
+    border: `${destak}.200`,
   },
 };
 

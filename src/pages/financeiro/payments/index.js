@@ -57,7 +57,13 @@ export default function Payments() {
             focusBorderColor={config.inputs}
           />
 
-          <Button leftIcon={<FaSearch />}>Buscar</Button>
+          <Button
+            leftIcon={<FaSearch />}
+            colorScheme={config.buttons}
+            variant="outline"
+          >
+            Buscar
+          </Button>
         </Grid>
 
         <Table size="sm" mt="25px">
@@ -117,6 +123,7 @@ export default function Payments() {
                     as={Button}
                     rightIcon={<MdKeyboardArrowDown />}
                     size="sm"
+                    colorScheme={config.buttons}
                   >
                     Opções
                   </MenuButton>
@@ -146,7 +153,11 @@ export default function Payments() {
         <Divider mt={5} mb={5} />
 
         <HStack spacing={3}>
-          <Button leftIcon={<GiReceiveMoney />} colorScheme="blue" size="lg">
+          <Button
+            leftIcon={<GiReceiveMoney />}
+            colorScheme={config.buttons}
+            size="lg"
+          >
             Negociar Vários
           </Button>
         </HStack>

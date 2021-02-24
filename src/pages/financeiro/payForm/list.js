@@ -54,7 +54,7 @@ export default function ListPayForm() {
                   isTruncated
                   noOfLines={1}
                   variant="link"
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   size="sm"
                   onClick={() => setModalBankAccount(true)}
                 >
@@ -68,7 +68,7 @@ export default function ListPayForm() {
                   isTruncated
                   noOfLines={1}
                   variant="link"
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   size="sm"
                   onClick={() => setModalStatus(true)}
                 >
@@ -84,7 +84,7 @@ export default function ListPayForm() {
                   isTruncated
                   noOfLines={1}
                   variant="link"
-                  colorScheme="blue"
+                  colorScheme={config.buttons}
                   size="sm"
                   onClick={() => setModalType(true)}
                 >
@@ -99,7 +99,7 @@ export default function ListPayForm() {
               <Button
                 leftIcon={<FaEdit />}
                 size="sm"
-                colorScheme="blue"
+                colorScheme={config.buttons}
                 isFullWidth
                 onClick={() => setModalEdit(true)}
               >
@@ -134,7 +134,7 @@ export default function ListPayForm() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>
@@ -165,7 +165,7 @@ export default function ListPayForm() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>
@@ -197,7 +197,7 @@ export default function ListPayForm() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>
@@ -246,7 +246,7 @@ export default function ListPayForm() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" leftIcon={<FaSave />}>
+            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
               Salvar
             </Button>
           </ModalFooter>

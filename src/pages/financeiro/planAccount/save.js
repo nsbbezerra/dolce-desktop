@@ -86,7 +86,7 @@ export default function PlanAccountSave() {
         DESPESAS
       </Text>
       <Divider mb={5} />
-      <Button leftIcon={<FaSave />} size="lg" colorScheme="blue">
+      <Button leftIcon={<FaSave />} size="lg" colorScheme={config.buttons}>
         Salvar
       </Button>
     </>
