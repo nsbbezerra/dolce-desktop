@@ -184,29 +184,23 @@ export default function Produtos() {
     });
   }
 
-  function handleToastMessage() {
-    showToast(
-      "Sem conexão com o servidor, verifique sua conexão com a internet",
-      "error",
-      "Conexão com o Servidor"
-    );
-  }
-
   if (error) {
     if (error.message === "Network Error") {
-      handleToastMessage();
-      return false;
+      alert(
+        "Sem conexão com o servidor, verifique sua conexão com a internet."
+      );
+    } else {
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
     }
-    const statusCode = error.response.status || 400;
-    const typeError =
-      error.response.data.message || "Ocorreu um erro ao buscar";
-    const errorMesg = error.response.data.errorMessage || statusCode;
-    const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
-    showToast(
-      errorMessageFinal,
-      "error",
-      statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
-    );
   }
 
   const previewThumbnail = useMemo(() => {
@@ -223,11 +217,8 @@ export default function Produtos() {
     setTabIndex(index);
   };
 
-  useEffect(() => {
-    finderCategorieBySource(findCategories);
-  }, [findCategories]);
-
   async function finderCategorieBySource(text) {
+    setFindCategories(text);
     if (text === "") {
       setCategories(categoriesSearched);
     } else {
@@ -241,11 +232,8 @@ export default function Produtos() {
     }
   }
 
-  useEffect(() => {
-    finderDepartmentsBySource(findDepartments);
-  }, [findDepartments]);
-
   async function finderDepartmentsBySource(text) {
+    setFindDepartments(text);
     if (text === "") {
       if (data) {
         await setDepartments(data.departments);
@@ -445,7 +433,9 @@ export default function Produtos() {
     } catch (error) {
       setLoading(false);
       if (error.message === "Network Error") {
-        handleToastMessage();
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
         return false;
       }
       const statusCode = error.response.status || 400;
@@ -1503,7 +1493,9 @@ export default function Produtos() {
                 focusBorderColor={config.inputs}
                 value={findCategories}
                 onChange={(e) =>
-                  setFindCategories(capitalizeAllFirstLetter(e.target.value))
+                  finderCategorieBySource(
+                    capitalizeAllFirstLetter(e.target.value)
+                  )
                 }
                 ref={initialRef}
               />
@@ -1564,7 +1556,9 @@ export default function Produtos() {
                 focusBorderColor={config.inputs}
                 value={findDepartments}
                 onChange={(e) =>
-                  setFindDepartments(capitalizeAllFirstLetter(e.target.value))
+                  finderDepartmentsBySource(
+                    capitalizeAllFirstLetter(e.target.value)
+                  )
                 }
                 ref={initialRef}
               />

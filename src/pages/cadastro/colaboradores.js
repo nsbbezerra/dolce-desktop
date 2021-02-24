@@ -106,14 +106,6 @@ export default function Colaboradores() {
     }
   }
 
-  function handleToastMessage() {
-    showToast(
-      "Sem conexão com o servidor, verifique sua conexão com a internet",
-      "error",
-      "Conexão com o Servidor"
-    );
-  }
-
   async function register(e) {
     if (e) {
       e.preventDefault();
@@ -175,11 +167,13 @@ export default function Colaboradores() {
       setLoading(false);
       clear();
     } catch (error) {
+      setLoading(false);
       if (error.message === "Network Error") {
-        handleToastMessage();
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
         return false;
       }
-      setLoading(false);
       const statusCode = error.response.status || 400;
       const typeError =
         error.response.data.message || "Ocorreu um erro ao salvar";

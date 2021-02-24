@@ -91,11 +91,8 @@ export default function Tamanhos() {
     inpt.focus();
   }
 
-  useEffect(() => {
-    finderProductsBySource(findProducts);
-  }, [findProducts]);
-
   async function finderProductsBySource(text) {
+    setFindProducts(text);
     if (text === "") {
       await setProducts(data);
     } else {
@@ -142,7 +139,9 @@ export default function Tamanhos() {
       setColors(response.data);
     } catch (error) {
       if (error.message === "Network Error") {
-        handleToastMessage();
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
         return false;
       }
       const statusCode = error.response.status || 400;
@@ -162,16 +161,22 @@ export default function Tamanhos() {
   }
 
   if (error) {
-    const statusCode = error.response.status || 400;
-    const typeError =
-      error.response.data.message || "Ocorreu um erro ao buscar";
-    const errorMesg = error.response.data.errorMessage || statusCode;
-    const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
-    showToast(
-      errorMessageFinal,
-      "error",
-      statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
-    );
+    if (error.message === "Network Error") {
+      alert(
+        "Sem conexão com o servidor, verifique sua conexão com a internet."
+      );
+    } else {
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
   }
 
   function removeSize(id) {
@@ -189,7 +194,9 @@ export default function Tamanhos() {
       removeSize(id);
     } catch (error) {
       if (error.message === "Network Error") {
-        handleToastMessage();
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
         return false;
       }
       const statusCode = error.response.status || 400;
@@ -218,7 +225,9 @@ export default function Tamanhos() {
       setSizes(response.data);
     } catch (error) {
       if (error.message === "Network Error") {
-        handleToastMessage();
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
         return false;
       }
       const statusCode = error.response.status || 400;
@@ -235,14 +244,6 @@ export default function Tamanhos() {
     setSkel(false);
   }
 
-  function handleToastMessage() {
-    showToast(
-      "Sem conexão com o servidor, verifique sua conexão com a internet",
-      "error",
-      "Conexão com o Servidor"
-    );
-  }
-
   async function findSizes() {
     setSkel(true);
     try {
@@ -250,7 +251,9 @@ export default function Tamanhos() {
       setSizes(response.data);
     } catch (error) {
       if (error.message === "Network Error") {
-        handleToastMessage();
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
         return false;
       }
       const statusCode = error.response.status || 400;
@@ -299,7 +302,9 @@ export default function Tamanhos() {
     } catch (error) {
       setLoading(false);
       if (error.message === "Network Error") {
-        handleToastMessage();
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
         return false;
       }
       const statusCode = error.response.status || 400;
@@ -599,7 +604,7 @@ export default function Tamanhos() {
                 focusBorderColor={config.inputs}
                 value={findProducts}
                 onChange={(e) =>
-                  setFindProducts(capitalizeFirstLetter(e.target.value))
+                  finderProductsBySource(capitalizeFirstLetter(e.target.value))
                 }
                 ref={initialRef}
               />

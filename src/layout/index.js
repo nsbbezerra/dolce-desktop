@@ -31,7 +31,6 @@ import {
   FormErrorMessage,
   Kbd,
   Icon,
-  useToast,
 } from "@chakra-ui/react";
 import Sider from "../components/sider";
 import Header from "../components/header";
@@ -56,7 +55,6 @@ import api from "../configs/axios";
 const remote = window.require("electron").remote;
 
 export default function Layout() {
-  const toast = useToast();
   const initialRef = useRef();
 
   const { setEmployee } = useEmployee();
@@ -81,16 +79,6 @@ export default function Layout() {
   const [modalMessage, setModalMessage] = useState("");
   const [showCloseButton, setShowCloseButton] = useState(false);
   const [typeRoute, setTypeRoute] = useState("https");
-
-  function showToast(message, status, title) {
-    toast({
-      title: title,
-      description: message,
-      status: status,
-      position: "bottom-right",
-      duration: 8000,
-    });
-  }
 
   useEffect(() => {
     setWrongUser(false);
@@ -151,28 +139,20 @@ export default function Layout() {
     findRoute();
   }, []);
 
-  function handleToastMessage() {
-    showToast(
-      "Sem conexão com o servidor, verifique sua conexão com a internet",
-      "error",
-      "Conexão com o Servidor"
-    );
-  }
-
   async function handleAuth(e) {
     e.preventDefault();
     if (user === "" || !user) {
-      setModalTitle("Atenção");
-      setModalMessage("Insira um usuário");
-      setModalConfirmeRoute(true);
+      setWrongUser(true);
+      setWrongUserMessage("Insira seu nome de usuário");
       return false;
     }
     if (pass === "" || !pass) {
-      setModalTitle("Atenção");
-      setModalMessage("Insira uma senha");
-      setModalConfirmeRoute(true);
+      setWrongPass(true);
+      setWrongPassMessage("Insira uma senha");
       return false;
     }
+    setWrongPass(false);
+    setWrongUser(false);
     setLoadingAuth(true);
     try {
       const response = await api.post("/employeeautenticate", {
@@ -183,9 +163,11 @@ export default function Layout() {
       setLoadingAuth(false);
       setModalAuth(false);
     } catch (error) {
-      let statusCode;
+      setLoadingAuth(false);
       if (error.message === "Network Error") {
-        handleToastMessage();
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
         return false;
       }
       const typeError = error.response.data.message || "";

@@ -101,16 +101,22 @@ export default function Categoria() {
   }, [thumbnail]);
 
   if (error) {
-    const statusCode = error.response.status || 400;
-    const typeError =
-      error.response.data.message || "Ocorreu um erro ao buscar";
-    const errorMesg = error.response.data.errorMessage || statusCode;
-    const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
-    showToast(
-      errorMessageFinal,
-      "error",
-      statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
-    );
+    if (error.message === "Network Error") {
+      alert(
+        "Sem conexão com o servidor, verifique sua conexão com a internet."
+      );
+    } else {
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
   }
 
   function handleValidator(path, message) {
@@ -144,11 +150,8 @@ export default function Categoria() {
     setModalDepartment(false);
   }
 
-  useEffect(() => {
-    finderClientsBySource(handleSearch);
-  }, [handleSearch]);
-
   async function finderClientsBySource(text) {
+    setHandleSearch(text);
     if (text === "") {
       await setDepartments(data);
     } else {
@@ -169,14 +172,6 @@ export default function Categoria() {
     if (keyName === "return" || keyName === "enter") {
       register(e);
     }
-  }
-
-  function handleToastMessage() {
-    showToast(
-      "Sem conexão com o servidor, verifique sua conexão com a internet",
-      "error",
-      "Conexão com o Servidor"
-    );
   }
 
   async function register(e) {
@@ -233,11 +228,13 @@ export default function Categoria() {
       setDescription("");
       setThumbnail(null);
     } catch (error) {
+      setLoading(false);
       if (error.message === "Network Error") {
-        handleToastMessage();
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
         return false;
       }
-      setLoading(false);
       const statusCode = error.response.status || 400;
       const typeError =
         error.response.data.message || "Ocorreu um erro ao salvar";
@@ -434,7 +431,9 @@ export default function Categoria() {
                 ref={initialRef}
                 value={handleSearch}
                 onChange={(e) =>
-                  setHandleSearch(capitalizeAllFirstLetter(e.target.value))
+                  finderClientsBySource(
+                    capitalizeAllFirstLetter(e.target.value)
+                  )
                 }
               />
 

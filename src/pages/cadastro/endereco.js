@@ -77,20 +77,8 @@ export default function Endereco() {
   }, [data]);
 
   useEffect(() => {
-    finderClientsBySource(findClient);
-  }, [findClient]);
-
-  useEffect(() => {
     handleCep(cep);
   }, [cep]);
-
-  function handleToastMessage() {
-    showToast(
-      "Sem conexão com o servidor, verifique sua conexão com a internet",
-      "error",
-      "Conexão com o Servidor"
-    );
-  }
 
   async function handleCep(value) {
     const parse = value.replace(/([\u0300-\u036f]|[^0-9a-zA-Z])/g, "");
@@ -104,7 +92,9 @@ export default function Endereco() {
         setState(response.data.state);
       } catch (error) {
         if (error.message === "Network Error") {
-          handleToastMessage();
+          alert(
+            "Sem conexão com o servidor, verifique sua conexão com a internet."
+          );
           return false;
         }
         const err = error.response.data.errors[0].message || "CEP Inválido";
@@ -145,6 +135,7 @@ export default function Endereco() {
   }
 
   async function finderClientsBySource(text) {
+    setFindClient(text);
     if (text === "") {
       await setClients(data);
     } else {
@@ -159,16 +150,22 @@ export default function Endereco() {
   }
 
   if (error) {
-    const statusCode = error.response.status || 400;
-    const typeError =
-      error.response.data.message || "Ocorreu um erro ao buscar";
-    const errorMesg = error.response.data.errorMessage || statusCode;
-    const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
-    showToast(
-      errorMessageFinal,
-      "error",
-      statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
-    );
+    if (error.message === "Network Error") {
+      alert(
+        "Sem conexão com o servidor, verifique sua conexão com a internet."
+      );
+    } else {
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
   }
 
   function capitalizeFirstLetter(string) {
@@ -247,11 +244,13 @@ export default function Endereco() {
       setLoadingAddress(false);
       clear();
     } catch (error) {
+      setLoadingAddress(false);
       if (error.message === "Network Error") {
-        handleToastMessage();
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
         return false;
       }
-      setLoadingAddress(false);
       const statusCode = error.response.status || 400;
       const typeError =
         error.response.data.message || "Ocorreu um erro ao salvar";
@@ -510,7 +509,7 @@ export default function Endereco() {
                 focusBorderColor={config.inputs}
                 value={findClient}
                 onChange={(e) =>
-                  setFindClient(capitalizeFirstLetter(e.target.value))
+                  finderClientsBySource(capitalizeFirstLetter(e.target.value))
                 }
               />
               <Box p={2} borderWidth="1px" rounded="md" mt={3}>
