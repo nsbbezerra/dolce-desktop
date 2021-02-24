@@ -21,9 +21,9 @@ import HeaderApp from "../../components/headerApp";
 import { FaIdCard, FaSave } from "react-icons/fa";
 import { AiOutlineEnter } from "react-icons/ai";
 import config from "../../configs/index";
-import InputMask from "react-input-mask";
 import api from "../../configs/axios";
 import Hotkeys from "react-hot-keys";
+import MaskedInput from "react-text-mask";
 
 import { useEmployee } from "../../context/Employee";
 
@@ -234,13 +234,35 @@ export default function Colaboradores() {
               }
             >
               <FormLabel>Telefone</FormLabel>
-              <InputMask
-                id="contact"
+              <MaskedInput
+                mask={[
+                  "(",
+                  /[0-9]/,
+                  /\d/,
+                  ")",
+                  " ",
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  "-",
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                ]}
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                mask="(99) 99999-9999"
-                className="mask-chakra"
                 placeholder="Telefone"
+                id="contact"
+                render={(ref, props) => (
+                  <Input
+                    ref={ref}
+                    {...props}
+                    focusBorderColor={config.inputs}
+                  />
+                )}
               />
               <FormErrorMessage>
                 {validators.find((obj) => obj.path === "contact")

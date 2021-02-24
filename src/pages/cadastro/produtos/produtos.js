@@ -63,7 +63,7 @@ import useFetch from "../../../hooks/useFetch";
 import Hotkeys from "react-hot-keys";
 import api from "../../../configs/axios";
 import marge from "../../../data/marge";
-import InputMask from "react-input-mask";
+import MaskedInput from "react-text-mask";
 
 export default function Produtos() {
   const { colorMode } = useColorMode();
@@ -737,32 +737,71 @@ export default function Produtos() {
                   <Grid mb={3} gap="15px" templateColumns="repeat(3, 1fr)">
                     <FormControl>
                       <FormLabel>CFOP</FormLabel>
-                      <InputMask
-                        mask="9999"
-                        className="mask-chakra"
-                        placeholder="CFOP"
+                      <MaskedInput
+                        mask={[/[0-9]/, /\d/, /\d/, /\d/]}
                         value={cfop}
                         onChange={(e) => setCfop(e.target.value)}
+                        placeholder="CFOP"
+                        render={(ref, props) => (
+                          <Input
+                            ref={ref}
+                            {...props}
+                            focusBorderColor={config.inputs}
+                          />
+                        )}
                       />
                     </FormControl>
                     <FormControl>
                       <FormLabel>NCM</FormLabel>
-                      <InputMask
-                        mask="9999.99.99"
-                        className="mask-chakra"
-                        placeholder="NCM"
+                      <MaskedInput
+                        mask={[
+                          /[0-9]/,
+                          /\d/,
+                          /\d/,
+                          /\d/,
+                          ".",
+                          /\d/,
+                          /\d/,
+                          ".",
+                          /\d/,
+                          /\d/,
+                        ]}
                         value={ncm}
                         onChange={(e) => setNcm(e.target.value)}
+                        placeholder="NCM"
+                        render={(ref, props) => (
+                          <Input
+                            ref={ref}
+                            {...props}
+                            focusBorderColor={config.inputs}
+                          />
+                        )}
                       />
                     </FormControl>
                     <FormControl>
                       <FormLabel>CEST</FormLabel>
-                      <InputMask
-                        mask="99.999.99"
-                        className="mask-chakra"
-                        placeholder="CEST"
+                      <MaskedInput
+                        mask={[
+                          /[0-9]/,
+                          /\d/,
+                          ".",
+                          /\d/,
+                          /\d/,
+                          /\d/,
+                          ".",
+                          /\d/,
+                          /\d/,
+                        ]}
                         value={cest}
                         onChange={(e) => setCest(e.target.value)}
+                        placeholder="CEST"
+                        render={(ref, props) => (
+                          <Input
+                            ref={ref}
+                            {...props}
+                            focusBorderColor={config.inputs}
+                          />
+                        )}
                       />
                     </FormControl>
                   </Grid>

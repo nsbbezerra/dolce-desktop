@@ -28,6 +28,8 @@ import {
   AlertDialogOverlay,
   useColorMode,
   Text,
+  Heading,
+  Divider,
 } from "@chakra-ui/react";
 import {
   FaUserCircle,
@@ -40,6 +42,7 @@ import {
 } from "react-icons/fa";
 
 import {
+  AiOutlineCheck,
   AiOutlineLogout,
   AiOutlineReload,
   AiOutlineStop,
@@ -65,6 +68,8 @@ export default function HeaderApp() {
   const [modalTheme, setModalTheme] = useState(false);
   const [theme, setTheme] = useState("light");
   const [alert, setAlert] = useState(false);
+  const [destak, setDestak] = useState("");
+  const [alertLogout, setAlertLogout] = useState(false);
 
   const handleCloseWindow = useCallback(() => {
     const window = remote.getCurrentWindow();
@@ -112,8 +117,8 @@ export default function HeaderApp() {
           cursor="pointer"
           borderRadius="xl"
           _checked={{
-            borderColor: "yellow.300",
-            boxShadow: "0px 0px 0px 4px #ecc94b",
+            borderColor: "gray.300",
+            boxShadow: "0px 0px 0px 4px #CBD5E0",
           }}
           _focus={{
             boxShadow: "outline",
@@ -180,9 +185,74 @@ export default function HeaderApp() {
     );
   }
 
+  function RadioCardColors(props) {
+    const { getInputProps, getCheckboxProps } = useRadio(props);
+
+    const input = getInputProps();
+    const checkbox = getCheckboxProps();
+
+    return (
+      <Box as="label">
+        <input {...input} />
+        <Box
+          {...checkbox}
+          cursor="pointer"
+          borderRadius="md"
+          _checked={{
+            borderColor: "gray.300",
+            boxShadow: "0px 0px 0px 3px #CBD5E0",
+          }}
+          _focus={{
+            boxShadow: "outline",
+          }}
+        >
+          <Box w="46px" h="30px" bg={`${props.children}.400`} rounded="md" />
+        </Box>
+      </Box>
+    );
+  }
+
+  function ExampleColors() {
+    const options = [
+      "gray",
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "teal",
+      "blue",
+      "cyan",
+      "purple",
+      "pink",
+    ];
+
+    const { getRootProps, getRadioProps } = useRadioGroup({
+      name: "framework",
+      defaultValue: destak,
+      onChange: (e) => setDestak(e),
+    });
+
+    const group = getRootProps();
+
+    return (
+      <HStack {...group}>
+        {options.map((value) => {
+          const radio = getRadioProps({ value });
+          return (
+            <RadioCardColors key={value} {...radio}>
+              {value}
+            </RadioCardColors>
+          );
+        })}
+      </HStack>
+    );
+  }
+
   async function findTheme() {
     const mode = await localStorage.getItem("mode");
+    const destakColor = await localStorage.getItem("destak");
     setTheme(mode);
+    setDestak(destakColor);
     await setColorMode(mode);
   }
 
@@ -192,6 +262,7 @@ export default function HeaderApp() {
 
   async function setColor() {
     await localStorage.setItem("mode", theme);
+    await localStorage.setItem("destak", destak);
     setModalTheme(false);
     setAlert(true);
   }
@@ -262,6 +333,7 @@ export default function HeaderApp() {
                 icon={<GiShop />}
                 rounded="xl"
                 ml={3}
+                onClick={() => toogleDevTools()}
               />
             </Tooltip>
 
@@ -271,7 +343,7 @@ export default function HeaderApp() {
                 icon={<AiOutlineLogout />}
                 rounded="xl"
                 ml={3}
-                onClick={() => toogleDevTools()}
+                onClick={() => setAlertLogout(true)}
               />
             </Tooltip>
           </Flex>
@@ -325,7 +397,15 @@ export default function HeaderApp() {
           <ModalHeader>Configurações do Tema</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            <Heading fontSize="sm" mb={2}>
+              Modo do tema:
+            </Heading>
             <Example />
+            <Divider mt={5} mb={5} />
+            <Heading fontSize="sm" mt={3} mb={2}>
+              Cor de destaque:
+            </Heading>
+            <ExampleColors />
           </ModalBody>
           <ModalFooter>
             <Button
@@ -378,6 +458,40 @@ export default function HeaderApp() {
                 leftIcon={<AiOutlineReload />}
               >
                 Reiniciar
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+
+      <AlertDialog
+        isOpen={alertLogout}
+        onClose={() => setAlertLogout(false)}
+        isCentered
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Logout
+            </AlertDialogHeader>
+
+            <AlertDialogBody>Deseja fazer logout?</AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button
+                colorScheme="red"
+                onClick={() => setAlertLogout(false)}
+                leftIcon={<AiOutlineStop />}
+              >
+                Não
+              </Button>
+              <Button
+                colorScheme="blue"
+                onClick={() => closeWindow()}
+                ml={3}
+                leftIcon={<AiOutlineCheck />}
+              >
+                Sim
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

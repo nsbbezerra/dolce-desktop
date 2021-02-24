@@ -1,18 +1,31 @@
+const destakColor = localStorage.getItem("destak");
+const destak = !destakColor ? "blue" : destakColor;
+
 const config = {
-  primary: "#D4AF37",
+  primary:
+    (destak === "gray" && "#A0AEC0") ||
+    (destak === "red" && "#F56565") ||
+    (destak === "orange" && "#ED8936") ||
+    (destak === "yellow" && "#ECC94B") ||
+    (destak === "green" && "#48BB78") ||
+    (destak === "teal" && "##38B2AC") ||
+    (destak === "blue" && "#4299E1") ||
+    (destak === "cyan" && "#0BC5EA") ||
+    (destak === "purple" && "#9F7AEA") ||
+    (destak === "pink" && "#ED64A6"),
   header: {
-    bg: "yellow.400",
+    bg: `${destak}.400`,
     color: "gray.900",
   },
   sider: {
-    colorBtn: "gray",
-    light: "yellow.100",
-    dark: "yellow.400",
-    btnHome: "yellow",
+    colorBtn: destak,
+    light: `${destak}.100`,
+    dark: `${destak}.400`,
+    btnHome: destak,
   },
-  inputs: "yellow.400",
-  switchs: "yellow",
-  tabs: "yellow",
+  inputs: `${destak}.400`,
+  switchs: destak,
+  tabs: destak,
   headerapp: {
     dark: "gray.700",
     light: "gray.100",

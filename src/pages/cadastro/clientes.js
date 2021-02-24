@@ -29,10 +29,10 @@ import {
 import { FaUserFriends, FaSave } from "react-icons/fa";
 import config from "../../configs";
 import HeaderApp from "../../components/headerApp";
-import InputMask from "react-input-mask";
 import { AiOutlineEnter } from "react-icons/ai";
 import Hotkeys from "react-hot-keys";
 import axios from "axios";
+import MaskedInput from "react-text-mask";
 
 import { useEmployee } from "../../context/Employee";
 import api from "../../configs/axios";
@@ -124,7 +124,7 @@ export default function SaveClient() {
       return false;
     }
     if (email === "" || !email) {
-      handleValidator("user", "O Email é obrigatório");
+      handleValidator("email", "O Email é obrigatório");
       return false;
     }
     if (
@@ -353,13 +353,34 @@ export default function SaveClient() {
               }
             >
               <FormLabel>CPF</FormLabel>
-              <InputMask
-                id="cpf"
-                mask="999.999.999-99"
-                className="mask-chakra"
-                placeholder="CPF"
+              <MaskedInput
+                mask={[
+                  /[0-9]/,
+                  /\d/,
+                  /\d/,
+                  ".",
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  ".",
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  "-",
+                  /\d/,
+                  /\d/,
+                ]}
                 value={cpf}
                 onChange={(e) => setCpf(e.target.value)}
+                placeholder="CPF"
+                id="cpf"
+                render={(ref, props) => (
+                  <Input
+                    ref={ref}
+                    {...props}
+                    focusBorderColor={config.inputs}
+                  />
+                )}
               />
               <FormErrorMessage>
                 {validators.find((obj) => obj.path === "cpf")
@@ -422,13 +443,35 @@ export default function SaveClient() {
               }
             >
               <FormLabel>Telefone</FormLabel>
-              <InputMask
-                id="contact"
-                mask="(99) 99999-9999"
-                className="mask-chakra"
-                placeholder="Telefone"
+              <MaskedInput
+                mask={[
+                  "(",
+                  /[0-9]/,
+                  /\d/,
+                  ")",
+                  " ",
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  "-",
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                ]}
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
+                placeholder="Telefone"
+                id="contact"
+                render={(ref, props) => (
+                  <Input
+                    ref={ref}
+                    {...props}
+                    focusBorderColor={config.inputs}
+                  />
+                )}
               />
               <FormErrorMessage>
                 {validators.find((obj) => obj.path === "contact")
@@ -601,13 +644,30 @@ export default function SaveClient() {
                   }
                 >
                   <FormLabel>CEP</FormLabel>
-                  <InputMask
-                    mask="99.999-999"
-                    className="mask-chakra"
-                    placeholder="CEP"
+                  <MaskedInput
+                    mask={[
+                      /[0-9]/,
+                      /\d/,
+                      ".",
+                      /\d/,
+                      /\d/,
+                      /\d/,
+                      "-",
+                      /\d/,
+                      /\d/,
+                      /\d/,
+                    ]}
                     value={cep}
                     onChange={(e) => setCep(e.target.value)}
+                    placeholder="CEP"
                     id="cep"
+                    render={(ref, props) => (
+                      <Input
+                        ref={ref}
+                        {...props}
+                        focusBorderColor={config.inputs}
+                      />
+                    )}
                   />
                   <FormErrorMessage>
                     {validators.find((obj) => obj.path === "cep")

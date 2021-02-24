@@ -37,13 +37,13 @@ import {
 import { FaMapMarkedAlt, FaSave, FaSearch, FaCheck } from "react-icons/fa";
 import config from "../../configs";
 import Headerapp from "../../components/headerApp";
-import InputMask from "react-input-mask";
 import useFetch from "../../hooks/useFetch";
 import Hotkeys from "react-hot-keys";
 import { AiOutlineEnter } from "react-icons/ai";
 import { useEmployee } from "../../context/Employee";
 import api from "../../configs/axios";
 import axios from "axios";
+import MaskedInput from "react-text-mask";
 
 export default function Endereco() {
   const toast = useToast();
@@ -390,13 +390,30 @@ export default function Endereco() {
               }
             >
               <FormLabel>CEP</FormLabel>
-              <InputMask
-                mask="99.999-999"
-                className="mask-chakra"
-                placeholder="CEP"
+              <MaskedInput
+                mask={[
+                  /[0-9]/,
+                  /\d/,
+                  ".",
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                  "-",
+                  /\d/,
+                  /\d/,
+                  /\d/,
+                ]}
                 value={cep}
                 onChange={(e) => setCep(e.target.value)}
+                placeholder="CEP"
                 id="cep"
+                render={(ref, props) => (
+                  <Input
+                    ref={ref}
+                    {...props}
+                    focusBorderColor={config.inputs}
+                  />
+                )}
               />
               <FormErrorMessage>
                 {validators.find((obj) => obj.path === "cep")
