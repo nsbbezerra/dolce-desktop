@@ -34,16 +34,27 @@ import {
   Flex,
   Icon,
   Text,
+  InputGroup,
+  InputRightElement,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
-import { FaSave, FaSearch, FaEdit, FaTrash } from "react-icons/fa";
+import {
+  FaSave,
+  FaSearch,
+  FaEdit,
+  FaTrash,
+  FaCalendarAlt,
+} from "react-icons/fa";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import {
   AiOutlineRise,
   AiOutlineFall,
   AiOutlineAreaChart,
 } from "react-icons/ai";
-import InputMask from "react-input-mask";
+import DatePicker, { registerLocale } from "react-datepicker";
+import pt_br from "date-fns/locale/pt-BR";
+
+registerLocale("pt_br", pt_br);
 
 export default function ListBankAccount() {
   const initialRef = useRef();
@@ -51,6 +62,7 @@ export default function ListBankAccount() {
   const [modalEdit, setModalEdit] = useState(false);
   const [drawerMoviment, setDrawerMoviment] = useState(false);
   const [typeSearch, setTypeSearch] = useState(1);
+  const [startDate, setStartDate] = useState(new Date());
 
   const DataAtual = new Date();
   const Ano = DataAtual.getFullYear();
@@ -58,6 +70,13 @@ export default function ListBankAccount() {
   function handleSearch(value) {
     setTypeSearch(parseInt(value));
   }
+
+  const CustomInputPicker = ({ value, onClick }) => (
+    <InputGroup>
+      <Input focusBorderColor={config.inputs} value={value} onClick={onClick} />
+      <InputRightElement pointerEvents="none" children={<FaCalendarAlt />} />
+    </InputGroup>
+  );
 
   return (
     <>
@@ -281,12 +300,24 @@ export default function ListBankAccount() {
                   <>
                     <FormControl isRequired>
                       <FormLabel>Período Inicial</FormLabel>
-                      <InputMask mask="99/99/9999" className="mask-chakra" />
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                        customInput={<CustomInputPicker />}
+                        locale="pt_br"
+                        dateFormat="dd/MM/yyyy"
+                      />
                     </FormControl>
 
                     <FormControl isRequired>
                       <FormLabel>Período Final</FormLabel>
-                      <InputMask mask="99/99/9999" className="mask-chakra" />
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                        customInput={<CustomInputPicker />}
+                        locale="pt_br"
+                        dateFormat="dd/MM/yyyy"
+                      />
                     </FormControl>
                   </>
                 ) : (
