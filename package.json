@@ -34,7 +34,8 @@
     "build": "react-scripts build",
     "start": "concurrently \"cross-env BROWSER=none yarn react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
     "package-win": "electron-builder build --ia32 --x64 --win nsis -c.extraMetadata.main=build/electron.js --publish never",
-    "package-linux": "electron-builder build --linux appimage --x64 -c.extraMetadata.main=build/electron.js --publish never"
+    "package-linux": "electron-builder build --linux appimage --x64 -c.extraMetadata.main=build/electron.js --publish never",
+    "package-mac": "electron-builder build --mac dmg --x64 -c.extraMetadata.main=build/electron.js --publish never"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -66,6 +67,10 @@
       "provider": "github",
       "repo": "palmieri",
       "owner": "nkinformatica"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icone.icns"
     },
     "win": {
       "icon": "build/icone.ico",

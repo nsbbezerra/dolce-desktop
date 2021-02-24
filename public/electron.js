@@ -5,11 +5,15 @@ const path = require("path");
 const isDev = require("electron-is-dev");
 let mainWindow;
 const Menu = electron.Menu;
+const os = require("os");
 
 Menu.setApplicationMenu(false);
 
 function createWindow() {
-  const iconPath = path.resolve(__dirname, "icone.png");
+  const iconPath =
+    os.platform() === "darwin"
+      ? path.resolve(__dirname, "icone.icns")
+      : path.resolve(__dirname, "icone.png");
   mainWindow = new BrowserWindow({
     width: 1300,
     height: 700,
