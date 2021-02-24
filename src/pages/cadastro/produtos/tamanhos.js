@@ -40,7 +40,6 @@ import {
   FormErrorMessage,
   ButtonGroup,
   Kbd,
-  Icon,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
 import {
@@ -55,7 +54,6 @@ import { useEmployee } from "../../../context/Employee";
 import useFetch from "../../../hooks/useFetch";
 import api from "../../../configs/axios";
 import Hotkeys from "react-hot-keys";
-import { AiOutlineEnter } from "react-icons/ai";
 
 export default function Tamanhos() {
   const toast = useToast();
@@ -327,7 +325,7 @@ export default function Tamanhos() {
     if (keyName === "f2") {
       setModalProducts(true);
     }
-    if (keyName === "enter" || keyName === "return") {
+    if (keyName === "f12") {
       register(e);
     }
   }
@@ -335,7 +333,7 @@ export default function Tamanhos() {
   return (
     <>
       <Hotkeys
-        keyName="f3, f2, enter, return"
+        keyName="f3, f2, f12"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -591,7 +589,7 @@ export default function Tamanhos() {
           >
             Salvar
             <Kbd ml={3} color="ButtonText">
-              <Icon as={AiOutlineEnter} />
+              F12
             </Kbd>
           </Button>
         </Box>

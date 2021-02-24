@@ -39,6 +39,7 @@ import {
   PopoverArrow,
   PopoverCloseButton,
   ButtonGroup,
+  Kbd,
 } from "@chakra-ui/react";
 import HeaderApp from "../../../components/headerApp";
 import { InputFile, File } from "../../../style/uploader";
@@ -55,7 +56,7 @@ import useFetch from "../../../hooks/useFetch";
 import { useEmployee } from "../../../context/Employee";
 import api from "../../../configs/axios";
 import Hotkeys from "react-hot-keys";
-import { AiOutlineEnter, AiOutlineClose } from "react-icons/ai";
+import { AiOutlineClose } from "react-icons/ai";
 
 export default function ImagesSave() {
   const { colorMode } = useColorMode();
@@ -363,356 +364,392 @@ export default function ImagesSave() {
     setSkel(false);
   }
 
+  function onKeyDown(keyName, e, handle) {
+    if (keyName === "f2") {
+      setModalProducts(true);
+    }
+    if (keyName === "f3") {
+      setModalColor(true);
+    }
+    if (keyName === "f12") {
+      register(e);
+    }
+  }
+
   return (
     <>
-      <HeaderApp title="Cadastro de Imagens" icon={FaImages} />
-
-      <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
-        <Grid templateColumns={"1fr 1fr"} gap="25px">
-          <HStack spacing="15px">
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "product") ? true : false
-              }
-            >
-              <FormLabel>Produto</FormLabel>
-              <Input
-                id="product"
-                focusBorderColor={config.inputs}
-                placeholder="Buscar Produtos"
-                w="350px"
-                value={nameProduct}
-                isReadOnly
-              />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "product")
-                  ? validators.find((obj) => obj.path === "product").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl>
-              <FormLabel color="transparent" userSelect="none">
-                D
-              </FormLabel>
-              <Button
-                isFullWidth
-                leftIcon={<FaSearch />}
-                onClick={() => setModalProducts(true)}
-                colorScheme={config.buttons}
-                variant="outline"
-              >
-                Buscar Produto
-              </Button>
-            </FormControl>
-          </HStack>
-          <Grid templateColumns="1fr 120px 200px" gap="15px">
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "color") ? true : false
-              }
-            >
-              <FormLabel>Nome da Cor</FormLabel>
-              <Input
-                id="color"
-                focusBorderColor={config.inputs}
-                placeholder="Nome da Cor"
-                isReadOnly
-                value={colorName}
-              />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "color")
-                  ? validators.find((obj) => obj.path === "color").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-
-            <FormControl>
-              <FormLabel>Demonstração</FormLabel>
-              <Input
-                focusBorderColor={config.inputs}
-                bg={`#${colorHex}`}
-                isReadOnly
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel color="transparent" userSelect="none">
-                D
-              </FormLabel>
-              <Button
-                isFullWidth
-                leftIcon={<FaSearch />}
-                onClick={() => setModalColor(true)}
-                colorScheme={config.buttons}
-                variant="outline"
-              >
-                Buscar Cor
-              </Button>
-            </FormControl>
-          </Grid>
-        </Grid>
-
-        <Divider mt={5} mb={5} />
-
-        <Grid templateColumns="300px 1fr" gap="15px">
-          <Box>
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "image") ? true : false
-              }
-            >
-              <FormLabel>Imagem</FormLabel>
-              <Box w="300px" h="300px">
-                {thumbnail ? (
-                  <Box rounded="md" borderWidth="1px" overflow="hidden">
-                    <Image src={previewThumbnail} w="300px" h="300px" />
-                    <Flex justify="center" mt="-30px">
-                      <Tooltip label="Remover Imagem" hasArrow>
-                        <IconButton
-                          icon={<AiOutlineClose />}
-                          colorScheme="red"
-                          rounded="full"
-                          size="sm"
-                          shadow="md"
-                          onClick={() => removeThumbnail()}
-                        />
-                      </Tooltip>
-                    </Flex>
-                  </Box>
-                ) : (
-                  <InputFile alt={300} lar={300} cor={colorMode}>
-                    <File
-                      type="file"
-                      onChange={(event) => setThumbnail(event.target.files[0])}
-                    />
-                    <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
-                    <Text>Insira uma imagem 300x300 pixels, de até 500kb</Text>
-                  </InputFile>
-                )}
-              </Box>
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "image")
-                  ? validators.find((obj) => obj.path === "image").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-            <Button
-              leftIcon={<FaSave />}
-              colorScheme={config.buttons}
-              size="lg"
-              mt={3}
-              isFullWidth
-              onClick={() => register()}
-              isLoading={loading}
-            >
-              Salvar Imagem
-            </Button>
-          </Box>
-
-          <Box borderWidth="1px" rounded="md" p={3}>
-            {skel === false ? (
-              <Grid
-                templateColumns="repeat(auto-fit, minmax(200px, 200px))"
-                gap="15px"
-                justifyContent="center"
-              >
-                {!!images.length && (
-                  <>
-                    {images.map((img) => (
-                      <Box
-                        w="200px"
-                        p={2}
-                        shadow="md"
-                        rounded="md"
-                        borderWidth="1px"
-                        key={img.id}
-                      >
-                        <Box w="100%" h="40px" bg={`#${img.hex}`} />
-                        <Center>
-                          <Text>{img.name}</Text>
-                        </Center>
-                        <Divider mt={1} mb={2} />
-                        <Image
-                          src={img.image}
-                          w="200px"
-                          h="200px"
-                          rounded="md"
-                        />
-                        <Popover>
-                          <PopoverTrigger>
-                            <Button
-                              leftIcon={<FaTimes />}
-                              isFullWidth
-                              colorScheme="red"
-                              mt={3}
-                            >
-                              Excluir Imagem
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent>
-                            <PopoverArrow />
-                            <PopoverCloseButton />
-                            <PopoverHeader>Confirmação!</PopoverHeader>
-                            <PopoverBody>
-                              Deseja remover esta imagem?
-                            </PopoverBody>
-                            <PopoverFooter d="flex" justifyContent="flex-end">
-                              <ButtonGroup size="sm">
-                                <Button
-                                  variant="outline"
-                                  colorScheme={config.buttons}
-                                >
-                                  Não
-                                </Button>
-                                <Button
-                                  colorScheme={config.buttons}
-                                  onClick={() => deleteImages(img.id)}
-                                >
-                                  Sim
-                                </Button>
-                              </ButtonGroup>
-                            </PopoverFooter>
-                          </PopoverContent>
-                        </Popover>
-                      </Box>
-                    ))}
-                  </>
-                )}
-              </Grid>
-            ) : (
-              <Stack mt={3}>
-                <Skeleton height="30px" />
-                <Skeleton height="30px" />
-                <Skeleton height="30px" />
-                <Skeleton height="30px" />
-              </Stack>
-            )}
-          </Box>
-        </Grid>
-      </Box>
-
-      <Modal
-        isOpen={modalColor}
-        onClose={() => setModalColor(false)}
-        size="xl"
-        isCentered
-        scrollBehavior="inside"
+      <Hotkeys
+        keyName="f2, f3, f12"
+        onKeyDown={onKeyDown}
+        allowRepeat
+        filter={(event) => {
+          return true;
+        }}
       >
-        <ModalOverlay />
-        <ModalContent pb={4}>
-          <ModalHeader>Selecione uma Cor</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {!!colors.length ? (
-              <Table size="sm">
-                <Thead fontWeight="700">
-                  <Tr>
-                    <Td>Cor</Td>
-                    <Td w="40%">Demonstração</Td>
-                    <Td w="15%" isNumeric></Td>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {colors.map((cor) => (
-                    <Tr key={cor.id}>
-                      <Td>{cor.name}</Td>
-                      <Td w="40%">
+        <HeaderApp title="Cadastro de Imagens" icon={FaImages} />
+
+        <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
+          <Grid templateColumns={"1fr 1fr"} gap="25px">
+            <HStack spacing="15px">
+              <FormControl
+                isRequired
+                isInvalid={
+                  validators.find((obj) => obj.path === "product")
+                    ? true
+                    : false
+                }
+              >
+                <FormLabel>Produto</FormLabel>
+                <Input
+                  id="product"
+                  focusBorderColor={config.inputs}
+                  placeholder="Buscar Produtos"
+                  w="350px"
+                  value={nameProduct}
+                  isReadOnly
+                />
+                <FormErrorMessage>
+                  {validators.find((obj) => obj.path === "product")
+                    ? validators.find((obj) => obj.path === "product").message
+                    : ""}
+                </FormErrorMessage>
+              </FormControl>
+              <FormControl>
+                <FormLabel color="transparent" userSelect="none">
+                  D
+                </FormLabel>
+                <Button
+                  isFullWidth
+                  leftIcon={<FaSearch />}
+                  onClick={() => setModalProducts(true)}
+                  colorScheme={config.buttons}
+                  variant="outline"
+                >
+                  Buscar Produto
+                  <Kbd color="ButtonText" ml={3}>
+                    F2
+                  </Kbd>
+                </Button>
+              </FormControl>
+            </HStack>
+            <Grid templateColumns="1fr 120px 200px" gap="15px">
+              <FormControl
+                isRequired
+                isInvalid={
+                  validators.find((obj) => obj.path === "color") ? true : false
+                }
+              >
+                <FormLabel>Nome da Cor</FormLabel>
+                <Input
+                  id="color"
+                  focusBorderColor={config.inputs}
+                  placeholder="Nome da Cor"
+                  isReadOnly
+                  value={colorName}
+                />
+                <FormErrorMessage>
+                  {validators.find((obj) => obj.path === "color")
+                    ? validators.find((obj) => obj.path === "color").message
+                    : ""}
+                </FormErrorMessage>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel>Demonstração</FormLabel>
+                <Input
+                  focusBorderColor={config.inputs}
+                  bg={`#${colorHex}`}
+                  isReadOnly
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel color="transparent" userSelect="none">
+                  D
+                </FormLabel>
+                <Button
+                  isFullWidth
+                  leftIcon={<FaSearch />}
+                  onClick={() => setModalColor(true)}
+                  colorScheme={config.buttons}
+                  variant="outline"
+                >
+                  Buscar Cor
+                  <Kbd color="ButtonText" ml={3}>
+                    F2
+                  </Kbd>
+                </Button>
+              </FormControl>
+            </Grid>
+          </Grid>
+
+          <Divider mt={5} mb={5} />
+
+          <Grid templateColumns="300px 1fr" gap="15px">
+            <Box>
+              <FormControl
+                isRequired
+                isInvalid={
+                  validators.find((obj) => obj.path === "image") ? true : false
+                }
+              >
+                <FormLabel>Imagem</FormLabel>
+                <Box w="300px" h="300px">
+                  {thumbnail ? (
+                    <Box rounded="md" borderWidth="1px" overflow="hidden">
+                      <Image src={previewThumbnail} w="300px" h="300px" />
+                      <Flex justify="center" mt="-30px">
+                        <Tooltip label="Remover Imagem" hasArrow>
+                          <IconButton
+                            icon={<AiOutlineClose />}
+                            colorScheme="red"
+                            rounded="full"
+                            size="sm"
+                            shadow="md"
+                            onClick={() => removeThumbnail()}
+                          />
+                        </Tooltip>
+                      </Flex>
+                    </Box>
+                  ) : (
+                    <InputFile alt={300} lar={300} cor={colorMode}>
+                      <File
+                        type="file"
+                        onChange={(event) =>
+                          setThumbnail(event.target.files[0])
+                        }
+                      />
+                      <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
+                      <Text>
+                        Insira uma imagem 300x300 pixels, de até 500kb
+                      </Text>
+                    </InputFile>
+                  )}
+                </Box>
+                <FormErrorMessage>
+                  {validators.find((obj) => obj.path === "image")
+                    ? validators.find((obj) => obj.path === "image").message
+                    : ""}
+                </FormErrorMessage>
+              </FormControl>
+              <Button
+                leftIcon={<FaSave />}
+                colorScheme={config.buttons}
+                size="lg"
+                mt={3}
+                isFullWidth
+                onClick={() => register()}
+                isLoading={loading}
+              >
+                Salvar Imagem{" "}
+                <Kbd color="ButtonText" ml={3}>
+                  F12
+                </Kbd>
+              </Button>
+            </Box>
+
+            <Box borderWidth="1px" rounded="md" p={3}>
+              {skel === false ? (
+                <Grid
+                  templateColumns="repeat(auto-fit, minmax(200px, 200px))"
+                  gap="15px"
+                  justifyContent="center"
+                >
+                  {!!images.length && (
+                    <>
+                      {images.map((img) => (
                         <Box
-                          bg={`#${cor.hex}`}
-                          w="100%"
-                          h="25px"
+                          w="200px"
+                          p={2}
+                          shadow="md"
                           rounded="md"
-                        />
-                      </Td>
-                      <Td w="15%" isNumeric>
-                        <Tooltip label="Usar esta cor" hasArrow>
+                          borderWidth="1px"
+                          key={img.id}
+                        >
+                          <Box w="100%" h="40px" bg={`#${img.hex}`} />
+                          <Center>
+                            <Text>{img.name}</Text>
+                          </Center>
+                          <Divider mt={1} mb={2} />
+                          <Image
+                            src={img.image}
+                            w="200px"
+                            h="200px"
+                            rounded="md"
+                          />
+                          <Popover>
+                            <PopoverTrigger>
+                              <Button
+                                leftIcon={<FaTimes />}
+                                isFullWidth
+                                colorScheme="red"
+                                mt={3}
+                              >
+                                Excluir Imagem
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                              <PopoverArrow />
+                              <PopoverCloseButton />
+                              <PopoverHeader>Confirmação!</PopoverHeader>
+                              <PopoverBody>
+                                Deseja remover esta imagem?
+                              </PopoverBody>
+                              <PopoverFooter d="flex" justifyContent="flex-end">
+                                <ButtonGroup size="sm">
+                                  <Button
+                                    variant="outline"
+                                    colorScheme={config.buttons}
+                                  >
+                                    Não
+                                  </Button>
+                                  <Button
+                                    colorScheme={config.buttons}
+                                    onClick={() => deleteImages(img.id)}
+                                  >
+                                    Sim
+                                  </Button>
+                                </ButtonGroup>
+                              </PopoverFooter>
+                            </PopoverContent>
+                          </Popover>
+                        </Box>
+                      ))}
+                    </>
+                  )}
+                </Grid>
+              ) : (
+                <Stack mt={3}>
+                  <Skeleton height="30px" />
+                  <Skeleton height="30px" />
+                  <Skeleton height="30px" />
+                  <Skeleton height="30px" />
+                </Stack>
+              )}
+            </Box>
+          </Grid>
+        </Box>
+
+        <Modal
+          isOpen={modalColor}
+          onClose={() => setModalColor(false)}
+          size="xl"
+          isCentered
+          scrollBehavior="inside"
+        >
+          <ModalOverlay />
+          <ModalContent pb={4}>
+            <ModalHeader>Selecione uma Cor</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {!!colors.length ? (
+                <Table size="sm">
+                  <Thead fontWeight="700">
+                    <Tr>
+                      <Td>Cor</Td>
+                      <Td w="40%">Demonstração</Td>
+                      <Td w="15%" isNumeric></Td>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {colors.map((cor) => (
+                      <Tr key={cor.id}>
+                        <Td>{cor.name}</Td>
+                        <Td w="40%">
+                          <Box
+                            bg={`#${cor.hex}`}
+                            w="100%"
+                            h="25px"
+                            rounded="md"
+                          />
+                        </Td>
+                        <Td w="15%" isNumeric>
+                          <Tooltip label="Usar esta cor" hasArrow>
+                            <IconButton
+                              aria-label="Search database"
+                              icon={<FaCheck />}
+                              size="xs"
+                              isRound
+                              colorScheme={config.buttons}
+                              onClick={() => handleColor(cor.id)}
+                            />
+                          </Tooltip>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              ) : (
+                <Stack mt={3}>
+                  <Skeleton height="30px" />
+                  <Skeleton height="30px" />
+                  <Skeleton height="30px" />
+                  <Skeleton height="30px" />
+                </Stack>
+              )}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+
+        <Modal
+          isOpen={modalProducts}
+          onClose={() => setModalProducts(false)}
+          size="xl"
+          scrollBehavior="inside"
+          isCentered
+          initialFocusRef={initialRef}
+        >
+          <ModalOverlay />
+          <ModalContent pb={4}>
+            <ModalHeader>Produtos</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Input
+                placeholder="Digite para Buscar"
+                focusBorderColor={config.inputs}
+                value={findProducts}
+                onChange={(e) =>
+                  finderProductsBySource(capitalizeFirstLetter(e.target.value))
+                }
+                ref={initialRef}
+              />
+              {products ? (
+                <Table size="sm" mt={3}>
+                  <Thead fontWeight="700">
+                    <Tr>
+                      <Td>Produto</Td>
+                      <Td w="10%" isNumeric></Td>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {products.map((pro) => (
+                      <Tr key={pro.id}>
+                        <Td>{pro.name}</Td>
+                        <Td w="10%" isNumeric>
                           <IconButton
                             aria-label="Search database"
                             icon={<FaCheck />}
                             size="xs"
                             isRound
                             colorScheme={config.buttons}
-                            onClick={() => handleColor(cor.id)}
+                            onClick={() => handleProduct(pro.id)}
                           />
-                        </Tooltip>
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            ) : (
-              <Stack mt={3}>
-                <Skeleton height="30px" />
-                <Skeleton height="30px" />
-                <Skeleton height="30px" />
-                <Skeleton height="30px" />
-              </Stack>
-            )}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
-      <Modal
-        isOpen={modalProducts}
-        onClose={() => setModalProducts(false)}
-        size="xl"
-        scrollBehavior="inside"
-        isCentered
-        initialFocusRef={initialRef}
-      >
-        <ModalOverlay />
-        <ModalContent pb={4}>
-          <ModalHeader>Produtos</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Input
-              placeholder="Digite para Buscar"
-              focusBorderColor={config.inputs}
-              value={findProducts}
-              onChange={(e) =>
-                finderProductsBySource(capitalizeFirstLetter(e.target.value))
-              }
-              ref={initialRef}
-            />
-            {products ? (
-              <Table size="sm" mt={3}>
-                <Thead fontWeight="700">
-                  <Tr>
-                    <Td>Produto</Td>
-                    <Td w="10%" isNumeric></Td>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {products.map((pro) => (
-                    <Tr key={pro.id}>
-                      <Td>{pro.name}</Td>
-                      <Td w="10%" isNumeric>
-                        <IconButton
-                          aria-label="Search database"
-                          icon={<FaCheck />}
-                          size="xs"
-                          isRound
-                          colorScheme={config.buttons}
-                          onClick={() => handleProduct(pro.id)}
-                        />
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            ) : (
-              <Stack mt={3}>
-                <Skeleton height="30px" />
-                <Skeleton height="30px" />
-                <Skeleton height="30px" />
-                <Skeleton height="30px" />
-              </Stack>
-            )}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              ) : (
+                <Stack mt={3}>
+                  <Skeleton height="30px" />
+                  <Skeleton height="30px" />
+                  <Skeleton height="30px" />
+                  <Skeleton height="30px" />
+                </Stack>
+              )}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      </Hotkeys>
     </>
   );
 }

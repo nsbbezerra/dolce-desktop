@@ -15,11 +15,9 @@ import {
   useToast,
   FormErrorMessage,
   Kbd,
-  Icon,
 } from "@chakra-ui/react";
 import HeaderApp from "../../components/headerApp";
 import { FaIdCard, FaSave } from "react-icons/fa";
-import { AiOutlineEnter } from "react-icons/ai";
 import config from "../../configs/index";
 import api from "../../configs/axios";
 import Hotkeys from "react-hot-keys";
@@ -188,7 +186,7 @@ export default function Colaboradores() {
   }
 
   function onKeyDown(keyName, e, handle) {
-    if (keyName === "return" || keyName === "enter") {
+    if (keyName === "f12") {
       register(e);
     }
   }
@@ -196,7 +194,7 @@ export default function Colaboradores() {
   return (
     <>
       <Hotkeys
-        keyName="return, enter"
+        keyName="f12"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -450,7 +448,7 @@ export default function Colaboradores() {
           >
             Cadastrar
             <Kbd ml={3} color="ButtonText">
-              <Icon as={AiOutlineEnter} />
+              F12
             </Kbd>
           </Button>
         </Box>

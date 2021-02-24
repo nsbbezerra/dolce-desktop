@@ -30,7 +30,6 @@ import {
   ModalBody,
   Kbd,
   FormErrorMessage,
-  Icon,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -49,9 +48,8 @@ import api from "../../../configs/axios";
 import useFetch from "../../../hooks/useFetch";
 import { useEmployee } from "../../../context/Employee";
 import Hotkeys from "react-hot-keys";
-import { AiOutlineEnter } from "react-icons/ai";
 
-export default function Cores({ id }) {
+export default function Cores() {
   const toast = useToast();
   const { data, error } = useFetch("/colorDependents");
   const { employee } = useEmployee();
@@ -210,7 +208,7 @@ export default function Cores({ id }) {
     if (keyName === "f3") {
       setModalProducts(true);
     }
-    if (keyName === "enter" || keyName === "return") {
+    if (keyName === "f12") {
       register(e);
     }
   }
@@ -275,7 +273,7 @@ export default function Cores({ id }) {
   return (
     <>
       <Hotkeys
-        keyName="f3, enter, return"
+        keyName="f3, f12"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -312,7 +310,9 @@ export default function Cores({ id }) {
               variant="outline"
             >
               Buscar Produto
-              <Kbd ml={3}>F3</Kbd>
+              <Kbd ml={3} color="ButtonText">
+                F3
+              </Kbd>
             </Button>
           </Grid>
 
@@ -456,7 +456,7 @@ export default function Cores({ id }) {
           >
             Salvar Cor{" "}
             <Kbd ml={3} color="ButtonText">
-              <Icon as={AiOutlineEnter} />
+              F12
             </Kbd>
           </Button>
         </Box>

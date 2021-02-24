@@ -43,7 +43,6 @@ import {
   Image,
   useToast,
   Kbd,
-  Icon,
 } from "@chakra-ui/react";
 import HeaderApp from "../../../components/headerApp";
 import {
@@ -54,7 +53,7 @@ import {
   FaCheck,
   FaSearch,
 } from "react-icons/fa";
-import { AiOutlineClose, AiOutlineEnter } from "react-icons/ai";
+import { AiOutlineClose } from "react-icons/ai";
 import { File, InputFile } from "../../../style/uploader";
 import config from "../../../configs";
 import dataTrib from "../../../data/data";
@@ -463,7 +462,7 @@ export default function Produtos() {
     if (keyName === "f2") {
       setModalDepartments(true);
     }
-    if (keyName === "return" || keyName === "enter") {
+    if (keyName === "f12") {
       register(e);
     }
   }
@@ -471,7 +470,7 @@ export default function Produtos() {
   return (
     <>
       <Hotkeys
-        keyName="f3, f2, return, enter"
+        keyName="f3, f2, f12"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -1511,7 +1510,7 @@ export default function Produtos() {
                   >
                     Salvar{" "}
                     <Kbd ml={3} color="ButtonText">
-                      <Icon as={AiOutlineEnter} />
+                      F12
                     </Kbd>
                   </Button>
                 </TabPanel>

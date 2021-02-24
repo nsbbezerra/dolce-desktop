@@ -17,10 +17,9 @@ import {
   Tooltip,
   FormErrorMessage,
   Kbd,
-  Icon,
 } from "@chakra-ui/react";
 import { FaSave, FaImage } from "react-icons/fa";
-import { AiFillShop, AiOutlineClose, AiOutlineEnter } from "react-icons/ai";
+import { AiFillShop, AiOutlineClose } from "react-icons/ai";
 import config from "../../configs";
 import HeaderApp from "../../components/headerApp";
 import { InputFile, File } from "../../style/uploader";
@@ -157,7 +156,7 @@ export default function Departamento() {
   }
 
   function onKeyDown(keyName, e, handle) {
-    if (keyName === "return") {
+    if (keyName === "f12") {
       register(e);
     }
   }
@@ -178,7 +177,7 @@ export default function Departamento() {
   return (
     <>
       <Hotkeys
-        keyName="return, enter"
+        keyName="f12"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -292,7 +291,7 @@ export default function Departamento() {
                 >
                   Cadastrar{" "}
                   <Kbd ml={3} color="ButtonText">
-                    <Icon as={AiOutlineEnter} />
+                    F12
                   </Kbd>
                 </Button>
               </Flex>

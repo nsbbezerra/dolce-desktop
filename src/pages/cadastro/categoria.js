@@ -28,10 +28,9 @@ import {
   FormErrorMessage,
   Image,
   Kbd,
-  Icon,
 } from "@chakra-ui/react";
 import { FaSave, FaImage, FaTags, FaSearch, FaCheck } from "react-icons/fa";
-import { AiOutlineClose, AiOutlineEnter } from "react-icons/ai";
+import { AiOutlineClose } from "react-icons/ai";
 import config from "../../configs";
 import HeaderApp from "../../components/headerApp";
 import { InputFile, File } from "../../style/uploader";
@@ -169,7 +168,7 @@ export default function Categoria() {
     if (keyName === "f3") {
       setModalDepartment(true);
     }
-    if (keyName === "return" || keyName === "enter") {
+    if (keyName === "f12") {
       register(e);
     }
   }
@@ -251,7 +250,7 @@ export default function Categoria() {
   return (
     <>
       <Hotkeys
-        keyName="f3, return, enter"
+        keyName="f3, f12"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -291,7 +290,7 @@ export default function Categoria() {
             >
               Buscar Departamento{" "}
               <Kbd ml={3} color="ButtonText">
-                f3
+                F3
               </Kbd>
             </Button>
           </Grid>
@@ -406,7 +405,7 @@ export default function Categoria() {
                 >
                   Cadastrar
                   <Kbd ml={3} color="ButtonText">
-                    <Icon as={AiOutlineEnter} />
+                    F12
                   </Kbd>
                 </Button>
               </Flex>

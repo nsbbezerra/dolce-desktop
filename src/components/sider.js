@@ -43,6 +43,7 @@ import {
   AiOutlineBgColors,
 } from "react-icons/ai";
 import { MdDashboard } from "react-icons/md";
+import { BsCardChecklist } from "react-icons/bs";
 import config from "../configs";
 
 export default function Sider() {
@@ -174,6 +175,12 @@ export default function Sider() {
           </MenuItem>
           <MenuItem icon={<FaImages />} onClick={() => routing("/images")}>
             Imagens
+          </MenuItem>
+          <MenuItem
+            icon={<BsCardChecklist />}
+            onClick={() => routing("/details")}
+          >
+            Detalhes do Produto
           </MenuItem>
           <MenuDivider />
           <MenuItem

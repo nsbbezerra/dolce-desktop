@@ -24,7 +24,6 @@ import {
   useToast,
   SkeletonText,
   Kbd,
-  Icon,
   AlertDialog,
   AlertDialogBody,
   AlertDialogFooter,
@@ -39,7 +38,6 @@ import config from "../../configs";
 import Headerapp from "../../components/headerApp";
 import useFetch from "../../hooks/useFetch";
 import Hotkeys from "react-hot-keys";
-import { AiOutlineEnter } from "react-icons/ai";
 import { useEmployee } from "../../context/Employee";
 import api from "../../configs/axios";
 import axios from "axios";
@@ -268,7 +266,7 @@ export default function Endereco() {
     if (keyName === "f3") {
       setModalClient(true);
     }
-    if (keyName === "return" || keyName === "enter") {
+    if (keyName === "f12") {
       registerAddress(e);
     }
   }
@@ -276,7 +274,7 @@ export default function Endereco() {
   return (
     <>
       <Hotkeys
-        keyName="f3, return, enter"
+        keyName="f3, f12"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -504,7 +502,7 @@ export default function Endereco() {
           >
             Cadastrar{" "}
             <Kbd ml={3} color="ButtonText">
-              <Icon as={AiOutlineEnter} />
+              F12
             </Kbd>
           </Button>
         </Box>

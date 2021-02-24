@@ -280,7 +280,7 @@ export default function SaveClient() {
   }
 
   function onKeyDown(keyName, e, handle) {
-    if (keyName === "return") {
+    if (keyName === "f12") {
       register(e);
     }
   }
@@ -315,7 +315,7 @@ export default function SaveClient() {
   return (
     <>
       <Hotkeys
-        keyName="return, enter"
+        keyName="f12"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -534,7 +534,7 @@ export default function SaveClient() {
           >
             Cadastrar{" "}
             <Kbd ml={3} color="ButtonText">
-              <Icon as={AiOutlineEnter} />
+              F12
             </Kbd>
           </Button>
         </Box>

@@ -18,6 +18,7 @@ import RegisterProducts from "../pages/cadastro/produtos/produtos";
 import RegisterColors from "../pages/cadastro/produtos/cores";
 import RegisterSizes from "../pages/cadastro/produtos/tamanhos";
 import RegisterImages from "../pages/cadastro/produtos/imagens";
+import RegisterList from "../pages/cadastro/produtos/details";
 
 /** ESTOQUE */
 import ListDepartment from "../pages/products/department";
@@ -138,6 +139,9 @@ export default function Routers() {
       </Route>
       <Route path="/images">
         <RegisterImages />
+      </Route>
+      <Route path={"/details"}>
+        <RegisterList />
       </Route>
     </Switch>
   );
