@@ -14,7 +14,7 @@ const config = {
     (destak === "purple" && "#9F7AEA") ||
     (destak === "pink" && "#ED64A6"),
   header: {
-    bg: `${destak}.400`,
+    bg: `${destak}.500`,
     color: "gray.900",
   },
   sider: {
