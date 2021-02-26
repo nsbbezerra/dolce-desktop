@@ -4,12 +4,18 @@ import { useEmployee } from "../context/Employee";
 
 export default function useFetch(url) {
   const { employee } = useEmployee();
-  const { data, error } = useSwr([url], async (url) => {
-    const response = await api.get(url, {
-      headers: { "x-access-token": employee.token },
-    });
-    return response.data;
-  });
+  const { data, error, mutate } = useSwr(
+    [url],
+    async (url) => {
+      const response = await api.get(url, {
+        headers: { "x-access-token": employee.token },
+      });
+      return response.data;
+    },
+    {
+      revalidateOnReconnect: true,
+    }
+  );
 
-  return { data, error };
+  return { data, error, mutate };
 }

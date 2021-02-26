@@ -43,10 +43,11 @@ import Hotkeys from "react-hot-keys";
 import useFetch from "../../hooks/useFetch";
 import Lottie from "../../components/lottie";
 import emptyAnimation from "../../animations/empty.json";
+import api from "../../configs/axios";
 
 export default function DepartmentList() {
   const { colorMode } = useColorMode();
-  const { data, error } = useFetch("/departments");
+  const { data, error, mutate } = useFetch("/departments");
   const toast = useToast();
 
   const [modalInfo, setModalInfo] = useState(false);
