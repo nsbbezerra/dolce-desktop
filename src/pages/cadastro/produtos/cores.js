@@ -39,6 +39,7 @@ import {
   PopoverArrow,
   PopoverCloseButton,
   ButtonGroup,
+  Flex,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
 import { FaSave, FaSearch, FaTimes, FaCheck } from "react-icons/fa";
@@ -48,6 +49,8 @@ import api from "../../../configs/axios";
 import useFetch from "../../../hooks/useFetch";
 import { useEmployee } from "../../../context/Employee";
 import Hotkeys from "react-hot-keys";
+import Lottie from "../../../components/lottie";
+import emptyAnimation from "../../../animations/empty.json";
 
 export default function Cores() {
   const toast = useToast();
@@ -382,7 +385,7 @@ export default function Cores() {
             </Stack>
           ) : (
             <>
-              {!!colors.length && (
+              {!!colors.length ? (
                 <>
                   <Divider mt={5} mb={5} />
                   <Wrap spacing="15px">
@@ -442,6 +445,11 @@ export default function Cores() {
                     ))}
                   </Wrap>
                 </>
+              ) : (
+                <Flex justify="center" align="center" direction="column">
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Nenhuma cor para mostrar</Text>
+                </Flex>
               )}
             </>
           )}
@@ -484,31 +492,44 @@ export default function Cores() {
                 ref={initialRef}
               />
               {products ? (
-                <Table size="sm" mt={3}>
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td>Produto</Td>
-                      <Td w="10%" isNumeric></Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {products.map((pro) => (
-                      <Tr key={pro.id}>
-                        <Td>{pro.name}</Td>
-                        <Td w="10%" isNumeric>
-                          <IconButton
-                            aria-label="Search database"
-                            icon={<FaCheck />}
-                            size="xs"
-                            isRound
-                            colorScheme={config.buttons}
-                            onClick={() => handleProduct(pro.id)}
-                          />
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
+                <>
+                  {products.length === 0 ? (
+                    <Flex justify="center" align="center" direction="column">
+                      <Lottie
+                        animation={emptyAnimation}
+                        height={200}
+                        width={200}
+                      />
+                      <Text>Nenhum produto para mostrar</Text>
+                    </Flex>
+                  ) : (
+                    <Table size="sm" mt={3}>
+                      <Thead fontWeight="700">
+                        <Tr>
+                          <Td>Produto</Td>
+                          <Td w="10%" isNumeric></Td>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {products.map((pro) => (
+                          <Tr key={pro.id}>
+                            <Td>{pro.name}</Td>
+                            <Td w="10%" isNumeric>
+                              <IconButton
+                                aria-label="Search database"
+                                icon={<FaCheck />}
+                                size="xs"
+                                isRound
+                                colorScheme={config.buttons}
+                                onClick={() => handleProduct(pro.id)}
+                              />
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  )}
+                </>
               ) : (
                 <Stack mt={3}>
                   <Skeleton height="30px" />

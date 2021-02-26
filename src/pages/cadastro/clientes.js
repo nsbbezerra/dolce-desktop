@@ -168,6 +168,7 @@ export default function SaveClient() {
         },
         { headers: { "x-access-token": employee.token } }
       );
+      console.log(response);
       setIdClient(response.data.client);
       setLoading(false);
       showToast(response.data.message, "success", "Sucesso");

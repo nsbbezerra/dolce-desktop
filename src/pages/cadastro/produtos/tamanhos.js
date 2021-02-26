@@ -54,6 +54,8 @@ import { useEmployee } from "../../../context/Employee";
 import useFetch from "../../../hooks/useFetch";
 import api from "../../../configs/axios";
 import Hotkeys from "react-hot-keys";
+import Lottie from "../../../components/lottie";
+import emptyAnimation from "../../../animations/empty.json";
 
 export default function Tamanhos() {
   const toast = useToast();
@@ -491,7 +493,7 @@ export default function Tamanhos() {
             </Stack>
           ) : (
             <>
-              {!!sizes.length && (
+              {!!sizes.length ? (
                 <>
                   <Divider mt={5} mb={5} />
                   <Wrap spacing="15px">
@@ -576,6 +578,11 @@ export default function Tamanhos() {
                     ))}
                   </Wrap>
                 </>
+              ) : (
+                <Flex justify="center" align="center" direction="column">
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Nenhum tamanho para mostrar</Text>
+                </Flex>
               )}
             </>
           )}
@@ -617,31 +624,44 @@ export default function Tamanhos() {
                 ref={initialRef}
               />
               {products ? (
-                <Table size="sm" mt={3}>
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td>Produto</Td>
-                      <Td w="10%" isNumeric></Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {products.map((pro) => (
-                      <Tr key={pro.id}>
-                        <Td>{pro.name}</Td>
-                        <Td w="10%" isNumeric>
-                          <IconButton
-                            aria-label="Search database"
-                            icon={<FaCheck />}
-                            size="xs"
-                            isRound
-                            colorScheme={config.buttons}
-                            onClick={() => handleProduct(pro.id)}
-                          />
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
+                <>
+                  {products.length === 0 ? (
+                    <Flex justify="center" align="center" direction="column">
+                      <Lottie
+                        animation={emptyAnimation}
+                        height={200}
+                        width={200}
+                      />
+                      <Text>Nenhum produto para mostrar</Text>
+                    </Flex>
+                  ) : (
+                    <Table size="sm" mt={3}>
+                      <Thead fontWeight="700">
+                        <Tr>
+                          <Td>Produto</Td>
+                          <Td w="10%" isNumeric></Td>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {products.map((pro) => (
+                          <Tr key={pro.id}>
+                            <Td>{pro.name}</Td>
+                            <Td w="10%" isNumeric>
+                              <IconButton
+                                aria-label="Search database"
+                                icon={<FaCheck />}
+                                size="xs"
+                                isRound
+                                colorScheme={config.buttons}
+                                onClick={() => handleProduct(pro.id)}
+                              />
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  )}
+                </>
               ) : (
                 <Stack mt={3}>
                   <Skeleton height="30px" />
@@ -704,12 +724,10 @@ export default function Tamanhos() {
                   </Tbody>
                 </Table>
               ) : (
-                <Stack mt={3}>
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                </Stack>
+                <Flex justify="center" align="center" direction="column">
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Nenhuma cor para mostrar</Text>
+                </Flex>
               )}
             </ModalBody>
           </ModalContent>

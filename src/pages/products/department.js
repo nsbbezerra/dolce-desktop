@@ -31,6 +31,7 @@ import {
   useToast,
   Stack,
   Skeleton,
+  Flex,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -40,6 +41,8 @@ import { FaSave, FaEdit, FaImage } from "react-icons/fa";
 import { InputFile, File } from "../../style/uploader";
 import Hotkeys from "react-hot-keys";
 import useFetch from "../../hooks/useFetch";
+import Lottie from "../../components/lottie";
+import emptyAnimation from "../../animations/empty.json";
 
 export default function DepartmentList() {
   const { colorMode } = useColorMode();
@@ -174,63 +177,72 @@ export default function DepartmentList() {
               <Skeleton height="30px" />
             </Stack>
           ) : (
-            <Table size="sm">
-              <Thead fontWeight="700">
-                <Tr>
-                  <Td w="5%" textAlign="center">
-                    Ativo?
-                  </Td>
-                  <Td w="25%">Nome</Td>
-                  <Td w="70%">Descrição</Td>
-                  <Td w="10%"></Td>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {departments.map((dep) => (
-                  <Tr key={dep.id}>
-                    <Td w="5%" textAlign="center">
-                      <Switch
-                        colorScheme={config.switchs}
-                        defaultIsChecked={dep.active}
-                      />
-                    </Td>
-                    <Td w="25%">{dep.name}</Td>
-                    <Td w="70%">
-                      <Text w="60vw" isTruncated noOfLines={1}>
-                        {dep.description}
-                      </Text>
-                    </Td>
-                    <Td w="10%">
-                      <Menu>
-                        <MenuButton
-                          isFullWidth
-                          as={Button}
-                          rightIcon={<MdKeyboardArrowDown />}
-                          size="sm"
-                          colorScheme={config.buttons}
-                        >
-                          Opções
-                        </MenuButton>
-                        <MenuList>
-                          <MenuItem
-                            icon={<FaEdit />}
-                            onClick={() => handleDepartment(dep.id)}
-                          >
-                            Editar Informações
-                          </MenuItem>
-                          <MenuItem
-                            icon={<FaImage />}
-                            onClick={() => handleThumbnail(dep.id)}
-                          >
-                            Alterar Imagem
-                          </MenuItem>
-                        </MenuList>
-                      </Menu>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
+            <>
+              {departments.length === 0 ? (
+                <Flex justify="center" align="center" direction="column">
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Nenhum departamento para mostrar</Text>
+                </Flex>
+              ) : (
+                <Table size="sm">
+                  <Thead fontWeight="700">
+                    <Tr>
+                      <Td w="5%" textAlign="center">
+                        Ativo?
+                      </Td>
+                      <Td w="25%">Nome</Td>
+                      <Td w="70%">Descrição</Td>
+                      <Td w="10%"></Td>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {departments.map((dep) => (
+                      <Tr key={dep.id}>
+                        <Td w="5%" textAlign="center">
+                          <Switch
+                            colorScheme={config.switchs}
+                            defaultIsChecked={dep.active}
+                          />
+                        </Td>
+                        <Td w="25%">{dep.name}</Td>
+                        <Td w="70%">
+                          <Text w="60vw" isTruncated noOfLines={1}>
+                            {dep.description}
+                          </Text>
+                        </Td>
+                        <Td w="10%">
+                          <Menu>
+                            <MenuButton
+                              isFullWidth
+                              as={Button}
+                              rightIcon={<MdKeyboardArrowDown />}
+                              size="sm"
+                              colorScheme={config.buttons}
+                            >
+                              Opções
+                            </MenuButton>
+                            <MenuList>
+                              <MenuItem
+                                icon={<FaEdit />}
+                                onClick={() => handleDepartment(dep.id)}
+                              >
+                                Editar Informações
+                              </MenuItem>
+                              <MenuItem
+                                icon={<FaImage />}
+                                onClick={() => handleThumbnail(dep.id)}
+                              >
+                                Alterar Imagem
+                              </MenuItem>
+                            </MenuList>
+                          </Menu>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              )}
+            </>
           )}
         </Box>
 

@@ -63,6 +63,8 @@ import Hotkeys from "react-hot-keys";
 import api from "../../../configs/axios";
 import marge from "../../../data/marge";
 import MaskedInput from "react-text-mask";
+import Lottie from "../../../components/lottie";
+import emptyAnimation from "../../../animations/empty.json";
 
 export default function Produtos() {
   const { colorMode } = useColorMode();
@@ -1571,12 +1573,10 @@ export default function Produtos() {
                   </Tbody>
                 </Table>
               ) : (
-                <Stack mt={3}>
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                </Stack>
+                <Flex justify="center" align="center" direction="column">
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Nenhuma categoria para mostrar</Text>
+                </Flex>
               )}
             </ModalBody>
           </ModalContent>
@@ -1633,12 +1633,10 @@ export default function Produtos() {
                   </Tbody>
                 </Table>
               ) : (
-                <Stack mt={3}>
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                </Stack>
+                <Flex justify="center" align="center" direction="column">
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Nenhum departamento para mostrar</Text>
+                </Flex>
               )}
             </ModalBody>
           </ModalContent>

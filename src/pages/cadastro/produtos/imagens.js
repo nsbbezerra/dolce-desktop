@@ -57,6 +57,8 @@ import { useEmployee } from "../../../context/Employee";
 import api from "../../../configs/axios";
 import Hotkeys from "react-hot-keys";
 import { AiOutlineClose } from "react-icons/ai";
+import Lottie from "../../../components/lottie";
+import emptyAnimation from "../../../animations/empty.json";
 
 export default function ImagesSave() {
   const { colorMode } = useColorMode();
@@ -554,7 +556,7 @@ export default function ImagesSave() {
                   gap="15px"
                   justifyContent="center"
                 >
-                  {!!images.length && (
+                  {!!images.length ? (
                     <>
                       {images.map((img) => (
                         <Box
@@ -615,6 +617,15 @@ export default function ImagesSave() {
                         </Box>
                       ))}
                     </>
+                  ) : (
+                    <Flex justify="center" align="center" direction="column">
+                      <Lottie
+                        animation={emptyAnimation}
+                        height={200}
+                        width={200}
+                      />
+                      <Text>Nenhuma imagem para mostrar</Text>
+                    </Flex>
                   )}
                 </Grid>
               ) : (
@@ -679,12 +690,10 @@ export default function ImagesSave() {
                   </Tbody>
                 </Table>
               ) : (
-                <Stack mt={3}>
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                  <Skeleton height="30px" />
-                </Stack>
+                <Flex justify="center" align="center" direction="column">
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Nenhuma cor para mostrar</Text>
+                </Flex>
               )}
             </ModalBody>
           </ModalContent>
@@ -713,31 +722,44 @@ export default function ImagesSave() {
                 ref={initialRef}
               />
               {products ? (
-                <Table size="sm" mt={3}>
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td>Produto</Td>
-                      <Td w="10%" isNumeric></Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {products.map((pro) => (
-                      <Tr key={pro.id}>
-                        <Td>{pro.name}</Td>
-                        <Td w="10%" isNumeric>
-                          <IconButton
-                            aria-label="Search database"
-                            icon={<FaCheck />}
-                            size="xs"
-                            isRound
-                            colorScheme={config.buttons}
-                            onClick={() => handleProduct(pro.id)}
-                          />
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
+                <>
+                  {products.length === 0 ? (
+                    <Flex justify="center" align="center" direction="column">
+                      <Lottie
+                        animation={emptyAnimation}
+                        height={200}
+                        width={200}
+                      />
+                      <Text>Nenhum produto para mostrar</Text>
+                    </Flex>
+                  ) : (
+                    <Table size="sm" mt={3}>
+                      <Thead fontWeight="700">
+                        <Tr>
+                          <Td>Produto</Td>
+                          <Td w="10%" isNumeric></Td>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {products.map((pro) => (
+                          <Tr key={pro.id}>
+                            <Td>{pro.name}</Td>
+                            <Td w="10%" isNumeric>
+                              <IconButton
+                                aria-label="Search database"
+                                icon={<FaCheck />}
+                                size="xs"
+                                isRound
+                                colorScheme={config.buttons}
+                                onClick={() => handleProduct(pro.id)}
+                              />
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  )}
+                </>
               ) : (
                 <Stack mt={3}>
                   <Skeleton height="30px" />

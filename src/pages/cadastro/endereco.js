@@ -32,6 +32,7 @@ import {
   AlertDialogOverlay,
   Text,
   FormErrorMessage,
+  Flex,
 } from "@chakra-ui/react";
 import { FaMapMarkedAlt, FaSave, FaSearch, FaCheck } from "react-icons/fa";
 import config from "../../configs";
@@ -42,6 +43,8 @@ import { useEmployee } from "../../context/Employee";
 import api from "../../configs/axios";
 import axios from "axios";
 import MaskedInput from "react-text-mask";
+import Lottie from "../../components/lottie";
+import emptyAnimation from "../../animations/empty.json";
 
 export default function Endereco() {
   const toast = useToast();
@@ -529,43 +532,56 @@ export default function Endereco() {
                   finderClientsBySource(capitalizeFirstLetter(e.target.value))
                 }
               />
-              <Box p={2} borderWidth="1px" rounded="md" mt={3}>
-                {clients ? (
-                  <Table size="sm" variant="striped">
-                    <Thead fontWeight="700">
-                      <Tr>
-                        <Td>Nome</Td>
-                        <Td w="10%">Ações</Td>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {clients && (
-                        <>
-                          {clients.map((client) => (
-                            <Tr key={client.id}>
-                              <Td>{client.name}</Td>
-                              <Td w="10%" textAlign="center">
-                                <Tooltip label="Selecionar cliente" hasArrow>
-                                  <IconButton
-                                    aria-label="Search database"
-                                    icon={<FaCheck />}
-                                    size="xs"
-                                    isRound
-                                    colorScheme={config.buttons}
-                                    onClick={() => handleFindClient(client.id)}
-                                  />
-                                </Tooltip>
-                              </Td>
-                            </Tr>
-                          ))}
-                        </>
-                      )}
-                    </Tbody>
-                  </Table>
-                ) : (
-                  <SkeletonText noOfLines={4} spacing="4" />
-                )}
-              </Box>
+              {clients ? (
+                <>
+                  {clients.length === 0 ? (
+                    <Flex justify="center" align="center" direction="column">
+                      <Lottie
+                        animation={emptyAnimation}
+                        height={200}
+                        width={200}
+                      />
+                      <Text>Nenhum cliente para mostrar</Text>
+                    </Flex>
+                  ) : (
+                    <Table size="sm" variant="striped">
+                      <Thead fontWeight="700">
+                        <Tr>
+                          <Td>Nome</Td>
+                          <Td w="10%">Ações</Td>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {clients && (
+                          <>
+                            {clients.map((client) => (
+                              <Tr key={client.id}>
+                                <Td>{client.name}</Td>
+                                <Td w="10%" textAlign="center">
+                                  <Tooltip label="Selecionar cliente" hasArrow>
+                                    <IconButton
+                                      aria-label="Search database"
+                                      icon={<FaCheck />}
+                                      size="xs"
+                                      isRound
+                                      colorScheme={config.buttons}
+                                      onClick={() =>
+                                        handleFindClient(client.id)
+                                      }
+                                    />
+                                  </Tooltip>
+                                </Td>
+                              </Tr>
+                            ))}
+                          </>
+                        )}
+                      </Tbody>
+                    </Table>
+                  )}
+                </>
+              ) : (
+                <SkeletonText noOfLines={4} spacing="4" />
+              )}
             </ModalBody>
           </ModalContent>
         </Modal>

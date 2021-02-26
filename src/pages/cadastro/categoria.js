@@ -38,6 +38,8 @@ import useFetch from "../../hooks/useFetch";
 import Hotkeys from "react-hot-keys";
 import api from "../../configs/axios";
 import { useEmployee } from "../../context/Employee";
+import Lottie from "../../components/lottie";
+import emptyAnimation from "../../animations/empty.json";
 
 export default function Categoria() {
   const { data, error } = useFetch("/departments");
@@ -439,42 +441,55 @@ export default function Categoria() {
               />
 
               {departments && (
-                <Box p={2} borderWidth="1px" rounded="md" mt={3}>
-                  <Table size="sm" variant="striped">
-                    <Thead fontWeight="700">
-                      <Tr>
-                        <Td>Nome</Td>
-                        <Td w="10%">Ações</Td>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {departments && (
-                        <>
-                          {departments.map((dep) => (
-                            <Tr key={dep.id}>
-                              <Td>{dep.name}</Td>
-                              <Td w="10%" textAlign="center">
-                                <Tooltip
-                                  label="Selecionar departamento"
-                                  hasArrow
-                                >
-                                  <IconButton
-                                    aria-label="Search database"
-                                    icon={<FaCheck />}
-                                    size="xs"
-                                    isRound
-                                    colorScheme={config.buttons}
-                                    onClick={() => handleDepartment(dep.id)}
-                                  />
-                                </Tooltip>
-                              </Td>
-                            </Tr>
-                          ))}
-                        </>
-                      )}
-                    </Tbody>
-                  </Table>
-                </Box>
+                <>
+                  {departments.length === 0 ? (
+                    <Flex justify="center" align="center" direction="column">
+                      <Lottie
+                        animation={emptyAnimation}
+                        height={200}
+                        width={200}
+                      />
+                      <Text>Nenhum departamento para mostrar</Text>
+                    </Flex>
+                  ) : (
+                    <Box p={2} borderWidth="1px" rounded="md" mt={3}>
+                      <Table size="sm" variant="striped">
+                        <Thead fontWeight="700">
+                          <Tr>
+                            <Td>Nome</Td>
+                            <Td w="10%">Ações</Td>
+                          </Tr>
+                        </Thead>
+                        <Tbody>
+                          {departments && (
+                            <>
+                              {departments.map((dep) => (
+                                <Tr key={dep.id}>
+                                  <Td>{dep.name}</Td>
+                                  <Td w="10%" textAlign="center">
+                                    <Tooltip
+                                      label="Selecionar departamento"
+                                      hasArrow
+                                    >
+                                      <IconButton
+                                        aria-label="Search database"
+                                        icon={<FaCheck />}
+                                        size="xs"
+                                        isRound
+                                        colorScheme={config.buttons}
+                                        onClick={() => handleDepartment(dep.id)}
+                                      />
+                                    </Tooltip>
+                                  </Td>
+                                </Tr>
+                              ))}
+                            </>
+                          )}
+                        </Tbody>
+                      </Table>
+                    </Box>
+                  )}
+                </>
               )}
             </ModalBody>
           </ModalContent>
