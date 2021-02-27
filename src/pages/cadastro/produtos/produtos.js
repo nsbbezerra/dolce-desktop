@@ -911,7 +911,9 @@ export default function Produtos() {
                             onChange={(e) => setPisCst(e.target.value)}
                           >
                             {dataTrib.map((dt) => (
-                              <option value={dt.code}>{dt.desc}</option>
+                              <option value={dt.code} key={dt.code}>
+                                {dt.desc}
+                              </option>
                             ))}
                           </Select>
                         </FormControl>
@@ -948,7 +950,9 @@ export default function Produtos() {
                             onChange={(e) => setCofinsCst(e.target.value)}
                           >
                             {dataTrib.map((dt) => (
-                              <option value={dt.code}>{dt.desc}</option>
+                              <option value={dt.code} key={dt.code}>
+                                {dt.desc}
+                              </option>
                             ))}
                           </Select>
                         </FormControl>
@@ -1235,7 +1239,9 @@ export default function Produtos() {
                         focusBorderColor={config.inputs}
                       >
                         {marge.map((mar) => (
-                          <option value={mar.value}>{mar.text}</option>
+                          <option value={mar.value} key={mar.value}>
+                            {mar.text}
+                          </option>
                         ))}
                       </Select>
 
