@@ -28,8 +28,6 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  Stack,
-  Skeleton,
   ModalBody,
   ModalCloseButton,
   Table,
