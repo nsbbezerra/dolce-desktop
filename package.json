@@ -33,7 +33,7 @@
     "dev": "yarn react-scripts start",
     "build": "react-scripts build",
     "start": "concurrently \"cross-env BROWSER=none yarn react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
-    "package-win": "electron-builder build --ia32 --x64 --win nsis -c.extraMetadata.main=build/electron.js --publish never",
+    "package-win": "electron-builder build --x64 --win nsis -c.extraMetadata.main=build/electron.js --publish never",
     "package-linux": "electron-builder build --linux appimage --x64 -c.extraMetadata.main=build/electron.js --publish never",
     "package-mac": "electron-builder build --mac dmg --x64 -c.extraMetadata.main=build/electron.js --publish never"
   },
@@ -78,8 +78,7 @@
         {
           "target": "nsis",
           "arch": [
-            "x64",
-            "ia32"
+            "x64"
           ]
         }
       ]
