@@ -37,6 +37,15 @@ import {
   NumberDecrementStepper,
   IconButton,
   Tooltip,
+  HStack,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Divider,
+  Heading,
+  Textarea,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -48,6 +57,7 @@ import {
   FaImage,
   FaTag,
   FaBoxOpen,
+  FaCalculator,
 } from "react-icons/fa";
 import { InputFile, File } from "../../style/uploader";
 import { AiOutlineClose } from "react-icons/ai";
@@ -61,10 +71,9 @@ import searchAnimation from "../../animations/search.json";
 import sendAnimation from "../../animations/send.json";
 import { mutate as mutateGlobal } from "swr";
 import Hotkeys from "react-hot-keys";
-
-import Products from "./edit/produtos/produtos";
-import Sizes from "./edit/produtos/tamanhos";
-import Imagens from "./edit/produtos/imagens";
+import dataTrib from "../../data/data";
+import MaskedInput from "react-text-mask";
+import marge from "../../data/marge";
 
 export default function CategoryList() {
   const { colorMode } = useColorMode();
@@ -87,6 +96,49 @@ export default function CategoryList() {
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState("");
   const [loadingImage, setLoadingImage] = useState(false);
+  const [sizes, setSizes] = useState([]);
+  const [size, setSize] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [sizeId, setSizeId] = useState(null);
+  const [loadingSize, setLoadingSize] = useState(false);
+
+  /** STATES PRIMEIRA TAB */
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [barcode, setBarcode] = useState("");
+  const [sku, setSku] = useState("");
+
+  /** STATES SEGUNDA TAB */
+  const [icmsRate, setIcmsRate] = useState(0);
+  const [icmsCst, setIcmsCst] = useState("");
+  const [pisRate, setPisRate] = useState(0);
+  const [pisCst, setPisCst] = useState("");
+  const [cofinsRate, setCofinsRate] = useState(0);
+  const [cofinsCst, setCofinsCst] = useState("");
+  const [icmsOrigin, setIcmsOrigin] = useState("");
+  const [icmsStRate, setIcmsStRate] = useState(0);
+  const [icmsMVA, setIcmsMVA] = useState(0);
+  const [icmsStModBc, setIcmsStModBc] = useState("");
+  const [fcpRate, setFcpRate] = useState(0);
+  const [fcpStRate, setFcpStRate] = useState(0);
+  const [fcpRetRate, setFcpRetRate] = useState(0);
+  const [ipiRate, setIpiRate] = useState(0);
+  const [ipiCode, setIpiCode] = useState("");
+  const [ipiCst, setIpiCst] = useState("");
+  const [cfop, setCfop] = useState("");
+  const [ncm, setNcm] = useState("");
+  const [cest, setCest] = useState("");
+
+  /** STATES TERCEIRA TAB */
+  const [margeLucro, setMargeLucro] = useState(1.15);
+  const [costValue, setCostValue] = useState(0);
+  const [otherCost, setOtherCost] = useState(0);
+  const [saleValue, setSaleValue] = useState(0);
+  const [productHeight, setProductHeight] = useState(0);
+  const [productWidth, setProductWidht] = useState(0);
+  const [productDiameter, setProductDiameter] = useState(0);
+  const [productLength, setProductLength] = useState(0);
+  const [productWeight, setProductWeight] = useState(0);
 
   useEffect(() => {
     console.log(data);
@@ -364,6 +416,126 @@ export default function CategoryList() {
     }
   }
 
+  async function handleFindSizes(id) {
+    setLoading(true);
+    try {
+      const response = await api.get(`/findSizeByProduct/${id}`);
+      setSizes(response.data);
+      setModalSize(true);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  function calcSalePrice() {
+    let cost = parseFloat(costValue) + parseFloat(otherCost);
+    setSaleValue(cost * margeLucro);
+  }
+
+  async function handleUpdateStock(id) {
+    const result = await sizes.find((obj) => obj.id === id);
+    setSize(result.size);
+    setAmount(result.amount);
+    setSizeId(result.id);
+    setModalGerImg(true);
+  }
+
+  async function saveSizeUpdate() {
+    setLoadingSize(true);
+    try {
+      const response = await api.put(
+        `/sizes/${sizeId}`,
+        {
+          size,
+          amount,
+        },
+        { headers: { "x-access-token": employee.token } }
+      );
+      const updatedSizes = await sizes.map((si) => {
+        if (si.id === sizeId) {
+          return { ...si, amount: amount, size: size };
+        }
+        return si;
+      });
+      setSizes(updatedSizes);
+      showToast(response.data.message, "success", "Sucesso");
+      setLoadingSize(false);
+      setModalGerImg(false);
+    } catch (error) {
+      setLoadingSize(false);
+      setModalGerImg(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function handleProductInfo(id) {
+    const result = await products.find((obj) => obj.id === id);
+    setName(result.name);
+    setBarcode(result.barcode);
+    setSku(result.sku);
+    setDescription(result.description);
+    setCfop(result.cfop || "");
+    setNcm(result.ncm || "");
+    setCest(result.cest || "");
+    setIcmsRate(result.icms_rate || "0");
+    setIcmsCst(result.icms_csosn || "");
+    setPisRate(result.pis_rate || "0");
+    setPisCst(result.pis_cst || "");
+    setCofinsRate(result.cofins_rate || "0");
+    setCofinsCst(result.cofins_cst || "");
+    setIcmsOrigin(result.icms_origin || "");
+    setIcmsStRate(result.icms_st_rate || "0");
+    setIcmsMVA(result.icms_marg_val_agregate || "0");
+    setFcpRetRate(result.fcp_ret_rate || "0");
+    setIcmsStModBc(result.icms_st_mod_bc || "");
+    setFcpRate(result.fcp_rate || "0");
+    setFcpStRate(result.fcp_st_rate || "0");
+    setIpiRate(result.ipi_rate || "0");
+    setIpiCode(result.ipi_code || "");
+    setIpiCst(result.ipi_cst || "");
+    setCostValue(result.cost_value || "0");
+    setOtherCost(result.other_cost || "0");
+    setSaleValue(result.sale_value || "0");
+    setProductHeight(result.freight_height || "0");
+    setProductWidht(result.freight_width || "0");
+    setProductLength(result.freight_length || "0");
+    setProductDiameter(result.freight_diameter || "0");
+    setProductWeight(result.freight_weight || "0");
+    setModalInfo(true);
+  }
+
   return (
     <>
       <Hotkeys
@@ -528,13 +700,13 @@ export default function CategoryList() {
                             <MenuList>
                               <MenuItem
                                 icon={<FaEdit />}
-                                onClick={() => setModalInfo(true)}
+                                onClick={() => handleProductInfo(prod.id)}
                               >
                                 Editar Informações
                               </MenuItem>
                               <MenuItem
                                 icon={<FaBoxOpen />}
-                                onClick={() => setModalSize(true)}
+                                onClick={() => handleFindSizes(prod.id)}
                               >
                                 Ajustar Estoque / Tamanhos
                               </MenuItem>
@@ -563,11 +735,747 @@ export default function CategoryList() {
           scrollBehavior="inside"
         >
           <ModalOverlay />
-          <ModalContent maxW="90vw">
+          <ModalContent maxW="90vw" h="98vh">
             <ModalHeader>Editar Informações</ModalHeader>
             <ModalCloseButton />
-            <ModalBody>{modalInfo === true && <Products />}</ModalBody>
+            <ModalBody>
+              <Tabs variant="enclosed" colorScheme={config.tabs}>
+                <TabList>
+                  <Tab>Informações</Tab>
+                  <Tab>Tributação</Tab>
+                  <Tab>Preço e Frete</Tab>
+                </TabList>
 
+                <TabPanels>
+                  {/** INFORMAÇÕES */}
+                  <TabPanel>
+                    <Grid templateColumns="1fr" gap="15px">
+                      <Box>
+                        <Grid templateColumns="1fr 200px 200px" gap="15px">
+                          <FormControl isRequired mr={3}>
+                            <FormLabel>Nome do Produto</FormLabel>
+                            <Input
+                              id="name"
+                              placeholder="Nome"
+                              focusBorderColor={config.inputs}
+                              value={name}
+                              onChange={(e) =>
+                                setName(capitalizeFirstLetter(e.target.value))
+                              }
+                            />
+                          </FormControl>
+
+                          <FormControl mr={3}>
+                            <FormLabel>Cod. de Barras</FormLabel>
+                            <Input
+                              placeholder="Código de Barras"
+                              focusBorderColor={config.inputs}
+                              value={barcode}
+                              onChange={(e) =>
+                                setBarcode(e.target.value.toUpperCase())
+                              }
+                            />
+                          </FormControl>
+
+                          <FormControl mr={3}>
+                            <FormLabel>Cod. SKU</FormLabel>
+                            <Input
+                              placeholder="Código SKU"
+                              focusBorderColor={config.inputs}
+                              value={sku}
+                              onChange={(e) =>
+                                setSku(e.target.value.toUpperCase())
+                              }
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid templateColumns="1fr" mt={3} gap="15px">
+                          <FormControl mr={3} isRequired>
+                            <FormLabel>Descrição</FormLabel>
+                            <Textarea
+                              id="description"
+                              placeholder="Descrição"
+                              resize="none"
+                              focusBorderColor={config.inputs}
+                              value={description}
+                              onChange={(e) =>
+                                setDescription(
+                                  capitalizeFirstLetter(e.target.value)
+                                )
+                              }
+                            />
+                          </FormControl>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  </TabPanel>
+
+                  {/** TRIBUTAÇÕES */}
+                  <TabPanel>
+                    <Grid mb={3} gap="15px" templateColumns="repeat(3, 1fr)">
+                      <FormControl>
+                        <FormLabel>CFOP</FormLabel>
+                        <MaskedInput
+                          mask={[/[0-9]/, /\d/, /\d/, /\d/]}
+                          value={cfop}
+                          onChange={(e) => setCfop(e.target.value)}
+                          placeholder="CFOP"
+                          render={(ref, props) => (
+                            <Input
+                              ref={ref}
+                              {...props}
+                              focusBorderColor={config.inputs}
+                            />
+                          )}
+                        />
+                      </FormControl>
+                      <FormControl>
+                        <FormLabel>NCM</FormLabel>
+                        <MaskedInput
+                          mask={[
+                            /[0-9]/,
+                            /\d/,
+                            /\d/,
+                            /\d/,
+                            ".",
+                            /\d/,
+                            /\d/,
+                            ".",
+                            /\d/,
+                            /\d/,
+                          ]}
+                          value={ncm}
+                          onChange={(e) => setNcm(e.target.value)}
+                          placeholder="NCM"
+                          render={(ref, props) => (
+                            <Input
+                              ref={ref}
+                              {...props}
+                              focusBorderColor={config.inputs}
+                            />
+                          )}
+                        />
+                      </FormControl>
+                      <FormControl>
+                        <FormLabel>CEST</FormLabel>
+                        <MaskedInput
+                          mask={[
+                            /[0-9]/,
+                            /\d/,
+                            ".",
+                            /\d/,
+                            /\d/,
+                            /\d/,
+                            ".",
+                            /\d/,
+                            /\d/,
+                          ]}
+                          value={cest}
+                          onChange={(e) => setCest(e.target.value)}
+                          placeholder="CEST"
+                          render={(ref, props) => (
+                            <Input
+                              ref={ref}
+                              {...props}
+                              focusBorderColor={config.inputs}
+                            />
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid templateColumns="repeat(3, 1fr)" gap="15px">
+                      <Box borderWidth="1px" rounded="md">
+                        <Heading size="sm" p={3}>
+                          ICMS
+                        </Heading>
+                        <Divider />
+                        <Grid templateColumns="1fr 1fr" gap="10px" p={2}>
+                          <FormControl mr={3}>
+                            <FormLabel>Alíquota</FormLabel>
+                            <NumberInput
+                              precision={2}
+                              step={0.01}
+                              focusBorderColor={config.inputs}
+                              value={icmsRate}
+                              onChange={(e) => setIcmsRate(e)}
+                            >
+                              <NumberInputField />
+                              <NumberInputStepper>
+                                <NumberIncrementStepper />
+                                <NumberDecrementStepper />
+                              </NumberInputStepper>
+                            </NumberInput>
+                          </FormControl>
+                          <FormControl mr={3}>
+                            <FormLabel>CSOSN</FormLabel>
+                            <Select
+                              focusBorderColor={config.inputs}
+                              value={icmsCst}
+                              onChange={(e) => setIcmsCst(e.target.value)}
+                            >
+                              <option value={"101"}>
+                                101 - Tributada pelo Simples Nacional com
+                                permissão de crédito
+                              </option>
+                              <option value={"102"}>
+                                102 - Tributada pelo Simples Nacional sem
+                                permissão de crédito
+                              </option>
+                              <option value={"103"}>
+                                103 - Isenção do ICMS no Simples Nacional para
+                                faixa de receita bruta
+                              </option>
+                              <option value={"201"}>
+                                201 - Tributada pelo Simples Nacional com
+                                permissão de crédito e com cobrança do ICMS por
+                                substituição tributária
+                              </option>
+                              <option value={"202"}>
+                                202 - Tributada pelo Simples Nacional sem
+                                permissão de crédito e com cobrança do ICMS por
+                                substituição tributária
+                              </option>
+                              <option value={"203"}>
+                                203 - Isenção do ICMS no Simples Nacional para
+                                faixa de receita bruta e com cobrança do ICMS
+                                por substituição tributária
+                              </option>
+                              <option value={"300"}>300 - Imune</option>
+                              <option value={"400"}>
+                                400 - Não tributada pelo Simples Nacional
+                              </option>
+                              <option value={"500"}>
+                                500 - ICMS cobrado anteriormente por
+                                substituição tributária (substituído) ou por
+                                antecipação
+                              </option>
+                              <option value={"900"}>900 - Outros</option>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Box>
+
+                      <Box borderWidth="1px" rounded="md">
+                        <Heading size="sm" p={3}>
+                          PIS
+                        </Heading>
+                        <Divider />
+                        <Grid templateColumns="1fr 1fr" gap="10px" p={2}>
+                          <FormControl mr={3}>
+                            <FormLabel>Alíquota</FormLabel>
+                            <NumberInput
+                              precision={2}
+                              step={0.01}
+                              focusBorderColor={config.inputs}
+                              onChange={(e) => setPisRate(e)}
+                              value={pisRate}
+                            >
+                              <NumberInputField />
+                              <NumberInputStepper>
+                                <NumberIncrementStepper />
+                                <NumberDecrementStepper />
+                              </NumberInputStepper>
+                            </NumberInput>
+                          </FormControl>
+                          <FormControl mr={3}>
+                            <FormLabel>CST</FormLabel>
+                            <Select
+                              focusBorderColor={config.inputs}
+                              value={pisCst}
+                              onChange={(e) => setPisCst(e.target.value)}
+                            >
+                              {dataTrib.map((dt) => (
+                                <option value={dt.code} key={dt.code}>
+                                  {dt.desc}
+                                </option>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Box>
+
+                      <Box borderWidth="1px" rounded="md">
+                        <Heading size="sm" p={3}>
+                          COFINS
+                        </Heading>
+                        <Divider />
+                        <Grid templateColumns="1fr 1fr" gap="10px" p={2}>
+                          <FormControl mr={3}>
+                            <FormLabel>Alíquota</FormLabel>
+                            <NumberInput
+                              precision={2}
+                              step={0.01}
+                              focusBorderColor={config.inputs}
+                              value={cofinsRate}
+                              onChange={(e) => setCofinsRate(e)}
+                            >
+                              <NumberInputField />
+                              <NumberInputStepper>
+                                <NumberIncrementStepper />
+                                <NumberDecrementStepper />
+                              </NumberInputStepper>
+                            </NumberInput>
+                          </FormControl>
+                          <FormControl mr={3}>
+                            <FormLabel>CST</FormLabel>
+                            <Select
+                              focusBorderColor={config.inputs}
+                              value={cofinsCst}
+                              onChange={(e) => setCofinsCst(e.target.value)}
+                            >
+                              {dataTrib.map((dt) => (
+                                <option value={dt.code} key={dt.code}>
+                                  {dt.desc}
+                                </option>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Box>
+                    </Grid>
+
+                    <Grid templateColumns="repeat(2, 1fr)" gap="15px" mt={3}>
+                      <Box borderWidth="1px" rounded="md">
+                        <Heading size="sm" p={3}>
+                          ICMS Outros
+                        </Heading>
+                        <Divider />
+                        <Grid templateColumns="repeat(4, 1fr)" gap="10px" p={2}>
+                          <FormControl mr={3}>
+                            <FormLabel>Origem</FormLabel>
+                            <Select
+                              focusBorderColor={config.inputs}
+                              value={icmsOrigin}
+                              onChange={(e) => setIcmsOrigin(e.target.value)}
+                            >
+                              <option value={"0"}>0 - Nacional</option>
+                              <option value={"1"}>
+                                1 - Estrangeira (importação direta)
+                              </option>
+                              <option value={"2"}>
+                                2 - Estrangeira (adquirida no mercado interno)
+                              </option>
+                              <option value={"3"}>
+                                3 - Nacional com mais de 40% de conteúdo
+                                estrangeiro
+                              </option>
+                              <option value={"4"}>
+                                4 - Nacional produzida através de processos
+                                produtivos básicos
+                              </option>
+                              <option value={"5"}>
+                                5 - Nacional com menos de 40% de conteúdo
+                                estrangeiro
+                              </option>
+                              <option value={"6"}>
+                                6 - Estrangeira (importação direta) sem produto
+                                nacional similar
+                              </option>
+                              <option value={"7"}>
+                                7 - Estrangeira (adquirida no mercado interno)
+                                sem produto nacional similar
+                              </option>
+                              <option value={"8"}>
+                                8 - Nacional, mercadoria ou bem com Conteúdo de
+                                Importação superior a 70%;
+                              </option>
+                            </Select>
+                          </FormControl>
+                          <FormControl mr={3}>
+                            <FormLabel>% Subst. Trib.</FormLabel>
+                            <Tooltip
+                              label="Alíquota de Substituição Tributária"
+                              hasArrow
+                            >
+                              <NumberInput
+                                precision={2}
+                                step={0.01}
+                                focusBorderColor={config.inputs}
+                                value={icmsStRate}
+                                onChange={(e) => setIcmsStRate(e)}
+                              >
+                                <NumberInputField />
+                                <NumberInputStepper>
+                                  <NumberIncrementStepper />
+                                  <NumberDecrementStepper />
+                                </NumberInputStepper>
+                              </NumberInput>
+                            </Tooltip>
+                          </FormControl>
+                          <FormControl mr={3}>
+                            <FormLabel>% MVA</FormLabel>
+                            <Tooltip
+                              label="Alíquota ST Margem de Valor Adicionada"
+                              hasArrow
+                            >
+                              <NumberInput
+                                precision={2}
+                                step={0.01}
+                                focusBorderColor={config.inputs}
+                                onChange={(e) => setIcmsMVA(e)}
+                                value={icmsMVA}
+                              >
+                                <NumberInputField />
+                                <NumberInputStepper>
+                                  <NumberIncrementStepper />
+                                  <NumberDecrementStepper />
+                                </NumberInputStepper>
+                              </NumberInput>
+                            </Tooltip>
+                          </FormControl>
+                          <FormControl mr={3}>
+                            <FormLabel>% FCP Ret.</FormLabel>
+                            <Tooltip
+                              label="Alíquota ST Margem de Valor Adicionada"
+                              hasArrow
+                            >
+                              <NumberInput
+                                precision={2}
+                                step={0.01}
+                                focusBorderColor={config.inputs}
+                                onChange={(e) => setFcpRetRate(e)}
+                                value={fcpRetRate}
+                              >
+                                <NumberInputField />
+                                <NumberInputStepper>
+                                  <NumberIncrementStepper />
+                                  <NumberDecrementStepper />
+                                </NumberInputStepper>
+                              </NumberInput>
+                            </Tooltip>
+                          </FormControl>
+                        </Grid>
+                        <Grid templateColumns="repeat(3, 1fr)" gap="10px" p={2}>
+                          <FormControl mr={3}>
+                            <FormLabel>Mod. BC ST</FormLabel>
+                            <Tooltip
+                              label="Modalidade de Base de Cálculo da Substituição Tributária"
+                              hasArrow
+                              placement="top"
+                            >
+                              <Select
+                                focusBorderColor={config.inputs}
+                                value={icmsStModBc}
+                                onChange={(e) => setIcmsStModBc(e.target.value)}
+                              >
+                                <option value={"0"}>
+                                  Preço tabelado ou máximo sugerido
+                                </option>
+                                <option value={"1"}>
+                                  Lista Negativa (valor)
+                                </option>
+                                <option value={"2"}>
+                                  Lista Positiva (valor)
+                                </option>
+                                <option value={"3"}>
+                                  Lista Neutra (valor)
+                                </option>
+                                <option value={"4"}>
+                                  Margem Valor Agregado (%)
+                                </option>
+                                <option value={"5"}>Pauta (valor)</option>
+                              </Select>
+                            </Tooltip>
+                          </FormControl>
+                          <FormControl mr={3}>
+                            <FormLabel>% FCP</FormLabel>
+                            <Tooltip label="Alíquota FCP" hasArrow>
+                              <NumberInput
+                                precision={2}
+                                step={0.01}
+                                focusBorderColor={config.inputs}
+                                value={fcpRate}
+                                onChange={(e) => setFcpRate(e)}
+                              >
+                                <NumberInputField />
+                                <NumberInputStepper>
+                                  <NumberIncrementStepper />
+                                  <NumberDecrementStepper />
+                                </NumberInputStepper>
+                              </NumberInput>
+                            </Tooltip>
+                          </FormControl>
+                          <FormControl mr={3}>
+                            <FormLabel>% FCP ST</FormLabel>
+                            <Tooltip
+                              label="Alíquota FCP de Substituição Tributária"
+                              hasArrow
+                            >
+                              <NumberInput
+                                precision={2}
+                                step={0.01}
+                                focusBorderColor={config.inputs}
+                                value={fcpStRate}
+                                onChange={(e) => setFcpStRate(e)}
+                              >
+                                <NumberInputField />
+                                <NumberInputStepper>
+                                  <NumberIncrementStepper />
+                                  <NumberDecrementStepper />
+                                </NumberInputStepper>
+                              </NumberInput>
+                            </Tooltip>
+                          </FormControl>
+                        </Grid>
+                      </Box>
+
+                      <Box borderWidth="1px" rounded="md">
+                        <Heading size="sm" p={3}>
+                          IPI
+                        </Heading>
+                        <Divider />
+                        <Grid templateColumns="1fr 1fr 1fr" gap="10px" p={2}>
+                          <FormControl mr={3}>
+                            <FormLabel>Alíquota</FormLabel>
+                            <NumberInput
+                              precision={2}
+                              step={0.01}
+                              focusBorderColor={config.inputs}
+                              value={ipiRate}
+                              onChange={(e) => setIpiRate(e)}
+                            >
+                              <NumberInputField />
+                              <NumberInputStepper>
+                                <NumberIncrementStepper />
+                                <NumberDecrementStepper />
+                              </NumberInputStepper>
+                            </NumberInput>
+                          </FormControl>
+                          <FormControl mr={3}>
+                            <FormLabel>Código</FormLabel>
+                            <Input
+                              placeholder="Código IPI"
+                              type="text"
+                              focusBorderColor={config.inputs}
+                              value={ipiCode}
+                              onChange={(e) => setIpiCode(e.target.value)}
+                            />
+                          </FormControl>
+                          <FormControl mr={3}>
+                            <FormLabel>IPI CST</FormLabel>
+                            <Select
+                              focusBorderColor={config.inputs}
+                              value={ipiCst}
+                              onChange={(e) => setIpiCst(e.target.value)}
+                            >
+                              <option value={""}>Nenhum</option>
+                              <option value={"00"}>
+                                00 – Entrada com Recuperação de Crédito
+                              </option>
+                              <option value={"01"}>
+                                01 – Entrada Tributada com Alíquota Zero
+                              </option>
+                              <option value={"02"}>02 – Entrada Isenta</option>
+                              <option value={"03"}>
+                                03 – Entrada Não Tributada
+                              </option>
+                              <option value={"04"}>04 – Entrada Imune</option>
+                              <option value={"05"}>
+                                05 – Entrada com Suspensão
+                              </option>
+                              <option value={"49"}>49 – Outras Entradas</option>
+                              <option value={"50"}>50 – Saída Tributada</option>
+                              <option value={"51"}>
+                                51 – Saída Tributável com Alíquota Zero
+                              </option>
+                              <option value={"52"}>52 – Saída Isenta</option>
+                              <option value={"53"}>
+                                53 – Saída Não Tributada
+                              </option>
+                              <option value={"54"}>54 – Saída Imune</option>
+                              <option value={"55"}>
+                                55 – Saída com Suspensão
+                              </option>
+                              <option value={"99"}>99 – Outras Saídas</option>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  </TabPanel>
+
+                  {/** VALORES */}
+                  <TabPanel>
+                    <Grid templateColumns="repeat(4, 1fr)" gap="15px">
+                      <FormControl isRequired mr={3}>
+                        <FormLabel>Margem de Lucro %</FormLabel>
+                        <Select
+                          value={margeLucro}
+                          onChange={(e) =>
+                            setMargeLucro(parseFloat(e.target.value))
+                          }
+                          focusBorderColor={config.inputs}
+                        >
+                          {marge.map((mar) => (
+                            <option value={mar.value} key={mar.value}>
+                              {mar.text}
+                            </option>
+                          ))}
+                        </Select>
+                      </FormControl>
+
+                      <FormControl isRequired mr={3}>
+                        <FormLabel>Valor de Custo</FormLabel>
+                        <NumberInput
+                          id="valueCusto"
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={costValue}
+                          onChange={(e) => setCostValue(e)}
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
+
+                      <FormControl mr={3}>
+                        <FormLabel>Outros Custos</FormLabel>
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={otherCost}
+                          onChange={(e) => setOtherCost(e)}
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
+                      <FormControl isRequired mr={3}>
+                        <FormLabel>Valor de Venda</FormLabel>
+                        <NumberInput
+                          id="valueSale"
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={saleValue}
+                          onChange={(e) => setSaleValue(e)}
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
+                    </Grid>
+                    <Button
+                      leftIcon={<FaCalculator />}
+                      mt={3}
+                      onClick={() => calcSalePrice()}
+                      colorScheme={config.buttons}
+                      variant="outline"
+                    >
+                      Calcular Preço de Venda
+                    </Button>
+
+                    <Divider mt={5} mb={5} />
+
+                    <Text fontSize="sm" color="red.400" mb={3}>
+                      Preencha cada campo com a quantidade referente a 1 (um)
+                      item.
+                    </Text>
+
+                    <Grid templateColumns="repeat(5, 1fr)" gap="15px">
+                      <FormControl isRequired mr={3}>
+                        <FormLabel>Altura</FormLabel>
+                        <NumberInput
+                          id="height"
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={productHeight}
+                          onChange={(e) => setProductHeight(e)}
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
+
+                      <FormControl isRequired mr={3}>
+                        <FormLabel>Largura</FormLabel>
+                        <NumberInput
+                          id="width"
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={productWidth}
+                          onChange={(e) => setProductWidht(e)}
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
+                      <FormControl isRequired mr={3}>
+                        <FormLabel>Comprimento</FormLabel>
+                        <NumberInput
+                          id="lenght"
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={productLength}
+                          onChange={(e) => setProductLength(e)}
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
+                      <FormControl isRequired mr={3}>
+                        <FormLabel>Diâmetro</FormLabel>
+                        <NumberInput
+                          id="diameter"
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={productDiameter}
+                          onChange={(e) => setProductDiameter(e)}
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
+                      <FormControl isRequired mr={3}>
+                        <FormLabel>Peso</FormLabel>
+                        <NumberInput
+                          id="weight"
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={productWeight}
+                          onChange={(e) => setProductWeight(e)}
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
+                    </Grid>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            </ModalBody>
             <ModalFooter>
               <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
                 Salvar
@@ -644,12 +1552,67 @@ export default function CategoryList() {
           onClose={() => setModalSize(false)}
           isCentered
           scrollBehavior="inside"
+          size="xl"
         >
           <ModalOverlay />
-          <ModalContent maxW="90vw" pb={4}>
-            <ModalHeader>Alterar Cores</ModalHeader>
+          <ModalContent pb={4}>
+            <ModalHeader>Estoque / Tamanhos</ModalHeader>
             <ModalCloseButton />
-            <ModalBody>{modalSize === true && <Sizes />}</ModalBody>
+            <ModalBody>
+              <Box borderWidth="1px" rounded="md" p={3}>
+                {sizes.length === 0 ? (
+                  <Flex justify="center" align="center" direction="column">
+                    <Lottie
+                      animation={emptyAnimation}
+                      height={200}
+                      width={200}
+                    />
+                    <Text>Nenhuma informação para mostrar</Text>
+                  </Flex>
+                ) : (
+                  <Table size="sm">
+                    <Thead fontWeight="700">
+                      <Tr>
+                        <Td>Tamanho</Td>
+                        <Td>Cor</Td>
+                        <Td isNumeric>Estoque</Td>
+                        <Td w="15%" isNumeric></Td>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {sizes.map((siz) => (
+                        <Tr key={siz.id} bg={siz.amount < 5 ? "red.100" : ""}>
+                          <Td>{siz.size}</Td>
+                          <Td>
+                            <HStack spacing="10px">
+                              <Box
+                                w="60px"
+                                h="25px"
+                                bg={`#${siz.hex}`}
+                                rounded="md"
+                              />
+                              <Text>{siz.name}</Text>
+                            </HStack>
+                          </Td>
+                          <Td isNumeric>{siz.amount}</Td>
+                          <Td w="15%" isNumeric>
+                            <Tooltip label="Ajustar Estoque / Tamanho" hasArrow>
+                              <IconButton
+                                colorScheme={config.buttons}
+                                size="xs"
+                                icon={<FaEdit />}
+                                rounded="full"
+                                onClick={() => handleUpdateStock(siz.id)}
+                              />
+                            </Tooltip>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                )}
+              </Box>
+            </ModalBody>
           </ModalContent>
         </Modal>
 
@@ -658,12 +1621,51 @@ export default function CategoryList() {
           onClose={() => setModalGerImg(false)}
           isCentered
           scrollBehavior="inside"
+          size="md"
         >
           <ModalOverlay />
-          <ModalContent maxW="90vw" pb={4}>
-            <ModalHeader>Alterar Cores</ModalHeader>
+          <ModalContent>
+            <ModalHeader>Ajustar Estoque / Tamanhos</ModalHeader>
             <ModalCloseButton />
-            <ModalBody>{modalGerImg === true && <Imagens />}</ModalBody>
+            <ModalBody>
+              <Grid templateColumns="1fr 1fr" gap="15px">
+                <FormControl>
+                  <FormLabel>Tamanho</FormLabel>
+                  <Input
+                    placeholder="Tamanho"
+                    value={size}
+                    onChange={(e) => setSize(e.target.value.toUpperCase())}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Estoque</FormLabel>
+                  <NumberInput
+                    id="lenght"
+                    precision={0}
+                    step={1}
+                    focusBorderColor={config.inputs}
+                    value={amount}
+                    onChange={(e) => setAmount(e)}
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </FormControl>
+              </Grid>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                leftIcon={<FaSave />}
+                colorScheme={config.buttons}
+                onClick={() => saveSizeUpdate()}
+                isLoading={loadingSize}
+              >
+                Salvar
+              </Button>
+            </ModalFooter>
           </ModalContent>
         </Modal>
 
