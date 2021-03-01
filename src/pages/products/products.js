@@ -101,6 +101,7 @@ export default function CategoryList() {
   const [amount, setAmount] = useState(0);
   const [sizeId, setSizeId] = useState(null);
   const [loadingSize, setLoadingSize] = useState(false);
+  const [loadingInfo, setLoadingInfo] = useState(false);
 
   /** STATES PRIMEIRA TAB */
   const [name, setName] = useState("");
@@ -502,6 +503,7 @@ export default function CategoryList() {
 
   async function handleProductInfo(id) {
     const result = await products.find((obj) => obj.id === id);
+    setProductId(result.id);
     setName(result.name);
     setBarcode(result.barcode);
     setSku(result.sku);
@@ -534,6 +536,115 @@ export default function CategoryList() {
     setProductDiameter(result.freight_diameter || "0");
     setProductWeight(result.freight_weight || "0");
     setModalInfo(true);
+  }
+
+  async function saveProduct() {
+    setLoadingInfo(true);
+    try {
+      const response = await api.put(
+        `/products/${productId}`,
+        {
+          name,
+          description,
+          barcode,
+          sku,
+          ncm,
+          cfop,
+          cest,
+          icms_rate: parseFloat(icmsRate),
+          icms_origin: icmsOrigin,
+          icms_csosn: icmsCst,
+          icms_st_rate: parseFloat(icmsStRate),
+          icms_marg_val_agregate: parseFloat(icmsMVA),
+          icms_st_mod_bc: icmsStModBc,
+          fcp_rate: parseFloat(fcpRate),
+          fcp_st_rate: parseFloat(fcpStRate),
+          fcp_ret_rate: parseFloat(fcpRetRate),
+          ipi_cst: ipiCst,
+          ipi_rate: parseFloat(ipiRate),
+          ipi_code: ipiCode,
+          pis_cst: pisCst,
+          pis_rate: parseFloat(pisRate),
+          cofins_cst: cofinsCst,
+          cofins_rate: parseFloat(cofinsRate),
+          cost_value: parseFloat(costValue),
+          other_cost: parseFloat(otherCost),
+          sale_value: parseFloat(saleValue),
+          freight_weight: parseFloat(productWeight),
+          freight_width: parseFloat(productWidth),
+          freight_height: parseFloat(productHeight),
+          freight_diameter: parseFloat(productDiameter),
+          freight_length: parseFloat(productLength),
+        },
+        {
+          headers: { "x-access-token": employee.token },
+        }
+      );
+
+      const updatedProducts = await data.map((prod) => {
+        if (prod.id === productId) {
+          return {
+            ...prod,
+            name: name,
+            description: description,
+            barcode: barcode,
+            sku: sku,
+            ncm: ncm,
+            cfop: cfop,
+            cest: cest,
+            icms_rate: icmsRate,
+            icms_origin: icmsOrigin,
+            icms_csosn: icmsCst,
+            icms_st_rate: icmsStRate,
+            icms_marg_val_agregate: icmsMVA,
+            icms_st_mod_bc: icmsStModBc,
+            fcp_rate: fcpRate,
+            fcp_st_rate: fcpStRate,
+            fcp_ret_rate: fcpRetRate,
+            ipi_cst: ipiCst,
+            ipi_rate: ipiRate,
+            ipi_code: ipiCode,
+            pis_cst: pisCst,
+            pis_rate: pisRate,
+            cofins_cst: cofinsCst,
+            cofins_rate: cofinsRate,
+            cost_value: costValue,
+            other_cost: otherCost,
+            sale_value: saleValue,
+            freight_weight: productWeight,
+            freight_width: productWidth,
+            freight_height: productHeight,
+            freight_diameter: productDiameter,
+            freight_length: productLength,
+          };
+        }
+        return prod;
+      });
+
+      setProducts(updatedProducts);
+
+      setLoadingInfo(false);
+      setModalInfo(false);
+    } catch (error) {
+      setLoadingInfo(false);
+      setModalInfo(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
   }
 
   return (
@@ -1126,10 +1237,7 @@ export default function CategoryList() {
                           </FormControl>
                           <FormControl mr={3}>
                             <FormLabel>% FCP Ret.</FormLabel>
-                            <Tooltip
-                              label="Alíquota ST Margem de Valor Adicionada"
-                              hasArrow
-                            >
+                            <Tooltip label="Alíquota FCP Retido" hasArrow>
                               <NumberInput
                                 precision={2}
                                 step={0.01}
@@ -1477,7 +1585,12 @@ export default function CategoryList() {
               </Tabs>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
+              <Button
+                colorScheme={config.buttons}
+                leftIcon={<FaSave />}
+                isLoading={loadingInfo}
+                onClick={() => saveProduct()}
+              >
                 Salvar
               </Button>
             </ModalFooter>

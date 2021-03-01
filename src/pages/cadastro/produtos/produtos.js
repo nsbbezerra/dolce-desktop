@@ -1049,10 +1049,7 @@ export default function Produtos() {
                         </FormControl>
                         <FormControl mr={3}>
                           <FormLabel>% FCP Ret.</FormLabel>
-                          <Tooltip
-                            label="Alíquota ST Margem de Valor Adicionada"
-                            hasArrow
-                          >
+                          <Tooltip label="Alíquota FCP Retido" hasArrow>
                             <NumberInput
                               precision={2}
                               step={0.01}
