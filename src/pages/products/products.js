@@ -142,7 +142,6 @@ export default function CategoryList() {
   const [productWeight, setProductWeight] = useState(0);
 
   useEffect(() => {
-    console.log(data);
     setProducts(data);
   }, [data]);
 
@@ -621,8 +620,42 @@ export default function CategoryList() {
         return prod;
       });
 
-      setProducts(updatedProducts);
-
+      mutate(updatedProducts, false);
+      mutateGlobal(`/products/${productId}`, {
+        id: productId,
+        name: name,
+        description: description,
+        barcode: barcode,
+        sku: sku,
+        ncm: ncm,
+        cfop: cfop,
+        cest: cest,
+        icms_rate: icmsRate,
+        icms_origin: icmsOrigin,
+        icms_csosn: icmsCst,
+        icms_st_rate: icmsStRate,
+        icms_marg_val_agregate: icmsMVA,
+        icms_st_mod_bc: icmsStModBc,
+        fcp_rate: fcpRate,
+        fcp_st_rate: fcpStRate,
+        fcp_ret_rate: fcpRetRate,
+        ipi_cst: ipiCst,
+        ipi_rate: ipiRate,
+        ipi_code: ipiCode,
+        pis_cst: pisCst,
+        pis_rate: pisRate,
+        cofins_cst: cofinsCst,
+        cofins_rate: cofinsRate,
+        cost_value: costValue,
+        other_cost: otherCost,
+        sale_value: saleValue,
+        freight_weight: productWeight,
+        freight_width: productWidth,
+        freight_height: productHeight,
+        freight_diameter: productDiameter,
+        freight_length: productLength,
+      });
+      showToast(response.data.message, "success", "Sucesso");
       setLoadingInfo(false);
       setModalInfo(false);
     } catch (error) {

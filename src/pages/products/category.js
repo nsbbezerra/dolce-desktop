@@ -106,7 +106,6 @@ export default function CategoryList() {
   }
 
   useEffect(() => {
-    console.log(data);
     setCategories(data);
   }, [data]);
 
