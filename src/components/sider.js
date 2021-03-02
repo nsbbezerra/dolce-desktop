@@ -34,6 +34,7 @@ import {
   FaFileImport,
   FaImages,
   FaRulerCombined,
+  FaShippingFast,
 } from "react-icons/fa";
 import {
   AiFillShop,
@@ -147,6 +148,12 @@ export default function Sider() {
             Endereços
           </MenuItem>
           <MenuDivider />
+          <MenuItem
+            icon={<FaShippingFast />}
+            onClick={() => routing("/providers")}
+          >
+            Fornecedores
+          </MenuItem>
           <MenuItem
             icon={<AiFillShop />}
             onClick={() => routing("/registerDepartment")}
