@@ -78,10 +78,15 @@ export default function Produtos() {
   const [findCategories, setFindCategories] = useState("");
   const [findDepartments, setFindDepartments] = useState("");
   const [loading, setLoading] = useState(false);
+  const [providers, setProviders] = useState([]);
+  const [modalProvider, setModalProvider] = useState(false);
+  const [providerId, setProviderId] = useState(null);
+  const [providerName, setProviderName] = useState("");
 
   useEffect(() => {
     if (data) {
       setDepartments(data.departments);
+      setProviders(data.providers);
     }
   }, [data]);
 
@@ -131,6 +136,7 @@ export default function Produtos() {
   const [departments, setDepartments] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoriesSearched, setCategoriesSearched] = useState([]);
+  const [findProvider, setFindProvider] = useState("");
 
   function clear() {
     setFcpRetRate(0);
@@ -231,6 +237,21 @@ export default function Produtos() {
     }
   }
 
+  async function finderProviderBySource(text) {
+    setFindProvider(text);
+    if (text === "") {
+      setProviders(data.providers);
+    } else {
+      let termos = await text.split(" ");
+      let frasesFiltradas = await providers.filter((frase) => {
+        return termos.reduce((resultadoAnterior, termoBuscado) => {
+          return resultadoAnterior && frase.name.includes(termoBuscado);
+        }, true);
+      });
+      await setProviders(frasesFiltradas);
+    }
+  }
+
   async function finderDepartmentsBySource(text) {
     setFindDepartments(text);
     if (text === "") {
@@ -317,6 +338,10 @@ export default function Produtos() {
   async function register(e) {
     if (e) {
       e.preventDefault();
+    }
+    if (!providerId) {
+      handleValidator("provider", "Selcione um fornecedor");
+      return false;
     }
     if (!departmentId) {
       handleValidator("department", "Selcione um departamento");
@@ -422,6 +447,7 @@ export default function Produtos() {
       data.append("freight_length", parseFloat(productLength));
       data.append("departments_id", departmentId);
       data.append("categories_id", categoryId);
+      data.append("provider", providerId);
 
       const response = await api.post("/products", data, {
         headers: { "x-access-token": employee.token },
@@ -462,15 +488,25 @@ export default function Produtos() {
     if (keyName === "f2") {
       setModalDepartments(true);
     }
+    if (keyName === "f5") {
+      setModalProvider(true);
+    }
     if (keyName === "f12") {
       register(e);
     }
   }
 
+  async function handleProvider(id) {
+    const result = await providers.find((obj) => obj.id === id);
+    setProviderId(result.id);
+    setProviderName(result.name);
+    setModalProvider(false);
+  }
+
   return (
     <>
       <Hotkeys
-        keyName="f3, f2, f12"
+        keyName="f3, f2, f12, f5"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -481,10 +517,52 @@ export default function Produtos() {
 
         <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
           <Grid
-            templateColumns="repeat(2, 1fr)"
+            templateColumns="repeat(3, 1fr)"
             gap="15px"
             alignContent="center"
           >
+            <HStack spacing="5px">
+              <FormControl
+                isRequired
+                mr={3}
+                isInvalid={
+                  validators.find((obj) => obj.path === "provider")
+                    ? true
+                    : false
+                }
+              >
+                <FormLabel>Fornecedor</FormLabel>
+                <Input
+                  id="provider"
+                  placeholder="Fornecedor"
+                  focusBorderColor={config.inputs}
+                  isReadOnly
+                  value={providerName}
+                />
+                <FormErrorMessage>
+                  {validators.find((obj) => obj.path === "provider")
+                    ? validators.find((obj) => obj.path === "provider").message
+                    : ""}
+                </FormErrorMessage>
+              </FormControl>
+              <FormControl>
+                <FormLabel color="transparent" userSelect="none">
+                  o
+                </FormLabel>
+                <Button
+                  isFullWidth
+                  leftIcon={<FaSearch />}
+                  onClick={() => setModalProvider(true)}
+                  colorScheme={config.buttons}
+                  variant="outline"
+                >
+                  Buscar{" "}
+                  <Kbd ml={3} color="ButtonText">
+                    F5
+                  </Kbd>
+                </Button>
+              </FormControl>
+            </HStack>
             <HStack spacing="5px">
               <FormControl
                 isRequired
@@ -499,7 +577,6 @@ export default function Produtos() {
                 <Input
                   id="department"
                   placeholder="Departamento"
-                  w="350px"
                   focusBorderColor={config.inputs}
                   isReadOnly
                   value={departmentName}
@@ -522,7 +599,7 @@ export default function Produtos() {
                   colorScheme={config.buttons}
                   variant="outline"
                 >
-                  Buscar Departamento{" "}
+                  Buscar{" "}
                   <Kbd ml={3} color="ButtonText">
                     F2
                   </Kbd>
@@ -543,7 +620,6 @@ export default function Produtos() {
                 <Input
                   id="category"
                   placeholder="Departamento"
-                  w="350px"
                   focusBorderColor={config.inputs}
                   isReadOnly
                   value={categoryName}
@@ -565,7 +641,7 @@ export default function Produtos() {
                   colorScheme={config.buttons}
                   variant="outline"
                 >
-                  Buscar Categoria{" "}
+                  Buscar{" "}
                   <Kbd ml={3} color="ButtonText">
                     F3
                   </Kbd>
@@ -1637,6 +1713,72 @@ export default function Produtos() {
                 <Flex justify="center" align="center" direction="column">
                   <Lottie animation={emptyAnimation} height={200} width={200} />
                   <Text>Nenhum departamento para mostrar</Text>
+                </Flex>
+              )}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+
+        <Modal
+          isOpen={modalProvider}
+          onClose={() => setModalProvider(false)}
+          size="xl"
+          scrollBehavior="inside"
+          isCentered
+          initialFocusRef={initialRef}
+        >
+          <ModalOverlay />
+          <ModalContent pb={4}>
+            <ModalHeader>Fornecedores</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Input
+                placeholder="Digite para Buscar"
+                focusBorderColor={config.inputs}
+                value={findProvider}
+                onChange={(e) =>
+                  finderProviderBySource(
+                    capitalizeAllFirstLetter(e.target.value)
+                  )
+                }
+                ref={initialRef}
+              />
+              {!!providers.length ? (
+                <Table size="sm" mt={3}>
+                  <Thead fontWeight="700">
+                    <Tr>
+                      <Td w="10%" textAlign="center"></Td>
+                      <Td>Fornecedor</Td>
+                      <Td w="10%" isNumeric></Td>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {providers.map((dep) => (
+                      <Tr key={dep.id}>
+                        <Td w="10%" textAlign="center">
+                          <Box rounded="lg" w="25px" h="25px" overflow="hidden">
+                            <Image src={dep.thumbnail} w="25px" h="25px" />
+                          </Box>
+                        </Td>
+                        <Td>{dep.name}</Td>
+                        <Td w="10%" isNumeric>
+                          <IconButton
+                            aria-label="Search database"
+                            icon={<FaCheck />}
+                            size="xs"
+                            isRound
+                            colorScheme={config.buttons}
+                            onClick={() => handleProvider(dep.id)}
+                          />
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              ) : (
+                <Flex justify="center" align="center" direction="column">
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Nenhum fornecedor para mostrar</Text>
                 </Flex>
               )}
             </ModalBody>

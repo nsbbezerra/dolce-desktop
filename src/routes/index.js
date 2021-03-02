@@ -7,6 +7,7 @@ import Dashboard from "../pages/dashboard";
 import ListClients from "../pages/admin/clients/index";
 import ListEmployee from "../pages/admin/employee/index";
 import ListOrders from "../pages/admin/orders/index";
+import ListProviders from "../pages/admin/providers/index";
 
 /** CADASTROS */
 import RegisterClientes from "../pages/cadastro/clientes";
@@ -146,6 +147,9 @@ export default function Routers() {
       </Route>
       <Route path="/providers">
         <RegisterProvider />
+      </Route>
+      <Route path="/listproviders">
+        <ListProviders />
       </Route>
     </Switch>
   );

@@ -209,6 +209,19 @@ export default function Layout() {
               </Box>
             </Box>
           </Grid>
+          <Flex
+            h="30px"
+            align="center"
+            justify="center"
+            bg="red.500"
+            color="white"
+            w="200px"
+            className="rotate-tag"
+          >
+            <Text fontSize="sm" fontWeight="700">
+              Versão: Beta 1.0.0
+            </Text>
+          </Flex>
         </Box>
 
         <Modal

@@ -107,6 +107,13 @@ export default function Sider() {
             Colaboradores
           </MenuItem>
           <MenuItem
+            icon={<FaShippingFast />}
+            onClick={() => routing("/listproviders")}
+          >
+            Fornecedores
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem
             icon={<FaShoppingBag />}
             onClick={() => routing("/listorders")}
             isDisabled
