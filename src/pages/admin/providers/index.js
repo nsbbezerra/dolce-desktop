@@ -342,7 +342,7 @@ export default function ListProviders() {
   async function handleImage(id) {
     const result = await providers.find((obj) => obj.id === id);
     setProviderId(result.id);
-    setUrl(result.thumbnail);
+    setUrl(!result.thumbnail ? "" : result.thumbnail);
     setModalImage(true);
   }
 

@@ -31,10 +31,13 @@ import {
   FormErrorMessage,
   Kbd,
   Icon,
+  Tooltip,
+  ModalCloseButton,
+  ModalHeader,
 } from "@chakra-ui/react";
 import Sider from "../components/sider";
 import Header from "../components/header";
-import { FaSave, FaUser, FaKey } from "react-icons/fa";
+import { FaSave, FaUser, FaKey, FaServer } from "react-icons/fa";
 import {
   AiOutlineLogin,
   AiFillEyeInvisible,
@@ -92,9 +95,13 @@ export default function Layout() {
     const tp = await localStorage.getItem("typert");
     const rt = await localStorage.getItem("route");
     const pt = await localStorage.getItem("port");
+    console.log("PORTA", pt);
     if (!rt && !pt && !tp) {
       setModalRoute(true);
     } else {
+      setTypeRoute(tp);
+      setPort(pt);
+      setRoute(rt);
       setModalRoute(false);
       setModalAuth(true);
     }
@@ -117,12 +124,6 @@ export default function Layout() {
       setModalConfirmeRoute(true);
       return false;
     }
-    if (port === "" || port === null || port === undefined || !port) {
-      setModalTitle("Atenção");
-      setModalMessage("Porta inválida");
-      setModalConfirmeRoute(true);
-      return false;
-    }
     setModalTitle("Sucesso");
     setModalMessage(
       "Rota configurada, para que as alterações tenham efeito reinicie a aplicação"
@@ -140,7 +141,9 @@ export default function Layout() {
   }, []);
 
   async function handleAuth(e) {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     if (user === "" || !user) {
       setWrongUser(true);
       setWrongUserMessage("Insira seu nome de usuário");
@@ -188,7 +191,14 @@ export default function Layout() {
 
   return (
     <>
-      <Hotkeys keyName="return, enter" onKeyDown={onKeyDown} allowRepeat>
+      <Hotkeys
+        keyName="return, enter"
+        onKeyDown={onKeyDown}
+        allowRepeat
+        filter={(event) => {
+          return true;
+        }}
+      >
         <Box w={"100vw"} h="100vh" maxH="100vh" maxW="100vw">
           <Header />
           <Grid templateColumns="60px 1fr" w="100%" h="91vh">
@@ -226,24 +236,19 @@ export default function Layout() {
 
         <Modal
           isOpen={modalRoute}
-          closeOnEsc={false}
-          closeOnOverlayClick={false}
+          onClose={() => setModalRoute(false)}
           isCentered
           scrollBehavior="inside"
           size="lg"
         >
           <ModalOverlay />
           <ModalContent maxW="40rem">
+            <ModalHeader>Configuração da Rota para o Servidor</ModalHeader>
+            <ModalCloseButton />
             <ModalBody>
               <Flex align="center" justify="center">
                 <Lottie animation={serverAnimation} height={200} width={200} />
               </Flex>
-              <Center>
-                <Text textAlign="center" color="red.500">
-                  Não foi encontrada uma rota para o servidor, por favor
-                  configure-a abaixo:
-                </Text>
-              </Center>
               <Grid templateColumns="2fr 1fr" gap="15px" mt={5}>
                 <FormControl>
                   <FormLabel>
@@ -266,6 +271,7 @@ export default function Layout() {
                     <Input
                       focusBorderColor={config.inputs}
                       placeholder="Rota ou Url"
+                      value={route}
                       onChange={(e) => setRoute(e.target.value)}
                     />
                   </InputGroup>
@@ -277,6 +283,7 @@ export default function Layout() {
                     <Input
                       focusBorderColor={config.inputs}
                       placeholder="Porta"
+                      value={port}
                       onChange={(e) => setPort(e.target.value)}
                     />
                   </InputGroup>
@@ -309,80 +316,87 @@ export default function Layout() {
         >
           <ModalOverlay />
           <ModalContent>
-            <ModalBody pb={4}>
-              <form onSubmit={handleAuth}>
-                <Flex align="center" justify="center" mb={5}>
-                  <Lottie animation={authAnimation} height={120} width={120} />
-                </Flex>
+            <ModalBody>
+              <Flex align="center" justify="center" mb={5}>
+                <Lottie animation={authAnimation} height={120} width={120} />
+              </Flex>
 
-                <FormControl isInvalid={wrongUser}>
-                  <InputGroup size="lg">
-                    <InputLeftElement
-                      pointerEvents="none"
-                      children={<FaUser />}
-                    />
-                    <Input
-                      ref={initialRef}
-                      type="text"
-                      placeholder="Usuário"
-                      value={user}
-                      onChange={(e) => setUser(e.target.value)}
-                      focusBorderColor={config.inputs}
-                      id="user"
-                    />
-                  </InputGroup>
-                  <FormErrorMessage>{wrongUserMessage}</FormErrorMessage>
-                </FormControl>
+              <FormControl isInvalid={wrongUser}>
+                <InputGroup size="lg">
+                  <InputLeftElement
+                    pointerEvents="none"
+                    children={<FaUser />}
+                  />
+                  <Input
+                    ref={initialRef}
+                    type="text"
+                    placeholder="Usuário"
+                    value={user}
+                    onChange={(e) => setUser(e.target.value)}
+                    focusBorderColor={config.inputs}
+                    id="user"
+                  />
+                </InputGroup>
+                <FormErrorMessage>{wrongUserMessage}</FormErrorMessage>
+              </FormControl>
 
-                <FormControl mt={3} isInvalid={wrongPass}>
-                  <InputGroup size="lg">
-                    <InputLeftElement
-                      pointerEvents="none"
-                      children={<FaKey />}
-                    />
-                    <Input
-                      type={showPass === true ? "password" : "text"}
-                      placeholder="Senha"
-                      value={pass}
-                      onChange={(e) => setPass(e.target.value)}
-                      focusBorderColor={config.inputs}
-                      id="pass"
-                    />
-                    <InputRightElement
-                      children={
-                        <IconButton
-                          rounded="full"
-                          size="sm"
-                          icon={
-                            showPass === true ? (
-                              <AiFillEye />
-                            ) : (
-                              <AiFillEyeInvisible />
-                            )
-                          }
-                          onClick={() => setShowPass(!showPass)}
-                        />
-                      }
-                    />
-                  </InputGroup>
-                  <FormErrorMessage>{wrongPassMessage}</FormErrorMessage>
-                </FormControl>
-                <Flex justify="flex-end" mt={5}>
-                  <Button
-                    colorScheme={config.buttons}
-                    leftIcon={<AiOutlineLogin />}
-                    size="lg"
-                    isLoading={loadingAuth}
-                    type="submit"
-                  >
-                    Login
-                    <Kbd ml={3} color="ButtonText">
-                      <Icon as={AiOutlineEnter} />
-                    </Kbd>
-                  </Button>
-                </Flex>
-              </form>
+              <FormControl mt={3} isInvalid={wrongPass}>
+                <InputGroup size="lg">
+                  <InputLeftElement pointerEvents="none" children={<FaKey />} />
+                  <Input
+                    type={showPass === true ? "password" : "text"}
+                    placeholder="Senha"
+                    value={pass}
+                    onChange={(e) => setPass(e.target.value)}
+                    focusBorderColor={config.inputs}
+                    id="pass"
+                  />
+                  <InputRightElement
+                    children={
+                      <IconButton
+                        rounded="full"
+                        size="sm"
+                        icon={
+                          showPass === true ? (
+                            <AiFillEye />
+                          ) : (
+                            <AiFillEyeInvisible />
+                          )
+                        }
+                        onClick={() => setShowPass(!showPass)}
+                      />
+                    }
+                  />
+                </InputGroup>
+                <FormErrorMessage>{wrongPassMessage}</FormErrorMessage>
+              </FormControl>
             </ModalBody>
+            <ModalFooter>
+              <Tooltip label="Configuração de rota do servidor" hasArrow>
+                <IconButton
+                  icon={<FaServer />}
+                  colorScheme={config.buttons}
+                  variant="outline"
+                  size="lg"
+                  fontSize="3xl"
+                  mr={3}
+                  onClick={() => setModalRoute(true)}
+                />
+              </Tooltip>
+              <Button
+                colorScheme={config.buttons}
+                leftIcon={<AiOutlineLogin />}
+                size="lg"
+                isLoading={loadingAuth}
+                type="submit"
+                onClick={() => handleAuth()}
+              >
+                Login
+                <Kbd ml={3} color="ButtonText">
+                  <Icon as={AiOutlineEnter} />
+                </Kbd>
+              </Button>
+            </ModalFooter>
           </ModalContent>
         </Modal>
 
