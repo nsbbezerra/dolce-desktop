@@ -310,7 +310,6 @@ export default function Sider() {
             size="lg"
             fontSize="2xl"
             variant="ghost"
-            isDisabled
           />
         </Tooltip>
         <MenuList shadow="lg">
