@@ -96,7 +96,6 @@ export default function Sider() {
           <MenuItem
             icon={<FaUserFriends />}
             onClick={() => routing("/listclients")}
-            isDisabled
           >
             Clientes
           </MenuItem>

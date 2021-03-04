@@ -39,12 +39,6 @@ export default function ConfigsApp() {
       setModalConfirmeRoute(true);
       return false;
     }
-    if (port === "" || port === null || port === undefined || !port) {
-      setModalTitle("Atenção");
-      setModalMessage("Porta inválida");
-      setModalConfirmeRoute(true);
-      return false;
-    }
     setModalTitle("Sucesso");
     setModalMessage(
       "Rota configurada, para que as alterações tenham efeito reinicie a aplicação"
