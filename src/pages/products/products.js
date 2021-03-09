@@ -163,10 +163,6 @@ export default function CategoryList() {
     return joined;
   }
 
-  function capitalizeOneLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
-
   async function finderProdBySource(text) {
     setSearchProduct(text);
     let index;
