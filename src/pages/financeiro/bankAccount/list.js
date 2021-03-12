@@ -72,7 +72,6 @@ import { mutate as mutateGlobal } from "swr";
 import Lottie from "../../../components/lottie";
 import emptyAnimation from "../../../animations/empty.json";
 import searchAnimation from "../../../animations/search.json";
-import sendAnimation from "../../../animations/send.json";
 
 registerLocale("pt_br", pt_br);
 
@@ -104,7 +103,6 @@ export default function ListBankAccount() {
   const [url, setUrl] = useState("");
 
   useEffect(() => {
-    console.log(data);
     setBanks(data);
   }, [data]);
 
@@ -238,6 +236,57 @@ export default function ListBankAccount() {
       setLoadingInfo(false);
     } catch (error) {
       setLoadingInfo(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function saveImage() {
+    if (!thumbnail) {
+      showToast("Insira uma imagem", "warning", "Atenção");
+      return false;
+    }
+    setLoadingImage(true);
+    let dataimage = new FormData();
+    dataimage.append("thumbnail", thumbnail);
+    try {
+      const response = await api.put(`/imagebankaccount/${idBank}`, dataimage, {
+        headers: { "x-access-token": employee.token },
+      });
+      const updatedBanks = await data.map((bnk) => {
+        if (bnk.id === idBank) {
+          return {
+            ...bnk,
+            blobName: response.data.blobName,
+            thumbnail: response.data.url,
+          };
+        }
+        return bnk;
+      });
+      mutate(updatedBanks, false);
+      mutateGlobal(`/imagebankaccount/${idBank}`, {
+        id: idBank,
+        blobName: response.data.blobName,
+        thumbnail: response.data.url,
+      });
+      setLoadingImage(false);
+      setModalImage(false);
+    } catch (error) {
+      setLoadingImage(false);
       if (error.message === "Network Error") {
         alert(
           "Sem conexão com o servidor, verifique sua conexão com a internet."
@@ -538,7 +587,7 @@ export default function ListBankAccount() {
               colorScheme={config.buttons}
               leftIcon={<FaSave />}
               isLoading={loadingImage}
-              onClick={() => {}}
+              onClick={() => saveImage()}
             >
               Salvar
             </Button>

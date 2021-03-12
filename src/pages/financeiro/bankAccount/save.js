@@ -21,6 +21,7 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  Kbd,
 } from "@chakra-ui/react";
 import { FaSave, FaImage } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
@@ -28,6 +29,7 @@ import { useEmployee } from "../../../context/Employee";
 import api from "../../../configs/axios";
 import config from "../../../configs/index";
 import { InputFile, File } from "../../../style/uploader";
+import Hotkeys from "react-hot-keys";
 
 export default function SaveBankAccount() {
   const { employee } = useEmployee();
@@ -178,206 +180,226 @@ export default function SaveBankAccount() {
     }
   }
 
+  function onKeyDown(keyName, e, handle) {
+    if (keyName === "f12") {
+      register(e);
+    }
+  }
+
   return (
     <>
-      <Grid templateColumns={"250px 1fr"} gap="15px">
-        <Box>
-          <FormControl
-            isRequired
-            isInvalid={
-              validators.find((obj) => obj.path === "image") ? true : false
-            }
-          >
-            <FormLabel>Imagem</FormLabel>
-            <Box w="250px" h="250px">
-              {thumbnail ? (
-                <Box rounded="md" borderWidth="1px" overflow="hidden">
-                  <Image src={previewThumbnail} w="250px" h="250px" />
-                  <Flex justify="center" mt="-30px">
-                    <Tooltip label="Remover Imagem" hasArrow>
-                      <IconButton
-                        icon={<AiOutlineClose />}
-                        colorScheme="red"
-                        rounded="full"
-                        size="sm"
-                        shadow="md"
-                        onClick={() => removeThumbnail()}
-                      />
-                    </Tooltip>
-                  </Flex>
-                </Box>
-              ) : (
-                <InputFile alt={250} lar={250} cor={colorMode}>
-                  <File
-                    type="file"
-                    onChange={(event) => setThumbnail(event.target.files[0])}
-                  />
-                  <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
-                  <Text>Insira uma imagem 300x300 pixels, de até 500kb</Text>
-                </InputFile>
-              )}
-            </Box>
-            <FormErrorMessage>
-              {validators.find((obj) => obj.path === "image")
-                ? validators.find((obj) => obj.path === "image").message
-                : ""}
-            </FormErrorMessage>
-          </FormControl>
-        </Box>
-        <Box>
-          <Grid templateColumns="3fr 1fr" gap="15px" mb={3}>
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "bank") ? true : false
-              }
-            >
-              <FormLabel>Banco</FormLabel>
-              <Input
-                id="bank"
-                value={bank}
-                onChange={(e) =>
-                  setBank(capitalizeAllFirstLetter(e.target.value))
-                }
-                type="text"
-                placeholder="Banco"
-                focusBorderColor={config.inputs}
-              />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "bank")
-                  ? validators.find((obj) => obj.path === "bank").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "mode") ? true : false
-              }
-            >
-              <FormLabel>Tipo</FormLabel>
-              <Select
-                focusBorderColor={config.inputs}
-                placeholder="Selecione uma opção"
-                value={mode}
-                onChange={(e) => setMode(e.target.value)}
-                id="mode"
-              >
-                <option value="current">Conta Corrente</option>
-                <option value="savings">Poupança</option>
-              </Select>
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "mode")
-                  ? validators.find((obj) => obj.path === "mode").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-          </Grid>
-
-          <Grid templateColumns="repeat(5, 1fr)" gap="15px">
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "agency") ? true : false
-              }
-            >
-              <FormLabel>Agencia</FormLabel>
-              <Input
-                id="agency"
-                value={agency}
-                onChange={(e) => setAgency(e.target.value.toUpperCase())}
-                type="text"
-                placeholder="Agencia"
-                focusBorderColor={config.inputs}
-              />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "agency")
-                  ? validators.find((obj) => obj.path === "agency").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "account") ? true : false
-              }
-            >
-              <FormLabel>Conta</FormLabel>
-              <Input
-                id="account"
-                value={account}
-                onChange={(e) => setAccount(e.target.value.toUpperCase())}
-                type="text"
-                placeholder="Conta"
-                focusBorderColor={config.inputs}
-              />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "account")
-                  ? validators.find((obj) => obj.path === "account").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Variação</FormLabel>
-              <Input
-                value={variation}
-                onChange={(e) => setVariation(e.target.value.toUpperCase())}
-                type="text"
-                placeholder="Variação"
-                focusBorderColor={config.inputs}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Operação</FormLabel>
-              <Input
-                value={operation}
-                onChange={(e) => setOperation(e.target.value.toUpperCase())}
-                type="text"
-                placeholder="Operação"
-                focusBorderColor={config.inputs}
-              />
-            </FormControl>
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "amount") ? true : false
-              }
-            >
-              <FormLabel>Valor Inicial</FormLabel>
-              <NumberInput
-                id="amount"
-                value={amount}
-                onChange={(e) => setAmount(e)}
-                precision={2}
-                step={0.01}
-                focusBorderColor={config.inputs}
-                placeholder="Valor Inicial"
-              >
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "amount")
-                  ? validators.find((obj) => obj.path === "amount").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-          </Grid>
-        </Box>
-      </Grid>
-      <Divider mt={5} mb={5} />
-      <Button
-        leftIcon={<FaSave />}
-        colorScheme={config.buttons}
-        size="lg"
-        isLoading={loading}
-        onClick={() => register()}
+      <Hotkeys
+        keyName="f12"
+        onKeyDown={onKeyDown}
+        allowRepeat
+        filter={(event) => {
+          return true;
+        }}
       >
-        Cadastrar
-      </Button>
+        <Grid templateColumns={"250px 1fr"} gap="15px">
+          <Box>
+            <FormControl
+              isRequired
+              isInvalid={
+                validators.find((obj) => obj.path === "image") ? true : false
+              }
+            >
+              <FormLabel>Imagem</FormLabel>
+              <Box w="250px" h="250px">
+                {thumbnail ? (
+                  <Box rounded="md" borderWidth="1px" overflow="hidden">
+                    <Image src={previewThumbnail} w="250px" h="250px" />
+                    <Flex justify="center" mt="-30px">
+                      <Tooltip label="Remover Imagem" hasArrow>
+                        <IconButton
+                          icon={<AiOutlineClose />}
+                          colorScheme="red"
+                          rounded="full"
+                          size="sm"
+                          shadow="md"
+                          onClick={() => removeThumbnail()}
+                        />
+                      </Tooltip>
+                    </Flex>
+                  </Box>
+                ) : (
+                  <InputFile alt={250} lar={250} cor={colorMode}>
+                    <File
+                      type="file"
+                      onChange={(event) => setThumbnail(event.target.files[0])}
+                    />
+                    <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
+                    <Text>Insira uma imagem 300x300 pixels, de até 500kb</Text>
+                  </InputFile>
+                )}
+              </Box>
+              <FormErrorMessage>
+                {validators.find((obj) => obj.path === "image")
+                  ? validators.find((obj) => obj.path === "image").message
+                  : ""}
+              </FormErrorMessage>
+            </FormControl>
+          </Box>
+          <Box>
+            <Grid templateColumns="3fr 1fr" gap="15px" mb={3}>
+              <FormControl
+                isRequired
+                isInvalid={
+                  validators.find((obj) => obj.path === "bank") ? true : false
+                }
+              >
+                <FormLabel>Banco</FormLabel>
+                <Input
+                  id="bank"
+                  value={bank}
+                  onChange={(e) =>
+                    setBank(capitalizeAllFirstLetter(e.target.value))
+                  }
+                  type="text"
+                  placeholder="Banco"
+                  focusBorderColor={config.inputs}
+                />
+                <FormErrorMessage>
+                  {validators.find((obj) => obj.path === "bank")
+                    ? validators.find((obj) => obj.path === "bank").message
+                    : ""}
+                </FormErrorMessage>
+              </FormControl>
+              <FormControl
+                isRequired
+                isInvalid={
+                  validators.find((obj) => obj.path === "mode") ? true : false
+                }
+              >
+                <FormLabel>Tipo</FormLabel>
+                <Select
+                  focusBorderColor={config.inputs}
+                  placeholder="Selecione uma opção"
+                  value={mode}
+                  onChange={(e) => setMode(e.target.value)}
+                  id="mode"
+                >
+                  <option value="current">Conta Corrente</option>
+                  <option value="savings">Poupança</option>
+                </Select>
+                <FormErrorMessage>
+                  {validators.find((obj) => obj.path === "mode")
+                    ? validators.find((obj) => obj.path === "mode").message
+                    : ""}
+                </FormErrorMessage>
+              </FormControl>
+            </Grid>
+
+            <Grid templateColumns="repeat(5, 1fr)" gap="15px">
+              <FormControl
+                isRequired
+                isInvalid={
+                  validators.find((obj) => obj.path === "agency") ? true : false
+                }
+              >
+                <FormLabel>Agencia</FormLabel>
+                <Input
+                  id="agency"
+                  value={agency}
+                  onChange={(e) => setAgency(e.target.value.toUpperCase())}
+                  type="text"
+                  placeholder="Agencia"
+                  focusBorderColor={config.inputs}
+                />
+                <FormErrorMessage>
+                  {validators.find((obj) => obj.path === "agency")
+                    ? validators.find((obj) => obj.path === "agency").message
+                    : ""}
+                </FormErrorMessage>
+              </FormControl>
+              <FormControl
+                isRequired
+                isInvalid={
+                  validators.find((obj) => obj.path === "account")
+                    ? true
+                    : false
+                }
+              >
+                <FormLabel>Conta</FormLabel>
+                <Input
+                  id="account"
+                  value={account}
+                  onChange={(e) => setAccount(e.target.value.toUpperCase())}
+                  type="text"
+                  placeholder="Conta"
+                  focusBorderColor={config.inputs}
+                />
+                <FormErrorMessage>
+                  {validators.find((obj) => obj.path === "account")
+                    ? validators.find((obj) => obj.path === "account").message
+                    : ""}
+                </FormErrorMessage>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Variação</FormLabel>
+                <Input
+                  value={variation}
+                  onChange={(e) => setVariation(e.target.value.toUpperCase())}
+                  type="text"
+                  placeholder="Variação"
+                  focusBorderColor={config.inputs}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Operação</FormLabel>
+                <Input
+                  value={operation}
+                  onChange={(e) => setOperation(e.target.value.toUpperCase())}
+                  type="text"
+                  placeholder="Operação"
+                  focusBorderColor={config.inputs}
+                />
+              </FormControl>
+              <FormControl
+                isRequired
+                isInvalid={
+                  validators.find((obj) => obj.path === "amount") ? true : false
+                }
+              >
+                <FormLabel>Valor Inicial</FormLabel>
+                <NumberInput
+                  id="amount"
+                  value={amount}
+                  onChange={(e) => setAmount(e)}
+                  precision={2}
+                  step={0.01}
+                  focusBorderColor={config.inputs}
+                  placeholder="Valor Inicial"
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+                <FormErrorMessage>
+                  {validators.find((obj) => obj.path === "amount")
+                    ? validators.find((obj) => obj.path === "amount").message
+                    : ""}
+                </FormErrorMessage>
+              </FormControl>
+            </Grid>
+          </Box>
+        </Grid>
+        <Divider mt={5} mb={5} />
+        <Button
+          leftIcon={<FaSave />}
+          colorScheme={config.buttons}
+          size="lg"
+          isLoading={loading}
+          onClick={() => register()}
+        >
+          Salvar
+          <Kbd ml={3} color="ButtonText">
+            F12
+          </Kbd>
+        </Button>
+      </Hotkeys>
     </>
   );
 }
