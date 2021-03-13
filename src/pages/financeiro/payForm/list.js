@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Thead,
@@ -20,95 +20,124 @@ import {
   Select,
   Grid,
   Input,
+  Flex,
+  Text,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
 import { FaEdit, FaSave } from "react-icons/fa";
+import Lottie from "../../../components/lottie";
+import emptyAnimation from "../../../animations/empty.json";
+import { useEmployee } from "../../../context/Employee";
+import api from "../../../configs/axios";
+import useFecth from "../../../hooks/useFetch";
+import { mutate as mutateGlobal } from "swr";
 
 export default function ListPayForm() {
+  const { employee } = useEmployee();
+  const { data, error, mutate } = useFecth("/payForm");
+
   const [modalBankAccount, setModalBankAccount] = useState(false);
   const [modalStatus, setModalStatus] = useState(false);
   const [modalType, setModalType] = useState(false);
   const [modalEdit, setModalEdit] = useState(false);
 
+  const [payForms, setPayForms] = useState([]);
+  const [banks, setBanks] = useState([]);
+
+  useEffect(() => {
+    console.log(data);
+    if (data) {
+      setPayForms(data.payForms);
+      setBanks(data.banks);
+    }
+  }, [data]);
+
   return (
     <>
-      <Table size="sm">
-        <Thead fontWeight="700">
-          <Tr>
-            <Td>Forma de Pagamento</Td>
-            <Td>Conta Bancária</Td>
-            <Td>Status</Td>
-            <Td>Nº Parcelas</Td>
-            <Td>Intervalo</Td>
-            <Td>Tipo</Td>
-            <Td w="12%">Ativo no Site?</Td>
-            <Td w="10%"></Td>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td>Dinheiro</Td>
-            <Td>
-              <Tooltip label="Clique para alterar" hasArrow>
+      {payForms.length === 0 ? (
+        <Flex justify="center" align="center" direction="column">
+          <Lottie animation={emptyAnimation} height={200} width={200} />
+          <Text>Nenhuma forma de pagamento para mostrar</Text>
+        </Flex>
+      ) : (
+        <Table size="sm">
+          <Thead fontWeight="700">
+            <Tr>
+              <Td>Forma de Pagamento</Td>
+              <Td>Conta Bancária</Td>
+              <Td>Status</Td>
+              <Td>Nº Parcelas</Td>
+              <Td>Intervalo</Td>
+              <Td>Tipo</Td>
+              <Td w="12%">Ativo no Site?</Td>
+              <Td w="10%"></Td>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>Dinheiro</Td>
+              <Td>
+                <Tooltip label="Clique para alterar" hasArrow>
+                  <Button
+                    isTruncated
+                    noOfLines={1}
+                    variant="link"
+                    colorScheme={config.buttons}
+                    size="sm"
+                    onClick={() => setModalBankAccount(true)}
+                  >
+                    Caixa Econômica
+                  </Button>
+                </Tooltip>
+              </Td>
+              <Td>
+                <Tooltip label="Clique para alterar" hasArrow>
+                  <Button
+                    isTruncated
+                    noOfLines={1}
+                    variant="link"
+                    colorScheme={config.buttons}
+                    size="sm"
+                    onClick={() => setModalStatus(true)}
+                  >
+                    À Vista
+                  </Button>
+                </Tooltip>
+              </Td>
+              <Td>10</Td>
+              <Td>30 Dias</Td>
+              <Td>
+                <Tooltip label="Clique para alterar" hasArrow>
+                  <Button
+                    isTruncated
+                    noOfLines={1}
+                    variant="link"
+                    colorScheme={config.buttons}
+                    size="sm"
+                    onClick={() => setModalType(true)}
+                  >
+                    Dinheiro
+                  </Button>
+                </Tooltip>
+              </Td>
+              <Td w="12%">
+                <Switch colorScheme={config.switchs} />
+              </Td>
+              <Td w="10%">
                 <Button
-                  isTruncated
-                  noOfLines={1}
-                  variant="link"
-                  colorScheme={config.buttons}
+                  leftIcon={<FaEdit />}
                   size="sm"
-                  onClick={() => setModalBankAccount(true)}
-                >
-                  Caixa Econômica
-                </Button>
-              </Tooltip>
-            </Td>
-            <Td>
-              <Tooltip label="Clique para alterar" hasArrow>
-                <Button
-                  isTruncated
-                  noOfLines={1}
-                  variant="link"
                   colorScheme={config.buttons}
-                  size="sm"
-                  onClick={() => setModalStatus(true)}
+                  isFullWidth
+                  onClick={() => setModalEdit(true)}
                 >
-                  À Vista
+                  Editar
                 </Button>
-              </Tooltip>
-            </Td>
-            <Td>10</Td>
-            <Td>30 Dias</Td>
-            <Td>
-              <Tooltip label="Clique para alterar" hasArrow>
-                <Button
-                  isTruncated
-                  noOfLines={1}
-                  variant="link"
-                  colorScheme={config.buttons}
-                  size="sm"
-                  onClick={() => setModalType(true)}
-                >
-                  Dinheiro
-                </Button>
-              </Tooltip>
-            </Td>
-            <Td w="12%">
-              <Switch colorScheme={config.switchs} />
-            </Td>
-            <Td w="10%">
-              <Button
-                leftIcon={<FaEdit />}
-                size="sm"
-                colorScheme={config.buttons}
-                isFullWidth
-                onClick={() => setModalEdit(true)}
-              >
-                Editar
-              </Button>
-            </Td>
-          </Tr>
-        </Tbody>
-      </Table>
+              </Td>
+            </Tr>
+          </Tbody>
+        </Table>
+      )}
 
       <Modal
         isOpen={modalBankAccount}
