@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Grid,
   Select,
@@ -10,10 +10,6 @@ import {
   Tr,
   Td,
   Tooltip,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -21,133 +17,395 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  RadioGroup,
-  Radio,
-  Stack,
+  Flex,
   FormLabel,
   FormControl,
-  Textarea,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
+  IconButton,
+  ButtonGroup,
+  useToast,
+  Text,
+  Kbd,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
-import { FaSearch, FaTrash, FaSave, FaSearchPlus } from "react-icons/fa";
-import { MdKeyboardArrowDown } from "react-icons/md";
-import InputMask from "react-input-mask";
+import { FaSearch, FaTrash, FaSave } from "react-icons/fa";
+import api from "../../../configs/axios";
+import useFetch from "../../../hooks/useFetch";
+import { useEmployee } from "../../../context/Employee";
+import Lottie from "../../../components/lottie";
+import emptyAnimation from "../../../animations/empty.json";
+import searchAnimation from "../../../animations/search.json";
+import * as dateFns from "date-fns";
+import { mutate as mutateGlobal } from "swr";
 
 export default function ListCheck() {
+  const toast = useToast();
+  const { employee } = useEmployee();
+  const { data, error, mutate } = useFetch("/checks");
+
   const [modalSituation, setModalSituation] = useState(false);
   const [modalType, setModalType] = useState(false);
-  const [modalEdit, setModalEdit] = useState(false);
+
+  const [checks, setChecks] = useState([]);
+  const [situation, setSituation] = useState("");
+  const [status, setStatus] = useState("");
+  const [idCheck, setIdCheck] = useState(null);
+
+  const [loadingSituation, setLoadingSituation] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false);
+  const [loadingDel, setLoadingDel] = useState(false);
+
+  useEffect(() => {
+    setChecks(data);
+  }, [data]);
+
+  if (error) {
+    if (error.message === "Network Error") {
+      alert(
+        "Sem conexão com o servidor, verifique sua conexão com a internet."
+      );
+    } else {
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  function showToast(message, status, title) {
+    toast({
+      title: title,
+      description: message,
+      status: status,
+      position: "bottom-right",
+      duration: 8000,
+    });
+  }
+
+  async function handleCheck(id, modal) {
+    const result = await checks.find((obj) => obj.id === id);
+    setIdCheck(result.id);
+    setSituation(result.situation);
+    setStatus(result.status);
+    if (modal === "situation") {
+      setModalSituation(true);
+    } else {
+      setModalType(true);
+    }
+  }
+
+  async function updateSituation() {
+    setLoadingSituation(true);
+    try {
+      const response = await api.put(
+        `/situation/${idCheck}`,
+        {
+          situation: situation,
+        },
+        {
+          headers: { "x-access-token": employee.token },
+        }
+      );
+      const updatedCheck = await data.map((chq) => {
+        if (chq.id === idCheck) {
+          return { ...chq, situation: response.data.cheks[0].situation };
+        }
+        return chq;
+      });
+      mutate(updatedCheck, false);
+      mutateGlobal(`/situation/${idCheck}`, {
+        id: idCheck,
+        situation: response.data.cheks[0].situation,
+      });
+      showToast(response.data.message, "success", "Sucesso");
+      setLoadingSituation(false);
+      setModalSituation(false);
+    } catch (error) {
+      setLoadingSituation(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function updateStatus() {
+    setLoadingStatus(true);
+    try {
+      const response = await api.put(
+        `/stats/${idCheck}`,
+        {
+          status: status,
+        },
+        {
+          headers: { "x-access-token": employee.token },
+        }
+      );
+      const updatedCheck = await data.map((chq) => {
+        if (chq.id === idCheck) {
+          return { ...chq, status: response.data.cheks[0].status };
+        }
+        return chq;
+      });
+      mutate(updatedCheck, false);
+      mutateGlobal(`/stats/${idCheck}`, {
+        id: idCheck,
+        status: response.data.cheks[0].status,
+      });
+      showToast(response.data.message, "success", "Sucesso");
+      setLoadingStatus(false);
+      setModalType(false);
+    } catch (error) {
+      setLoadingStatus(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function removeCheck(id) {
+    setLoadingDel(true);
+    try {
+      const response = await api.delete(`/checks/${id}`, {
+        headers: { "x-access-token": employee.token },
+      });
+      const removedChecks = await data.filter((obj) => obj.id !== id);
+      setChecks(removedChecks);
+      showToast(response.data.message, "success", "Sucesso");
+    } catch (error) {
+      setLoadingDel(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
 
   return (
     <>
-      <Grid templateColumns="1fr 1fr 200px" gap="15px">
-        <Select
-          placeholder="Selecione uma opção de busca"
-          focusBorderColor={config.inputs}
-        >
-          <option value="option1">Todas as contas</option>
-          <option value="option2">Buscar pelo nome</option>
-          <option value="option3">Buscar ativas</option>
-          <option value="option4">Buscar bloqueadas</option>
-        </Select>
-
-        <Input
-          type="text"
-          placeholder="Digite para buscar"
-          focusBorderColor={config.inputs}
-        />
-
-        <Button
-          leftIcon={<FaSearch />}
-          colorScheme={config.buttons}
-          variant="outline"
-        >
-          Buscar
-        </Button>
+      <Grid templateColumns="1fr" gap="15px">
+        <FormControl>
+          <FormLabel>
+            Digite para buscar <Kbd ml={3}>F3</Kbd>
+          </FormLabel>
+          <Input
+            type="text"
+            placeholder="Digite para buscar"
+            focusBorderColor={config.inputs}
+          />
+        </FormControl>
       </Grid>
 
-      <Table size="sm" mt="25px">
-        <Thead fontWeight="700">
-          <Tr>
-            <Td isTruncated>Cliente</Td>
-            <Td isTruncated>Número</Td>
-            <Td>Situação</Td>
-            <Td>Tipo</Td>
-            <Td>Emissão</Td>
-            <Td>Vencimento</Td>
-            <Td isNumeric w="15%">
-              Valor
-            </Td>
-            <Td w="15%"></Td>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td isTruncated>Natanael dos Santos Bezerra</Td>
-            <Td isTruncated>1312989123 91283791827 98172983172</Td>
-            <Td>
-              <Tooltip label="Clique para alterar" hasArrow>
-                <Button
-                  isTruncated
-                  noOfLines={1}
-                  variant="link"
-                  colorScheme="yellow"
-                  size="sm"
-                  onClick={() => setModalSituation(true)}
-                >
-                  Aguardando
-                </Button>
-              </Tooltip>
-            </Td>
-            <Td>
-              <Tooltip label="Clique para alterar" hasArrow>
-                <Button
-                  isTruncated
-                  noOfLines={1}
-                  variant="link"
-                  colorScheme={config.buttons}
-                  size="sm"
-                  onClick={() => setModalType(true)}
-                >
-                  À Vista
-                </Button>
-              </Tooltip>
-            </Td>
-            <Td>10/10/1010</Td>
-            <Td>10/10/1010</Td>
-            <Td isNumeric w="15%">
-              R$ 4000,00
-            </Td>
-            <Td w="15%">
-              <Menu>
-                <MenuButton
-                  isFullWidth
-                  as={Button}
-                  rightIcon={<MdKeyboardArrowDown />}
-                  size="sm"
-                  colorScheme={config.buttons}
-                >
-                  Opções
-                </MenuButton>
-                <MenuList>
-                  <MenuItem
-                    icon={<FaSearchPlus />}
-                    onClick={() => setModalEdit(true)}
-                  >
-                    Visualizar e Editar
-                  </MenuItem>
-                  <MenuItem icon={<FaTrash />}>Excluir</MenuItem>
-                </MenuList>
-              </Menu>
-            </Td>
-          </Tr>
-        </Tbody>
-      </Table>
+      {!checks ? (
+        <Flex justify="center" align="center" direction="column">
+          <Lottie animation={searchAnimation} height={200} width={200} />
+          <Text>Buscando Informações</Text>
+        </Flex>
+      ) : (
+        <>
+          {checks.length === 0 ? (
+            <Flex justify="center" align="center" direction="column">
+              <Lottie animation={emptyAnimation} height={200} width={200} />
+              <Text>Nenhum cheque para mostrar</Text>
+            </Flex>
+          ) : (
+            <Table size="sm" mt="25px">
+              <Thead fontWeight="700">
+                <Tr>
+                  <Td isTruncated>Cliente</Td>
+                  <Td isTruncated>Número</Td>
+                  <Td>Situação</Td>
+                  <Td>Status</Td>
+                  <Td>Emissão</Td>
+                  <Td>Vencimento</Td>
+                  <Td isNumeric w="15%">
+                    Valor
+                  </Td>
+                  <Td w="3%" textAlign="center"></Td>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {checks.map((chq) => (
+                  <Tr key={chq.id}>
+                    <Td isTruncated>{chq.name_client}</Td>
+                    <Td isTruncated>{chq.number}</Td>
+                    <Td>
+                      <Tooltip label="Clique para alterar" hasArrow>
+                        {(chq.situation === "okay" && (
+                          <Button
+                            isTruncated
+                            noOfLines={1}
+                            variant="link"
+                            colorScheme="green"
+                            size="sm"
+                            onClick={() => handleCheck(chq.id, "situation")}
+                          >
+                            Aprovado
+                          </Button>
+                        )) ||
+                          (chq.situation === "waiting" && (
+                            <Button
+                              isTruncated
+                              noOfLines={1}
+                              variant="link"
+                              colorScheme="yellow"
+                              size="sm"
+                              onClick={() => handleCheck(chq.id, "situation")}
+                            >
+                              Aguardando
+                            </Button>
+                          )) ||
+                          (chq.situation === "refused" && (
+                            <Button
+                              isTruncated
+                              noOfLines={1}
+                              variant="link"
+                              colorScheme="red"
+                              size="sm"
+                              onClick={() => handleCheck(chq.id, "situation")}
+                            >
+                              Recusado
+                            </Button>
+                          ))}
+                      </Tooltip>
+                    </Td>
+                    <Td>
+                      <Tooltip label="Clique para alterar" hasArrow>
+                        {chq.status === "in_cash" ? (
+                          <Button
+                            isTruncated
+                            noOfLines={1}
+                            variant="link"
+                            colorScheme={config.buttons}
+                            size="sm"
+                            onClick={() => handleCheck(chq.id, "status")}
+                          >
+                            À Vista
+                          </Button>
+                        ) : (
+                          <Button
+                            isTruncated
+                            noOfLines={1}
+                            variant="link"
+                            colorScheme={config.buttons}
+                            size="sm"
+                            onClick={() => handleCheck(chq.id, "status")}
+                          >
+                            À Prazo
+                          </Button>
+                        )}
+                      </Tooltip>
+                    </Td>
+                    <Td>
+                      {dateFns.format(new Date(chq.emission), "dd/MM/yyyy")}
+                    </Td>
+                    <Td>
+                      {dateFns.format(new Date(chq.due_date), "dd/MM/yyyy")}
+                    </Td>
+                    <Td isNumeric w="15%">
+                      {parseFloat(chq.value).toLocaleString("pt-br", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </Td>
+                    <Td w="3%" textAlign="center">
+                      <Popover placement="bottom-end">
+                        <PopoverTrigger>
+                          <IconButton
+                            icon={<FaTrash />}
+                            rounded="full"
+                            size="xs"
+                            colorScheme="red"
+                          />
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <PopoverArrow />
+                          <PopoverCloseButton />
+                          <PopoverHeader>Confirmação!</PopoverHeader>
+                          <PopoverBody>Deseja excluir este cheque?</PopoverBody>
+                          <PopoverFooter d="flex" justifyContent="flex-end">
+                            <ButtonGroup size="sm">
+                              <Button
+                                variant="outline"
+                                colorScheme={config.buttons}
+                              >
+                                Não
+                              </Button>
+                              <Button
+                                colorScheme="red"
+                                colorScheme={config.buttons}
+                                isLoading={loadingDel}
+                                onClick={() => removeCheck(chq.id)}
+                              >
+                                Sim
+                              </Button>
+                            </ButtonGroup>
+                          </PopoverFooter>
+                        </PopoverContent>
+                      </Popover>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          )}
+        </>
+      )}
 
       <Modal
         isOpen={modalSituation}
         onClose={() => setModalSituation(false)}
-        size="xl"
+        size="sm"
         isCentered
       >
         <ModalOverlay />
@@ -155,103 +413,30 @@ export default function ListCheck() {
           <ModalHeader>Alterar Situação do Cheque</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <RadioGroup defaultValue="2">
-              <Stack spacing={8} direction="row">
-                <Radio size="lg" colorScheme="yellow" value="1">
-                  Aguardando
-                </Radio>
-                <Radio size="lg" colorScheme="green" value="2">
-                  Aprovado
-                </Radio>
-                <Radio size="lg" colorScheme="red" value="3">
-                  Recusado
-                </Radio>
-              </Stack>
-            </RadioGroup>
+            <FormControl>
+              <FormLabel>Situação</FormLabel>
+              <Select
+                id="situation"
+                placeholder="Selecione"
+                variant="outline"
+                focusBorderColor={config.inputs}
+                value={situation}
+                onChange={(e) => setSituation(e.target.value)}
+              >
+                <option value="waiting">Aguardando</option>
+                <option value="okay">Aprovado</option>
+                <option value="refused">Recusado</option>
+              </Select>
+            </FormControl>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
-              Salvar
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      <Modal
-        isOpen={modalEdit}
-        onClose={() => setModalEdit(false)}
-        size="xl"
-        isCentered
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Editar Cheque</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Grid templateColumns="1fr 1fr" gap="15px">
-              <FormControl>
-                <FormLabel>Número</FormLabel>
-                <Input
-                  type="text"
-                  placeholder="Número"
-                  focusBorderColor={config.inputs}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Entidade</FormLabel>
-                <Input
-                  type="text"
-                  placeholder="Entidade"
-                  focusBorderColor={config.inputs}
-                />
-              </FormControl>
-            </Grid>
-
-            <Grid mt={3} templateColumns="repeat(1, 1fr)" gap="15px">
-              <FormControl>
-                <FormLabel>Valor do Cheque</FormLabel>
-                <Input
-                  type="number"
-                  placeholder="Valor do Cheque"
-                  focusBorderColor={config.inputs}
-                />
-              </FormControl>
-            </Grid>
-
-            <Grid mt={3} templateColumns="repeat(2, 1fr)" gap="15px">
-              <FormControl>
-                <FormLabel>Data da Emissão</FormLabel>
-                <InputMask
-                  mask="99/99/9999"
-                  className="mask-chakra"
-                  placeholder="Data da Emissão"
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Vencimento</FormLabel>
-                <InputMask
-                  mask="99/99/9999"
-                  className="mask-chakra"
-                  placeholder="Vencimento"
-                />
-              </FormControl>
-            </Grid>
-
-            <Grid mt={3} templateColumns="1fr" gap="15px">
-              <FormControl>
-                <FormLabel>Observações</FormLabel>
-                <Textarea
-                  resize="none"
-                  focusBorderColor={config.inputs}
-                  rows={2}
-                />
-              </FormControl>
-            </Grid>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
+            <Button
+              colorScheme={config.buttons}
+              leftIcon={<FaSave />}
+              isLoading={loadingSituation}
+              onClick={() => updateSituation()}
+            >
               Salvar
             </Button>
           </ModalFooter>
@@ -266,24 +451,32 @@ export default function ListCheck() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Alterar Tipo do Cheque</ModalHeader>
+          <ModalHeader>Alterar Status do Cheque</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
               <FormLabel>Tipo de Cheque</FormLabel>
               <Select
+                id="status"
                 placeholder="Selecione"
                 variant="outline"
                 focusBorderColor={config.inputs}
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
               >
-                <option value="credit">À Vista</option>
-                <option value="debit">À Prazo</option>
+                <option value="in_cash">À Vista</option>
+                <option value="parceled_out">À Prazo</option>
               </Select>
             </FormControl>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
+            <Button
+              colorScheme={config.buttons}
+              leftIcon={<FaSave />}
+              isLoading={loadingStatus}
+              onClick={() => updateStatus()}
+            >
               Salvar
             </Button>
           </ModalFooter>
