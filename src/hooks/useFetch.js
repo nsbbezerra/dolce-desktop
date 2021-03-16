@@ -14,7 +14,7 @@ export default function useFetch(url) {
     },
     {
       revalidateOnReconnect: true,
-      refreshInterval: 7000,
+      refreshInterval: 10000,
     }
   );
 
