@@ -12,6 +12,8 @@ if (pt === "" || pt === null || !pt) {
   route = `${tp}://${rt}:${pt}`;
 }
 
+localStorage.setItem("baseUrl", route);
+
 const api = axios.create({
   baseURL: route,
 });

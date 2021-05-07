@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState } from "react";
 import {
   Flex,
   Box,
   Grid,
-  Text,
   FormLabel,
   FormControl,
   Input,
@@ -12,24 +11,19 @@ import {
   Button,
   useColorMode,
   useToast,
-  Image,
-  IconButton,
-  Tooltip,
   FormErrorMessage,
   Kbd,
 } from "@chakra-ui/react";
-import { FaSave, FaImage } from "react-icons/fa";
-import { AiFillShop, AiOutlineClose } from "react-icons/ai";
+import { FaSave } from "react-icons/fa";
+import { AiFillShop } from "react-icons/ai";
 import config from "../../configs";
 import HeaderApp from "../../components/headerApp";
-import { InputFile, File } from "../../style/uploader";
 import api from "../../configs/axios";
 import Hotkeys from "react-hot-keys";
 import { useEmployee } from "../../context/Employee";
 
 export default function Departamento() {
   const toast = useToast();
-  const { colorMode } = useColorMode();
   const { employee } = useEmployee();
 
   const [validators, setValidators] = useState([]);
@@ -37,25 +31,6 @@ export default function Departamento() {
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [thumbnail, setThumbnail] = useState(null);
-
-  useEffect(() => {
-    if (thumbnail) {
-      let size = thumbnail.size / 1024;
-      let thumbname = thumbnail.name;
-      if (thumbname.includes(" ")) {
-        handleValidator("image", "Nome da imagem não pode conter espaços");
-      }
-      if (size > 500) {
-        handleValidator(
-          "image",
-          "Imagem maior que 500kb, insira uma imagem menor"
-        );
-      }
-    } else {
-      setValidators([]);
-    }
-  }, [thumbnail]);
 
   function handleValidator(path, message) {
     let val = [];
@@ -66,16 +41,6 @@ export default function Departamento() {
       const inpt = document.getElementById(path);
       inpt.focus();
     }
-  }
-
-  const previewThumbnail = useMemo(() => {
-    return thumbnail ? URL.createObjectURL(thumbnail) : null;
-  }, [thumbnail]);
-
-  async function removeThumbnail() {
-    await URL.revokeObjectURL(thumbnail);
-    setThumbnail(null);
-    setValidators([]);
   }
 
   function showToast(message, status, title) {
@@ -92,22 +57,6 @@ export default function Departamento() {
     if (e) {
       e.preventDefault();
     }
-    if (!thumbnail) {
-      handleValidator("image", "Selecione uma imagem");
-      return false;
-    }
-    if (thumbnail.name.includes(" ")) {
-      handleValidator("image", "Nome da imagem não pode conter espaços");
-      return false;
-    }
-    let size = thumbnail.size / 1024;
-    if (size > 500) {
-      handleValidator(
-        "image",
-        "Imagem maior que 500kb, insira uma imagem menor"
-      );
-      return false;
-    }
     if (!name || name === "") {
       handleValidator("name", "Insira um nome para este departamento");
       return false;
@@ -121,18 +70,17 @@ export default function Departamento() {
     }
     setLoading(true);
     try {
-      let data = new FormData();
-      data.append("name", name);
-      data.append("description", description);
-      data.append("thumbnail", thumbnail);
-      const response = await api.post("/departments", data, {
-        headers: { "x-access-token": employee.token },
-      });
+      const response = await api.post(
+        "/departments",
+        { name, description },
+        {
+          headers: { "x-access-token": employee.token },
+        }
+      );
       setLoading(false);
       showToast(response.data.message, "success", "Sucesso");
       setName("");
       setDescription("");
-      setThumbnail(null);
       setValidators([]);
     } catch (error) {
       setLoading(false);
@@ -187,48 +135,7 @@ export default function Departamento() {
         <HeaderApp title="Cadastro de Departamentos" icon={AiFillShop} />
 
         <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
-          <Grid templateColumns="250px 1fr" gap="15px">
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "image") ? true : false
-              }
-            >
-              <FormLabel>Imagem</FormLabel>
-              <Box w="250px" h="250px">
-                {thumbnail ? (
-                  <Box rounded="md" borderWidth="1px" overflow="hidden">
-                    <Image src={previewThumbnail} w="250px" h="250px" />
-                    <Flex justify="center" mt="-30px">
-                      <Tooltip label="Remover Imagem" hasArrow>
-                        <IconButton
-                          icon={<AiOutlineClose />}
-                          colorScheme="red"
-                          rounded="full"
-                          size="sm"
-                          shadow="md"
-                          onClick={() => removeThumbnail()}
-                        />
-                      </Tooltip>
-                    </Flex>
-                  </Box>
-                ) : (
-                  <InputFile alt={250} lar={250} cor={colorMode}>
-                    <File
-                      type="file"
-                      onChange={(event) => setThumbnail(event.target.files[0])}
-                    />
-                    <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
-                    <Text>Insira uma imagem 300x300 pixels, de até 500kb</Text>
-                  </InputFile>
-                )}
-              </Box>
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "image")
-                  ? validators.find((obj) => obj.path === "image").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
+          <Grid templateColumns="1fr" gap="15px">
             <Box>
               <FormControl
                 isRequired
@@ -281,20 +188,19 @@ export default function Departamento() {
                 </FormErrorMessage>
               </FormControl>
               <Divider mt={5} mb={5} />
-              <Flex justify="flex-end">
-                <Button
-                  leftIcon={<FaSave />}
-                  colorScheme={config.buttons}
-                  size="lg"
-                  isLoading={loading}
-                  onClick={() => register()}
-                >
-                  Cadastrar{" "}
-                  <Kbd ml={3} color="ButtonText">
-                    F12
-                  </Kbd>
-                </Button>
-              </Flex>
+
+              <Button
+                leftIcon={<FaSave />}
+                colorScheme={config.buttons}
+                size="lg"
+                isLoading={loading}
+                onClick={() => register()}
+              >
+                Cadastrar{" "}
+                <Kbd ml={3} color="ButtonText">
+                  F12
+                </Kbd>
+              </Button>
             </Box>
           </Grid>
         </Box>

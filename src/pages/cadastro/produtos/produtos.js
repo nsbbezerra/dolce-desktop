@@ -1747,7 +1747,6 @@ export default function Produtos() {
                 <Table size="sm" mt={3}>
                   <Thead fontWeight="700">
                     <Tr>
-                      <Td w="10%" textAlign="center"></Td>
                       <Td>Fornecedor</Td>
                       <Td w="10%" isNumeric></Td>
                     </Tr>
@@ -1755,11 +1754,6 @@ export default function Produtos() {
                   <Tbody>
                     {providers.map((dep) => (
                       <Tr key={dep.id}>
-                        <Td w="10%" textAlign="center">
-                          <Box rounded="lg" w="25px" h="25px" overflow="hidden">
-                            <Image src={dep.thumbnail} w="25px" h="25px" />
-                          </Box>
-                        </Td>
                         <Td>{dep.name}</Td>
                         <Td w="10%" isNumeric>
                           <IconButton

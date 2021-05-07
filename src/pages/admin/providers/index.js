@@ -85,6 +85,16 @@ export default function ListProviders() {
   const [url, setUrl] = useState("");
   const [loadingImage, setLoadingImage] = useState(false);
   const [findProvider, setFindProvider] = useState("");
+  const [baseUrl, setBaseUrl] = useState("");
+
+  async function findBaseUrl() {
+    const base = await localStorage.getItem("baseUrl");
+    setBaseUrl(base);
+  }
+
+  useEffect(() => {
+    findBaseUrl();
+  }, []);
 
   async function finderProviderBySource(text) {
     setFindProvider(text);
@@ -360,8 +370,7 @@ export default function ListProviders() {
         if (prov.id === providerId) {
           return {
             ...prov,
-            thumbnail: response.data.url,
-            blobName: response.data.blobName,
+            thumbnail: response.data.newProvider[0].thumbnail,
           };
         }
         return prov;
@@ -369,9 +378,10 @@ export default function ListProviders() {
       mutate(updatedProvider, false);
       mutateGlobal(`/changeProviderImage/${providerId}`, {
         id: providerId,
-        thumbnail: response.data.url,
-        blobName: response.data.blobName,
+        thumbnail: response.data.newProvider[0].thumbnail,
       });
+      setThumbnail(null);
+      removeThumbnail();
       showToast(response.data.message, "success", "Sucesso");
       setLoadingImage(false);
       setModalImage(false);
@@ -449,11 +459,11 @@ export default function ListProviders() {
                       <Td w="7%" textAlign="center">
                         Ativo?
                       </Td>
-                      <Td w="25%">Fornecedor</Td>
+                      <Td w="20%">Fornecedor</Td>
                       <Td w="13%">CNPJ</Td>
                       <Td>Email</Td>
-                      <Td>Contato</Td>
-                      <Td>Cidade</Td>
+                      <Td w="13%">Contato</Td>
+                      <Td w="13%">Cidade</Td>
                       <Td w="5%">UF</Td>
                       <Td w="10%"></Td>
                     </Tr>
@@ -463,7 +473,11 @@ export default function ListProviders() {
                       <Tr key={prov.id}>
                         <Td w="5%" textAlign="center">
                           <Box w="25px" h="25px" rounded="lg" overflow="hidden">
-                            <Image src={prov.thumbnail} w="25px" h="25px" />
+                            <Image
+                              src={`${baseUrl}/imagem/${prov.thumbnail}`}
+                              w="25px"
+                              h="25px"
+                            />
                           </Box>
                         </Td>
                         <Td w="7%" textAlign="center">
@@ -476,11 +490,11 @@ export default function ListProviders() {
                             }
                           />
                         </Td>
-                        <Td w="25%">{prov.name}</Td>
+                        <Td w="20%">{prov.name}</Td>
                         <Td w="13%">{prov.cnpj}</Td>
                         <Td>{prov.email}</Td>
-                        <Td>{prov.contact}</Td>
-                        <Td>{prov.city}</Td>
+                        <Td w="13%">{prov.contact}</Td>
+                        <Td w="13%">{prov.city}</Td>
                         <Td w="5%">{prov.state}</Td>
                         <Td w="10%">
                           <Menu>
@@ -983,7 +997,12 @@ export default function ListProviders() {
                 >
                   <Box w="280px" h="320px">
                     <Text>Imagem atual:</Text>
-                    <Image src={url} w="280px" h="310px" rounded="md" />
+                    <Image
+                      src={`${baseUrl}/imagem/${url}`}
+                      w="280px"
+                      h="310px"
+                      rounded="md"
+                    />
                   </Box>
                   <Box>
                     <Text>Nova imagem:</Text>

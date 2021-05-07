@@ -141,6 +141,17 @@ export default function CategoryList() {
   const [productLength, setProductLength] = useState(0);
   const [productWeight, setProductWeight] = useState(0);
 
+  const [baseUrl, setBaseUrl] = useState("");
+
+  async function findBaseUrl() {
+    const base = await localStorage.getItem("baseUrl");
+    setBaseUrl(base);
+  }
+
+  useEffect(() => {
+    findBaseUrl();
+  }, []);
+
   useEffect(() => {
     setProducts(data);
   }, [data]);
@@ -370,12 +381,12 @@ export default function CategoryList() {
         dataImage,
         { headers: { "x-access-token": employee.token } }
       );
+      console.log(response);
       const productUpdated = await data.map((prod) => {
         if (prod.id === productId) {
           return {
             ...prod,
-            blobName: response.data.blobName,
-            thumbnail: response.data.url,
+            thumbnail: response.data[0].thumbnail,
           };
         }
         return prod;
@@ -383,14 +394,13 @@ export default function CategoryList() {
       mutate(productUpdated, false);
       mutateGlobal(`/productChangeImage/${productId}`, {
         id: productId,
-        blobName: response.data.blobName,
-        thumbnail: response.data.url,
+        thumbnail: response.data[0].thumbnail,
       });
       setThumbnail(null);
       removeThumbnail();
       setModalImage(false);
       setLoadingImage(false);
-      showToast(response.data.message, "success", "Sucesso");
+      showToast("Imagem alterada com sucesso", "success", "Sucesso");
     } catch (error) {
       setLoadingImage(false);
       if (error.message === "Network Error") {
@@ -1825,7 +1835,12 @@ export default function CategoryList() {
               <Grid templateColumns="1fr 1fr" gap="20px" justifyItems="center">
                 <Box w="280px" h="320px">
                   <Text>Imagem atual:</Text>
-                  <Image src={url} w="280px" h="310px" rounded="md" />
+                  <Image
+                    src={`${baseUrl}/imagem/${url}`}
+                    w="280px"
+                    h="310px"
+                    rounded="md"
+                  />
                 </Box>
                 <Box>
                   <Text>Nova imagem:</Text>

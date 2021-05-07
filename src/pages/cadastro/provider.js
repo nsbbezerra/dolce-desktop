@@ -217,6 +217,7 @@ export default function RegisterProvider() {
       data.append("cep", cep);
       data.append("city", city);
       data.append("state", state);
+      console.log(thumbnail);
       const response = await api.post("/providers", data, {
         headers: { "x-access-token": employee.token },
       });

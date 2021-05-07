@@ -402,12 +402,6 @@ export default function DepartmentList() {
                               >
                                 Editar Informações
                               </MenuItem>
-                              <MenuItem
-                                icon={<FaImage />}
-                                onClick={() => handleThumbnail(dep.id)}
-                              >
-                                Alterar Imagem
-                              </MenuItem>
                             </MenuList>
                           </Menu>
                         </Td>

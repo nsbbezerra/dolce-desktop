@@ -16,7 +16,6 @@ import {
   AlertDialogOverlay,
   Flex,
   Text,
-  Center,
   FormControl,
   FormLabel,
   Input,
@@ -190,7 +189,7 @@ export default function Layout() {
   }
 
   return (
-    <>
+    <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
       <Hotkeys
         keyName="return, enter"
         onKeyDown={onKeyDown}
@@ -199,14 +198,14 @@ export default function Layout() {
           return true;
         }}
       >
-        <Box w={"100vw"} h="100vh" maxH="100vh" maxW="100vw">
+        <Box w={"100%"} h="100%" overflow="hidden">
           <Header />
-          <Grid templateColumns="60px 1fr" w="100%" h="91vh">
+          <Grid templateColumns="60px 1fr" w="100%" h="92vh" overflow="hidden">
             <Box>
               <Sider />
             </Box>
 
-            <Box p={2} overflow="hidden">
+            <Box p={2} w="100%" overflow="hidden">
               <Box
                 w="100%"
                 h="100%"
@@ -219,19 +218,6 @@ export default function Layout() {
               </Box>
             </Box>
           </Grid>
-          <Flex
-            h="30px"
-            align="center"
-            justify="center"
-            bg="red.500"
-            color="white"
-            w="200px"
-            className="rotate-tag"
-          >
-            <Text fontSize="sm" fontWeight="700">
-              Versão: Beta 1.0.0
-            </Text>
-          </Flex>
         </Box>
 
         <Modal
@@ -435,6 +421,6 @@ export default function Layout() {
           </AlertDialogOverlay>
         </AlertDialog>
       </Hotkeys>
-    </>
+    </div>
   );
 }

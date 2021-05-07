@@ -13,7 +13,6 @@ import {
   Button,
   Text,
   Grid,
-  Select,
   Input,
   Switch,
   Modal,
@@ -399,12 +398,6 @@ export default function CategoryList() {
                                 onClick={() => handleInfo(cat.id)}
                               >
                                 Editar Informações
-                              </MenuItem>
-                              <MenuItem
-                                icon={<FaImage />}
-                                onClick={() => handleImage(cat.id)}
-                              >
-                                Alterar Imagem
                               </MenuItem>
                             </MenuList>
                           </Menu>

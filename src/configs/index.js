@@ -36,6 +36,7 @@ const config = {
     color: `${destak}.800`,
     border: `${destak}.200`,
   },
+  url: "http://localhost:3333",
 };
 
 export default config;

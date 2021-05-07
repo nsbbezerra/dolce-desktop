@@ -51,23 +51,12 @@ export default function Categoria() {
   const [modalDepartment, setModalDepartment] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [validators, setValidators] = useState([]);
-  const [thumbnail, setThumbnail] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [idDepartment, setIdDepartment] = useState(null);
   const [nameDepartment, setNameDepartment] = useState("");
   const [handleSearch, setHandleSearch] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const previewThumbnail = useMemo(() => {
-    return thumbnail ? URL.createObjectURL(thumbnail) : null;
-  }, [thumbnail]);
-
-  async function removeThumbnail() {
-    await URL.revokeObjectURL(thumbnail);
-    setThumbnail(null);
-    setValidators([]);
-  }
 
   function showToast(message, status, title) {
     toast({
@@ -82,24 +71,6 @@ export default function Categoria() {
   useEffect(() => {
     setDepartments(data);
   }, [data]);
-
-  useEffect(() => {
-    if (thumbnail) {
-      let size = thumbnail.size / 1024;
-      let thumbname = thumbnail.name;
-      if (thumbname.includes(" ")) {
-        handleValidator("image", "Nome da imagem não pode conter espaços");
-      }
-      if (size > 500) {
-        handleValidator(
-          "image",
-          "Imagem maior que 500kb, insira uma imagem menor"
-        );
-      }
-    } else {
-      setValidators([]);
-    }
-  }, [thumbnail]);
 
   if (error) {
     if (error.message === "Network Error") {
@@ -184,22 +155,6 @@ export default function Categoria() {
       setModalDepartment(true);
       return false;
     }
-    if (!thumbnail) {
-      handleValidator("image", "Selecione uma imagem");
-      return false;
-    }
-    if (thumbnail.name.includes(" ")) {
-      handleValidator("image", "Nome da imagem não pode conter espaços");
-      return false;
-    }
-    let size = thumbnail.size / 1024;
-    if (size > 500) {
-      handleValidator(
-        "image",
-        "Imagem maior que 500kb, insira uma imagem menor"
-      );
-      return false;
-    }
     if (!name || name === "") {
       handleValidator("name", "Insira um nome para a categoria");
       return false;
@@ -211,15 +166,13 @@ export default function Categoria() {
     setValidators([]);
     setLoading(true);
     try {
-      let data = new FormData();
-      data.append("department", idDepartment);
-      data.append("name", name);
-      data.append("description", description);
-      data.append("thumbnail", thumbnail);
-
-      const response = await api.post("/categories", data, {
-        headers: { "x-access-token": employee.token },
-      });
+      const response = await api.post(
+        "/categories",
+        { department: idDepartment, name, description },
+        {
+          headers: { "x-access-token": employee.token },
+        }
+      );
 
       setLoading(false);
       showToast(response.data.message, "success", "Sucesso");
@@ -227,7 +180,6 @@ export default function Categoria() {
       setNameDepartment("");
       setName("");
       setDescription("");
-      setThumbnail(null);
     } catch (error) {
       setLoading(false);
       if (error.message === "Network Error") {
@@ -297,55 +249,7 @@ export default function Categoria() {
             </Button>
           </Grid>
           <Divider mt={5} mb={5} />
-          <Grid templateColumns="250px 1fr" gap="15px">
-            <Box w="250px" h="250px">
-              <FormControl
-                isRequired
-                isInvalid={
-                  validators.find((obj) => obj.path === "image") ? true : false
-                }
-              >
-                <FormLabel>Imagem</FormLabel>
-                <Box w="250px" h="250px">
-                  {thumbnail ? (
-                    <Box rounded="md" borderWidth="1px" overflow="hidden">
-                      <Image src={previewThumbnail} w="250px" h="250px" />
-                      <Flex justify="center" mt="-30px">
-                        <Tooltip label="Remover Imagem" hasArrow>
-                          <IconButton
-                            icon={<AiOutlineClose />}
-                            colorScheme="red"
-                            rounded="full"
-                            size="sm"
-                            shadow="md"
-                            onClick={() => removeThumbnail()}
-                          />
-                        </Tooltip>
-                      </Flex>
-                    </Box>
-                  ) : (
-                    <InputFile alt={250} lar={250} cor={colorMode}>
-                      <File
-                        type="file"
-                        onChange={(event) =>
-                          setThumbnail(event.target.files[0])
-                        }
-                      />
-                      <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
-                      <Text>
-                        Insira uma imagem 300x300 pixels, de até 500kb
-                      </Text>
-                    </InputFile>
-                  )}
-                </Box>
-                <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "image")
-                    ? validators.find((obj) => obj.path === "image").message
-                    : ""}
-                </FormErrorMessage>
-              </FormControl>
-            </Box>
-
+          <Grid templateColumns="1fr" gap="15px">
             <Box>
               <FormControl
                 isRequired
@@ -397,20 +301,19 @@ export default function Categoria() {
                 </FormErrorMessage>
               </FormControl>
               <Divider mt={5} mb={5} />
-              <Flex justify="flex-end">
-                <Button
-                  leftIcon={<FaSave />}
-                  colorScheme={config.buttons}
-                  size="lg"
-                  isLoading={loading}
-                  onClick={() => register()}
-                >
-                  Cadastrar
-                  <Kbd ml={3} color="ButtonText">
-                    F12
-                  </Kbd>
-                </Button>
-              </Flex>
+
+              <Button
+                leftIcon={<FaSave />}
+                colorScheme={config.buttons}
+                size="lg"
+                isLoading={loading}
+                onClick={() => register()}
+              >
+                Cadastrar
+                <Kbd ml={3} color="ButtonText">
+                  F12
+                </Kbd>
+              </Button>
             </Box>
           </Grid>
         </Box>

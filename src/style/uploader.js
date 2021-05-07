@@ -13,8 +13,7 @@ export const InputFile = styled.label`
   cursor: pointer;
   transition: all 0.3s;
   border-radius: 3px;
-  color: ${(props) =>
-    props.cor === "light" ? theme.colors.gray[800] : theme.colors.white};
+  color: ${(props) => (props.cor === "dark" ? theme.colors.white : "")};
   font-size: 15px;
   border: 1px dashed ${config.primary};
   text-align: center;
