@@ -92,6 +92,8 @@ export default function CategoryList() {
   const [advancedFind, setAdvancedFind] = useState("4");
   const [promoStatus, setPromoStatus] = useState(null);
   const [promoValue, setPromoValue] = useState("0");
+  const [valueProduct, setValueProduct] = useState(0);
+  const [promoRate, setPromoRate] = useState("0");
   const [productId, setProductId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState("");
@@ -147,6 +149,18 @@ export default function CategoryList() {
     const base = await localStorage.getItem("baseUrl");
     setBaseUrl(base);
   }
+
+  useEffect(() => {
+    let rate = parseFloat(promoRate);
+    let prodV = parseFloat(valueProduct);
+    let calc = prodV * (rate / 100);
+    let rest = prodV - parseFloat(calc);
+    if (isNaN(rest)) {
+      setPromoValue("0");
+    } else {
+      setPromoValue(parseFloat(rest.toFixed(2)));
+    }
+  }, [promoRate]);
 
   useEffect(() => {
     findBaseUrl();
@@ -262,8 +276,9 @@ export default function CategoryList() {
     }
   }
 
-  function handlePromo(value, id) {
+  function handlePromo(value, id, saleValue) {
     setProductId(id);
+    setValueProduct(saleValue);
     setPromoStatus(value);
     setModalPromo(true);
   }
@@ -277,6 +292,7 @@ export default function CategoryList() {
         {
           promotional: promoStatus,
           promotional_value: parseFloat(promoValue),
+          promotional_rate: parseFloat(promoRate),
         },
         { headers: { "x-access-token": employee.token } }
       );
@@ -286,6 +302,7 @@ export default function CategoryList() {
             ...prod,
             promotional: response.data.product[0].promotional,
             promotional_value: response.data.product[0].promotional_value,
+            promotional_rate: response.data.product[0].promotional_rate,
           };
         }
         return prod;
@@ -295,6 +312,7 @@ export default function CategoryList() {
         id: productId,
         promotional: response.data.product[0].promotional,
         promotional_value: response.data.product[0].promotional_value,
+        promotional_rate: response.data.product[0].promotional_rate,
       });
       setLoading(false);
       showToast(response.data.message, "success", "Sucesso");
@@ -774,8 +792,8 @@ export default function CategoryList() {
                       <Td w="15%" isNumeric>
                         Valor Promocional
                       </Td>
-                      <Td w="10%" textAlign="center">
-                        Avaliação
+                      <Td w="10%" isNumeric>
+                        Desconto
                       </Td>
                       <Td w="10%"></Td>
                     </Tr>
@@ -797,7 +815,11 @@ export default function CategoryList() {
                             colorScheme={config.switchs}
                             defaultIsChecked={prod.promotional}
                             onChange={(e) =>
-                              handlePromo(e.target.checked, prod.id)
+                              handlePromo(
+                                e.target.checked,
+                                prod.id,
+                                prod.sale_value
+                              )
                             }
                           />
                         </Td>
@@ -828,13 +850,10 @@ export default function CategoryList() {
                                 }
                               )}
                         </Td>
-                        <Td w="10%" textAlign="center">
-                          <StarRatings
-                            rating={!prod.rating ? 0 : parseFloat(prod.rating)}
-                            starDimension="15px"
-                            starSpacing="2px"
-                            starRatedColor={config.primary}
-                          />
+                        <Td w="10%" isNumeric>
+                          {prod.promotional_rate !== null
+                            ? `${prod.promotional_rate}%`
+                            : "0.00%"}
                         </Td>
                         <Td w="10%">
                           <Menu>
@@ -1641,7 +1660,7 @@ export default function CategoryList() {
           onClose={() => setModalPromo(false)}
           isCentered
           scrollBehavior="inside"
-          size="sm"
+          size="lg"
           closeOnEsc={false}
           closeOnOverlayClick={false}
         >
@@ -1649,22 +1668,34 @@ export default function CategoryList() {
           <ModalContent>
             <ModalHeader>Valor Promocional</ModalHeader>
             <ModalBody>
-              <FormControl>
-                <NumberInput
-                  id="lenght"
-                  precision={2}
-                  step={0.01}
-                  focusBorderColor={config.inputs}
-                  value={promoValue}
-                  onChange={(e) => setPromoValue(e)}
-                >
-                  <NumberInputField />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-              </FormControl>
+              <Grid templateColumns="1fr 1fr" gap="20px">
+                <FormControl>
+                  <FormLabel>Desconto (%)</FormLabel>
+                  <NumberInput
+                    id="lenght"
+                    precision={2}
+                    step={0.01}
+                    focusBorderColor={config.inputs}
+                    value={promoRate}
+                    onChange={(e) => setPromoRate(e)}
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel>Valor R$</FormLabel>
+                  <Input
+                    value={promoValue}
+                    isReadOnly
+                    focusBorderColor={config.inputs}
+                  />
+                </FormControl>
+              </Grid>
             </ModalBody>
             <ModalFooter>
               <Button
@@ -1711,7 +1742,7 @@ export default function CategoryList() {
             <ModalHeader>Estoque / Tamanhos</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Box borderWidth="1px" rounded="md" p={3}>
+              <Box>
                 {sizes.length === 0 ? (
                   <Flex justify="center" align="center" direction="column">
                     <Lottie
@@ -1787,6 +1818,7 @@ export default function CategoryList() {
                     placeholder="Tamanho"
                     value={size}
                     onChange={(e) => setSize(e.target.value.toUpperCase())}
+                    focusBorderColor={config.inputs}
                   />
                 </FormControl>
                 <FormControl>

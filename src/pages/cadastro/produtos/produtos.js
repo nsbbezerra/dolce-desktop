@@ -532,35 +532,33 @@ export default function Produtos() {
                 }
               >
                 <FormLabel>Fornecedor</FormLabel>
-                <Input
-                  id="provider"
-                  placeholder="Fornecedor"
-                  focusBorderColor={config.inputs}
-                  isReadOnly
-                  value={providerName}
-                />
+                <Grid templateColumns="2fr 1fr" gap="15px">
+                  <Input
+                    id="provider"
+                    placeholder="Fornecedor"
+                    focusBorderColor={config.inputs}
+                    isReadOnly
+                    value={providerName}
+                  />
+                  <Button
+                    isFullWidth
+                    leftIcon={<FaSearch />}
+                    onClick={() => setModalProvider(true)}
+                    colorScheme={config.buttons}
+                    variant="outline"
+                  >
+                    Buscar{" "}
+                    <Kbd ml={3} color="ButtonText">
+                      F5
+                    </Kbd>
+                  </Button>
+                </Grid>
+
                 <FormErrorMessage>
                   {validators.find((obj) => obj.path === "provider")
                     ? validators.find((obj) => obj.path === "provider").message
                     : ""}
                 </FormErrorMessage>
-              </FormControl>
-              <FormControl>
-                <FormLabel color="transparent" userSelect="none">
-                  o
-                </FormLabel>
-                <Button
-                  isFullWidth
-                  leftIcon={<FaSearch />}
-                  onClick={() => setModalProvider(true)}
-                  colorScheme={config.buttons}
-                  variant="outline"
-                >
-                  Buscar{" "}
-                  <Kbd ml={3} color="ButtonText">
-                    F5
-                  </Kbd>
-                </Button>
               </FormControl>
             </HStack>
             <HStack spacing="5px">
@@ -574,36 +572,34 @@ export default function Produtos() {
                 }
               >
                 <FormLabel>Departamento</FormLabel>
-                <Input
-                  id="department"
-                  placeholder="Departamento"
-                  focusBorderColor={config.inputs}
-                  isReadOnly
-                  value={departmentName}
-                />
+                <Grid templateColumns="2fr 1fr" gap="15px">
+                  <Input
+                    id="department"
+                    placeholder="Departamento"
+                    focusBorderColor={config.inputs}
+                    isReadOnly
+                    value={departmentName}
+                  />
+                  <Button
+                    isFullWidth
+                    leftIcon={<FaSearch />}
+                    onClick={() => setModalDepartments(true)}
+                    colorScheme={config.buttons}
+                    variant="outline"
+                  >
+                    Buscar{" "}
+                    <Kbd ml={3} color="ButtonText">
+                      F2
+                    </Kbd>
+                  </Button>
+                </Grid>
+
                 <FormErrorMessage>
                   {validators.find((obj) => obj.path === "department")
                     ? validators.find((obj) => obj.path === "department")
                         .message
                     : ""}
                 </FormErrorMessage>
-              </FormControl>
-              <FormControl>
-                <FormLabel color="transparent" userSelect="none">
-                  o
-                </FormLabel>
-                <Button
-                  isFullWidth
-                  leftIcon={<FaSearch />}
-                  onClick={() => setModalDepartments(true)}
-                  colorScheme={config.buttons}
-                  variant="outline"
-                >
-                  Buscar{" "}
-                  <Kbd ml={3} color="ButtonText">
-                    F2
-                  </Kbd>
-                </Button>
               </FormControl>
             </HStack>
             <HStack spacing="5px">
@@ -617,35 +613,33 @@ export default function Produtos() {
                 }
               >
                 <FormLabel>Categoria</FormLabel>
-                <Input
-                  id="category"
-                  placeholder="Departamento"
-                  focusBorderColor={config.inputs}
-                  isReadOnly
-                  value={categoryName}
-                />
+                <Grid templateColumns="2fr 1fr" gap="15px">
+                  <Input
+                    id="category"
+                    placeholder="Departamento"
+                    focusBorderColor={config.inputs}
+                    isReadOnly
+                    value={categoryName}
+                  />
+                  <Button
+                    isFullWidth
+                    leftIcon={<FaSearch />}
+                    onClick={() => setModalCategories(true)}
+                    colorScheme={config.buttons}
+                    variant="outline"
+                  >
+                    Buscar{" "}
+                    <Kbd ml={3} color="ButtonText">
+                      F3
+                    </Kbd>
+                  </Button>
+                </Grid>
+
                 <FormErrorMessage>
                   {validators.find((obj) => obj.path === "category")
                     ? validators.find((obj) => obj.path === "category").message
                     : ""}
                 </FormErrorMessage>
-              </FormControl>
-              <FormControl>
-                <FormLabel color="transparent" userSelect="none">
-                  o
-                </FormLabel>
-                <Button
-                  isFullWidth
-                  leftIcon={<FaSearch />}
-                  onClick={() => setModalCategories(true)}
-                  colorScheme={config.buttons}
-                  variant="outline"
-                >
-                  Buscar{" "}
-                  <Kbd ml={3} color="ButtonText">
-                    F3
-                  </Kbd>
-                </Button>
               </FormControl>
             </HStack>
           </Grid>

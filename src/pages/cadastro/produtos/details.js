@@ -153,6 +153,10 @@ export default function DetailsProduct() {
       handleValidator("description", "A descrição é obrigatória");
       return false;
     }
+    if (description.length > 255) {
+      handleValidator("description", "O número máximo de caracteres é: 255");
+      return false;
+    }
     setLoading(true);
     try {
       const response = await api.post(
@@ -260,7 +264,9 @@ export default function DetailsProduct() {
           >
             <FormLabel>
               Descrição do Produto -{" "}
-              <strong>Separe por (.) os parágrafos</strong>
+              <strong>
+                Separe por (.) os parágrafos, Máx. 255 caracteres.
+              </strong>
             </FormLabel>
             <Textarea
               id="description"
@@ -269,6 +275,9 @@ export default function DetailsProduct() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+            <Text fontSize="sm" mb={5}>
+              Caracteres: {description.length}
+            </Text>
             <FormErrorMessage>
               {validators.find((obj) => obj.path === "description")
                 ? validators.find((obj) => obj.path === "description").message

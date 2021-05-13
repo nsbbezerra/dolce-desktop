@@ -355,8 +355,8 @@ export default function Categoria() {
                       <Text>Nenhum departamento para mostrar</Text>
                     </Flex>
                   ) : (
-                    <Box p={2} borderWidth="1px" rounded="md" mt={3}>
-                      <Table size="sm" variant="striped">
+                    <Box mt={3}>
+                      <Table size="sm">
                         <Thead fontWeight="700">
                           <Tr>
                             <Td>Nome</Td>

@@ -82,6 +82,7 @@ export default function ImagesSave() {
   const [images, setImages] = useState([]);
   const [skel, setSkel] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [baseUrl, setBaseUrl] = useState("");
 
   function capitalizeFirstLetter(string) {
     let splited = string.split(" ");
@@ -185,6 +186,15 @@ export default function ImagesSave() {
     }
   }
 
+  async function findBaseUrl() {
+    const base = await localStorage.getItem("baseUrl");
+    setBaseUrl(base);
+  }
+
+  useEffect(() => {
+    findBaseUrl();
+  }, []);
+
   useEffect(() => {
     setProducts(data);
   }, [data]);
@@ -219,6 +229,7 @@ export default function ImagesSave() {
     setColorHex(result.hex);
     try {
       const response = await api.get(`/findImages/${result.products_id}`);
+
       setImages(response.data);
     } catch (error) {
       if (error.message === "Network Error") {
@@ -402,36 +413,34 @@ export default function ImagesSave() {
                 }
               >
                 <FormLabel>Produto</FormLabel>
-                <Input
-                  id="product"
-                  focusBorderColor={config.inputs}
-                  placeholder="Buscar Produtos"
-                  w="350px"
-                  value={nameProduct}
-                  isReadOnly
-                />
+                <Grid templateColumns="2fr 1fr" gap="15px">
+                  <Input
+                    id="product"
+                    focusBorderColor={config.inputs}
+                    placeholder="Buscar Produtos"
+                    w="100%"
+                    value={nameProduct}
+                    isReadOnly
+                  />
+                  <Button
+                    isFullWidth
+                    leftIcon={<FaSearch />}
+                    onClick={() => setModalProducts(true)}
+                    colorScheme={config.buttons}
+                    variant="outline"
+                  >
+                    Buscar Produto
+                    <Kbd color="ButtonText" ml={3}>
+                      F2
+                    </Kbd>
+                  </Button>
+                </Grid>
+
                 <FormErrorMessage>
                   {validators.find((obj) => obj.path === "product")
                     ? validators.find((obj) => obj.path === "product").message
                     : ""}
                 </FormErrorMessage>
-              </FormControl>
-              <FormControl>
-                <FormLabel color="transparent" userSelect="none">
-                  D
-                </FormLabel>
-                <Button
-                  isFullWidth
-                  leftIcon={<FaSearch />}
-                  onClick={() => setModalProducts(true)}
-                  colorScheme={config.buttons}
-                  variant="outline"
-                >
-                  Buscar Produto
-                  <Kbd color="ButtonText" ml={3}>
-                    F2
-                  </Kbd>
-                </Button>
               </FormControl>
             </HStack>
             <Grid templateColumns="1fr 120px 200px" gap="15px">
@@ -442,6 +451,7 @@ export default function ImagesSave() {
                 }
               >
                 <FormLabel>Nome da Cor</FormLabel>
+
                 <Input
                   id="color"
                   focusBorderColor={config.inputs}
@@ -567,13 +577,8 @@ export default function ImagesSave() {
                           borderWidth="1px"
                           key={img.id}
                         >
-                          <Box w="100%" h="40px" bg={`#${img.hex}`} />
-                          <Center>
-                            <Text>{img.name}</Text>
-                          </Center>
-                          <Divider mt={1} mb={2} />
                           <Image
-                            src={img.image}
+                            src={`${baseUrl}/imagem/${img.image}`}
                             w="200px"
                             h="200px"
                             rounded="md"
@@ -585,6 +590,7 @@ export default function ImagesSave() {
                                 isFullWidth
                                 colorScheme="red"
                                 mt={3}
+                                size="sm"
                               >
                                 Excluir Imagem
                               </Button>

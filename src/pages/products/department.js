@@ -153,13 +153,6 @@ export default function DepartmentList() {
     setModalInfo(true);
   }
 
-  async function handleThumbnail(id) {
-    const result = await departments.find((obj) => obj.id === id);
-    setUrl(result.thumbnail);
-    setIdDepartment(result.id);
-    setModalImage(true);
-  }
-
   async function handleUpdateInfo() {
     if (name === "") {
       return false;
