@@ -135,37 +135,33 @@ export default function Pdv() {
           return true;
         }}
       >
-        <HeaderApp title="Ponto de Venda" icon={FaShoppingBag} />
-
-        <Grid
-          templateRows="62px 57vh 68px"
-          gap="15px"
-          mt="25px"
-          h="76.65vh"
-          maxH="76.65vh"
-        >
-          <Flex
-            h="62px"
-            p={2}
-            shadow="md"
-            borderWidth="1px"
-            rounded="md"
-            align="center"
-            justify="flex-end"
-          >
-            <InputGroup mr={3}>
-              <InputLeftAddon>Vendedor</InputLeftAddon>
-              <Input focusBorderColor={config.inputs} />
-              <InputRightElement pointerEvents="none" children={<FaUser />} />
-            </InputGroup>
-            <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date)}
-              customInput={<CustomInputPicker />}
-              locale="pt_br"
-              dateFormat="dd/MM/yyyy"
-            />
-          </Flex>
+        <Grid templateRows="120px 1fr 68px" gap="15px" h="100%" maxH="100%">
+          <Box>
+            <HeaderApp title="Ponto de Venda" icon={FaShoppingBag} />
+            <Flex
+              mt="25px"
+              h="62px"
+              p={2}
+              shadow="md"
+              borderWidth="1px"
+              rounded="md"
+              align="center"
+              justify="flex-end"
+            >
+              <InputGroup mr={3}>
+                <InputLeftAddon>Vendedor</InputLeftAddon>
+                <Input focusBorderColor={config.inputs} />
+                <InputRightElement pointerEvents="none" children={<FaUser />} />
+              </InputGroup>
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                customInput={<CustomInputPicker />}
+                locale="pt_br"
+                dateFormat="dd/MM/yyyy"
+              />
+            </Flex>
+          </Box>
           <Grid templateColumns="repeat(2, 1fr)" gap="15px" h="100%">
             <Box
               borderWidth="1px"

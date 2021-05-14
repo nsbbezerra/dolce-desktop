@@ -6,6 +6,7 @@ import { AiFillBank } from "react-icons/ai";
 
 import Save from "./save";
 import List from "./list";
+import Pix from "./pix";
 
 export default function BankAccountIndex() {
   return (
@@ -17,6 +18,7 @@ export default function BankAccountIndex() {
           <TabList>
             <Tab>Cadastro</Tab>
             <Tab>Listagem</Tab>
+            <Tab>PIX</Tab>
           </TabList>
 
           <TabPanels>
@@ -25,6 +27,9 @@ export default function BankAccountIndex() {
             </TabPanel>
             <TabPanel>
               <List />
+            </TabPanel>
+            <TabPanel>
+              <Pix />
             </TabPanel>
           </TabPanels>
         </Tabs>

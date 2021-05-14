@@ -72,6 +72,7 @@ import { mutate as mutateGlobal } from "swr";
 import Lottie from "../../../components/lottie";
 import emptyAnimation from "../../../animations/empty.json";
 import searchAnimation from "../../../animations/search.json";
+import sendAnimation from "../../../animations/send.json";
 
 registerLocale("pt_br", pt_br);
 
@@ -91,6 +92,7 @@ export default function ListBankAccount() {
   const [modalImage, setModalImage] = useState(false);
   const [loadingInfo, setLoadingInfo] = useState(false);
   const [loadingImage, setLoadingImage] = useState(false);
+  const [loadingBlock, setLoadingBlock] = useState(false);
 
   const [bank, setBank] = useState("");
   const [mode, setMode] = useState("");
@@ -101,6 +103,17 @@ export default function ListBankAccount() {
   const [amount, setAmount] = useState("0");
   const [idBank, setIdBank] = useState(null);
   const [url, setUrl] = useState("");
+
+  const [baseUrl, setBaseUrl] = useState("");
+
+  async function findBaseUrl() {
+    const base = await localStorage.getItem("baseUrl");
+    setBaseUrl(base);
+  }
+
+  useEffect(() => {
+    findBaseUrl();
+  }, []);
 
   useEffect(() => {
     setBanks(data);
@@ -271,8 +284,7 @@ export default function ListBankAccount() {
         if (bnk.id === idBank) {
           return {
             ...bnk,
-            blobName: response.data.blobName,
-            thumbnail: response.data.url,
+            thumbnail: response.data[0].thumbnail,
           };
         }
         return bnk;
@@ -280,13 +292,62 @@ export default function ListBankAccount() {
       mutate(updatedBanks, false);
       mutateGlobal(`/imagebankaccount/${idBank}`, {
         id: idBank,
-        blobName: response.data.blobName,
-        thumbnail: response.data.url,
+        thumbnail: response.data[0].thumbnail,
       });
+      setThumbnail(null);
+      removeThumbnail();
       setLoadingImage(false);
       setModalImage(false);
+      showToast("Imagem alterada com sucesso", "success", "Sucesso");
     } catch (error) {
       setLoadingImage(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function activeAccount(id, value) {
+    setLoadingBlock(true);
+
+    try {
+      const response = await api.put(
+        `/activebankaccount/${id}`,
+        {
+          active: value,
+        },
+        {
+          headers: { "x-access-token": employee.token },
+        }
+      );
+      const updatedBanks = await data.map((bnk) => {
+        if (bnk.id === id) {
+          return { ...bnk, active: response.data.bank[0].active };
+        }
+        return bnk;
+      });
+      mutate(updatedBanks, false);
+      mutateGlobal(`/activebankaccount/${id}`, {
+        id: id,
+        active: response.data.bank[0].active,
+      });
+      setLoadingBlock(false);
+      showToast(response.data.message, "success", "Sucesso");
+    } catch (error) {
+      setLoadingBlock(false);
       if (error.message === "Network Error") {
         alert(
           "Sem conexão com o servidor, verifique sua conexão com a internet."
@@ -343,7 +404,11 @@ export default function ListBankAccount() {
                   <Tr key={bnk.id}>
                     <Td w="5%" textAlign="center">
                       <Box w="25px" h="25px" rounded="lg" overflow="hidden">
-                        <Image src={bnk.thumbnail} w="25px" h="25px" />
+                        <Image
+                          src={`${baseUrl}/imagem/${bnk.thumbnail}`}
+                          w="25px"
+                          h="25px"
+                        />
                       </Box>
                     </Td>
                     <Td w="5%" textAlign="center">
@@ -352,6 +417,9 @@ export default function ListBankAccount() {
                         colorScheme={config.switchs}
                         size="sm"
                         defaultIsChecked={bnk.active}
+                        onChange={(e) =>
+                          activeAccount(bnk.id, e.target.checked)
+                        }
                       />
                     </Td>
                     <Td>{bnk.bank}</Td>
@@ -542,7 +610,12 @@ export default function ListBankAccount() {
             <Grid templateColumns="1fr 1fr" gap="20px" justifyItems="center">
               <Box w="250px" h="270px">
                 <Text>Imagem atual:</Text>
-                <Image src={url} w="250px" h="250px" rounded="md" />
+                <Image
+                  src={`${baseUrl}/imagem/${url}`}
+                  w="250px"
+                  h="250px"
+                  rounded="md"
+                />
               </Box>
               <Box>
                 <Text>Nova imagem:</Text>
@@ -592,6 +665,27 @@ export default function ListBankAccount() {
               Salvar
             </Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={loadingBlock}
+        isCentered
+        scrollBehavior="inside"
+        size="xl"
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+      >
+        <ModalOverlay />
+        <ModalContent bg="transparent" shadow="none" overflow="hidden">
+          <ModalBody overflow="hidden">
+            <Flex justify="center" align="center" direction="column">
+              <Lottie animation={sendAnimation} height={400} width={400} />
+              <Text mt={"-60px"} fontSize="3xl">
+                Aguarde...
+              </Text>
+            </Flex>
+          </ModalBody>
         </ModalContent>
       </Modal>
 

@@ -50,6 +50,7 @@ export default function SaveRevenues() {
               leftIcon={<FaSearch />}
               colorScheme={config.buttons}
               w="110px"
+              variant="outline"
             >
               Buscar
             </Button>
