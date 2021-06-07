@@ -44,6 +44,7 @@ import emptyAnimation from "../../../animations/empty.json";
 import searchAnimation from "../../../animations/search.json";
 import * as dateFns from "date-fns";
 import { mutate as mutateGlobal } from "swr";
+import Hotkeys from "react-hot-keys";
 
 export default function ListCheck() {
   const toast = useToast();
@@ -231,257 +232,276 @@ export default function ListCheck() {
     }
   }
 
+  function onKeyDown(keyName, e, handle) {
+    if (keyName === "f3") {
+      let input = document.getElementById("search");
+      input.focus();
+    }
+  }
+
   return (
     <>
-      <Grid templateColumns="1fr" gap="15px">
-        <FormControl>
-          <FormLabel>
-            Digite para buscar <Kbd ml={3}>F3</Kbd>
-          </FormLabel>
-          <Input
-            type="text"
-            placeholder="Digite para buscar"
-            focusBorderColor={config.inputs}
-          />
-        </FormControl>
-      </Grid>
+      <Hotkeys
+        keyName="f3"
+        onKeyDown={onKeyDown}
+        allowRepeat
+        filter={(event) => {
+          return true;
+        }}
+      >
+        <Grid templateColumns="1fr" gap="15px">
+          <FormControl>
+            <FormLabel>
+              Digite para buscar <Kbd ml={3}>F3</Kbd>
+            </FormLabel>
+            <Input
+              type="text"
+              id="search"
+              placeholder="Digite para buscar"
+              focusBorderColor={config.inputs}
+            />
+          </FormControl>
+        </Grid>
 
-      {!checks ? (
-        <Flex justify="center" align="center" direction="column">
-          <Lottie animation={searchAnimation} height={200} width={200} />
-          <Text>Buscando Informações</Text>
-        </Flex>
-      ) : (
-        <>
-          {checks.length === 0 ? (
-            <Flex justify="center" align="center" direction="column">
-              <Lottie animation={emptyAnimation} height={200} width={200} />
-              <Text>Nenhum cheque para mostrar</Text>
-            </Flex>
-          ) : (
-            <Table size="sm" mt="25px">
-              <Thead fontWeight="700">
-                <Tr>
-                  <Td isTruncated>Cliente</Td>
-                  <Td isTruncated>Número</Td>
-                  <Td>Situação</Td>
-                  <Td>Status</Td>
-                  <Td>Emissão</Td>
-                  <Td>Vencimento</Td>
-                  <Td isNumeric w="15%">
-                    Valor
-                  </Td>
-                  <Td w="3%" textAlign="center"></Td>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {checks.map((chq) => (
-                  <Tr key={chq.id}>
-                    <Td isTruncated>{chq.name_client}</Td>
-                    <Td isTruncated>{chq.number}</Td>
-                    <Td>
-                      <Tooltip label="Clique para alterar" hasArrow>
-                        {(chq.situation === "okay" && (
-                          <Button
-                            isTruncated
-                            noOfLines={1}
-                            variant="link"
-                            colorScheme="green"
-                            size="sm"
-                            onClick={() => handleCheck(chq.id, "situation")}
-                          >
-                            Aprovado
-                          </Button>
-                        )) ||
-                          (chq.situation === "waiting" && (
+        {!checks ? (
+          <Flex justify="center" align="center" direction="column">
+            <Lottie animation={searchAnimation} height={200} width={200} />
+            <Text>Buscando Informações</Text>
+          </Flex>
+        ) : (
+          <>
+            {checks.length === 0 ? (
+              <Flex justify="center" align="center" direction="column">
+                <Lottie animation={emptyAnimation} height={200} width={200} />
+                <Text>Nenhum cheque para mostrar</Text>
+              </Flex>
+            ) : (
+              <Table size="sm" mt="25px">
+                <Thead fontWeight="700">
+                  <Tr>
+                    <Td isTruncated>Cliente</Td>
+                    <Td isTruncated>Número</Td>
+                    <Td>Situação</Td>
+                    <Td>Status</Td>
+                    <Td>Emissão</Td>
+                    <Td>Vencimento</Td>
+                    <Td isNumeric w="15%">
+                      Valor
+                    </Td>
+                    <Td w="3%" textAlign="center"></Td>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {checks.map((chq) => (
+                    <Tr key={chq.id}>
+                      <Td isTruncated>{chq.name_client}</Td>
+                      <Td isTruncated>{chq.number}</Td>
+                      <Td>
+                        <Tooltip label="Clique para alterar" hasArrow>
+                          {(chq.situation === "okay" && (
                             <Button
                               isTruncated
                               noOfLines={1}
                               variant="link"
-                              colorScheme="yellow"
+                              colorScheme="green"
                               size="sm"
                               onClick={() => handleCheck(chq.id, "situation")}
                             >
-                              Aguardando
+                              Aprovado
                             </Button>
                           )) ||
-                          (chq.situation === "refused" && (
+                            (chq.situation === "waiting" && (
+                              <Button
+                                isTruncated
+                                noOfLines={1}
+                                variant="link"
+                                colorScheme="yellow"
+                                size="sm"
+                                onClick={() => handleCheck(chq.id, "situation")}
+                              >
+                                Aguardando
+                              </Button>
+                            )) ||
+                            (chq.situation === "refused" && (
+                              <Button
+                                isTruncated
+                                noOfLines={1}
+                                variant="link"
+                                colorScheme="red"
+                                size="sm"
+                                onClick={() => handleCheck(chq.id, "situation")}
+                              >
+                                Recusado
+                              </Button>
+                            ))}
+                        </Tooltip>
+                      </Td>
+                      <Td>
+                        <Tooltip label="Clique para alterar" hasArrow>
+                          {chq.status === "in_cash" ? (
                             <Button
                               isTruncated
                               noOfLines={1}
                               variant="link"
-                              colorScheme="red"
+                              colorScheme={config.buttons}
                               size="sm"
-                              onClick={() => handleCheck(chq.id, "situation")}
+                              onClick={() => handleCheck(chq.id, "status")}
                             >
-                              Recusado
+                              À Vista
                             </Button>
-                          ))}
-                      </Tooltip>
-                    </Td>
-                    <Td>
-                      <Tooltip label="Clique para alterar" hasArrow>
-                        {chq.status === "in_cash" ? (
-                          <Button
-                            isTruncated
-                            noOfLines={1}
-                            variant="link"
-                            colorScheme={config.buttons}
-                            size="sm"
-                            onClick={() => handleCheck(chq.id, "status")}
-                          >
-                            À Vista
-                          </Button>
-                        ) : (
-                          <Button
-                            isTruncated
-                            noOfLines={1}
-                            variant="link"
-                            colorScheme={config.buttons}
-                            size="sm"
-                            onClick={() => handleCheck(chq.id, "status")}
-                          >
-                            À Prazo
-                          </Button>
-                        )}
-                      </Tooltip>
-                    </Td>
-                    <Td>
-                      {dateFns.format(new Date(chq.emission), "dd/MM/yyyy")}
-                    </Td>
-                    <Td>
-                      {dateFns.format(new Date(chq.due_date), "dd/MM/yyyy")}
-                    </Td>
-                    <Td isNumeric w="15%">
-                      {parseFloat(chq.value).toLocaleString("pt-br", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
-                    </Td>
-                    <Td w="3%" textAlign="center">
-                      <Popover placement="bottom-end">
-                        <PopoverTrigger>
-                          <IconButton
-                            icon={<FaTrash />}
-                            rounded="full"
-                            size="xs"
-                            colorScheme="red"
-                          />
-                        </PopoverTrigger>
-                        <PopoverContent>
-                          <PopoverArrow />
-                          <PopoverCloseButton />
-                          <PopoverHeader>Confirmação!</PopoverHeader>
-                          <PopoverBody>Deseja excluir este cheque?</PopoverBody>
-                          <PopoverFooter d="flex" justifyContent="flex-end">
-                            <ButtonGroup size="sm">
-                              <Button
-                                variant="outline"
-                                colorScheme={config.buttons}
-                              >
-                                Não
-                              </Button>
-                              <Button
-                                colorScheme="red"
-                                colorScheme={config.buttons}
-                                isLoading={loadingDel}
-                                onClick={() => removeCheck(chq.id)}
-                              >
-                                Sim
-                              </Button>
-                            </ButtonGroup>
-                          </PopoverFooter>
-                        </PopoverContent>
-                      </Popover>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          )}
-        </>
-      )}
+                          ) : (
+                            <Button
+                              isTruncated
+                              noOfLines={1}
+                              variant="link"
+                              colorScheme={config.buttons}
+                              size="sm"
+                              onClick={() => handleCheck(chq.id, "status")}
+                            >
+                              À Prazo
+                            </Button>
+                          )}
+                        </Tooltip>
+                      </Td>
+                      <Td>
+                        {dateFns.format(new Date(chq.emission), "dd/MM/yyyy")}
+                      </Td>
+                      <Td>
+                        {dateFns.format(new Date(chq.due_date), "dd/MM/yyyy")}
+                      </Td>
+                      <Td isNumeric w="15%">
+                        {parseFloat(chq.value).toLocaleString("pt-br", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </Td>
+                      <Td w="3%" textAlign="center">
+                        <Popover placement="bottom-end">
+                          <PopoverTrigger>
+                            <IconButton
+                              icon={<FaTrash />}
+                              rounded="full"
+                              size="xs"
+                              colorScheme="red"
+                            />
+                          </PopoverTrigger>
+                          <PopoverContent>
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <PopoverHeader>Confirmação!</PopoverHeader>
+                            <PopoverBody>
+                              Deseja excluir este cheque?
+                            </PopoverBody>
+                            <PopoverFooter d="flex" justifyContent="flex-end">
+                              <ButtonGroup size="sm">
+                                <Button
+                                  variant="outline"
+                                  colorScheme={config.buttons}
+                                >
+                                  Não
+                                </Button>
+                                <Button
+                                  colorScheme="red"
+                                  colorScheme={config.buttons}
+                                  isLoading={loadingDel}
+                                  onClick={() => removeCheck(chq.id)}
+                                >
+                                  Sim
+                                </Button>
+                              </ButtonGroup>
+                            </PopoverFooter>
+                          </PopoverContent>
+                        </Popover>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            )}
+          </>
+        )}
 
-      <Modal
-        isOpen={modalSituation}
-        onClose={() => setModalSituation(false)}
-        size="sm"
-        isCentered
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Alterar Situação do Cheque</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Situação</FormLabel>
-              <Select
-                id="situation"
-                placeholder="Selecione"
-                variant="outline"
-                focusBorderColor={config.inputs}
-                value={situation}
-                onChange={(e) => setSituation(e.target.value)}
+        <Modal
+          isOpen={modalSituation}
+          onClose={() => setModalSituation(false)}
+          size="sm"
+          isCentered
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Alterar Situação do Cheque</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel>Situação</FormLabel>
+                <Select
+                  id="situation"
+                  placeholder="Selecione"
+                  variant="outline"
+                  focusBorderColor={config.inputs}
+                  value={situation}
+                  onChange={(e) => setSituation(e.target.value)}
+                >
+                  <option value="waiting">Aguardando</option>
+                  <option value="okay">Aprovado</option>
+                  <option value="refused">Recusado</option>
+                </Select>
+              </FormControl>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                colorScheme={config.buttons}
+                leftIcon={<FaSave />}
+                isLoading={loadingSituation}
+                onClick={() => updateSituation()}
               >
-                <option value="waiting">Aguardando</option>
-                <option value="okay">Aprovado</option>
-                <option value="refused">Recusado</option>
-              </Select>
-            </FormControl>
-          </ModalBody>
+                Salvar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
 
-          <ModalFooter>
-            <Button
-              colorScheme={config.buttons}
-              leftIcon={<FaSave />}
-              isLoading={loadingSituation}
-              onClick={() => updateSituation()}
-            >
-              Salvar
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+        <Modal
+          isOpen={modalType}
+          onClose={() => setModalType(false)}
+          size="sm"
+          isCentered
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Alterar Status do Cheque</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel>Tipo de Cheque</FormLabel>
+                <Select
+                  id="status"
+                  placeholder="Selecione"
+                  variant="outline"
+                  focusBorderColor={config.inputs}
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
+                  <option value="in_cash">À Vista</option>
+                  <option value="parceled_out">À Prazo</option>
+                </Select>
+              </FormControl>
+            </ModalBody>
 
-      <Modal
-        isOpen={modalType}
-        onClose={() => setModalType(false)}
-        size="sm"
-        isCentered
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Alterar Status do Cheque</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Tipo de Cheque</FormLabel>
-              <Select
-                id="status"
-                placeholder="Selecione"
-                variant="outline"
-                focusBorderColor={config.inputs}
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
+            <ModalFooter>
+              <Button
+                colorScheme={config.buttons}
+                leftIcon={<FaSave />}
+                isLoading={loadingStatus}
+                onClick={() => updateStatus()}
               >
-                <option value="in_cash">À Vista</option>
-                <option value="parceled_out">À Prazo</option>
-              </Select>
-            </FormControl>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button
-              colorScheme={config.buttons}
-              leftIcon={<FaSave />}
-              isLoading={loadingStatus}
-              onClick={() => updateStatus()}
-            >
-              Salvar
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+                Salvar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Hotkeys>
     </>
   );
 }

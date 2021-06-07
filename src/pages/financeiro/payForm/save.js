@@ -318,7 +318,7 @@ export default function PayFormSave() {
               size="lg"
               mt={1}
               mb={-1}
-              value={show_on_site}
+              isChecked={show_on_site}
               onChange={(e) => setShow_on_site(e.target.checked)}
             />
           </FormControl>

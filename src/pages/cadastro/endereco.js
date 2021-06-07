@@ -544,7 +544,7 @@ export default function Endereco() {
                       <Text>Nenhum cliente para mostrar</Text>
                     </Flex>
                   ) : (
-                    <Table size="sm" variant="striped">
+                    <Table size="sm">
                       <Thead fontWeight="700">
                         <Tr>
                           <Td>Nome</Td>

@@ -228,12 +228,12 @@ export default function ListPlanAccount() {
     }
 
     if (numberSearch === "2") {
-      const restul = await data.find((obj) => obj.active === true);
+      const restul = await data.filter((obj) => obj.active === true);
       setPlans(restul);
     }
 
     if (numberSearch === "3") {
-      const restul = await data.find((obj) => obj.active === false);
+      const restul = await data.filter((obj) => obj.active === false);
       setPlans(restul);
     }
   }
