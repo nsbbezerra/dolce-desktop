@@ -285,14 +285,7 @@ export default function HeaderApp() {
         pl={3}
         borderBottomWidth="1px"
       >
-        <Flex h="60px" w="230px" justify="center" align="center">
-          <Icon
-            as={AiOutlineDrag}
-            fontSize="30px"
-            ml={3}
-            mr={3}
-            className="draggable"
-          />
+        <Flex h="60px" w="220px" justify="center" align="center">
           <Image src={Icone} w="45px" h="45px" mr="10px" />
           <Image src={Logo} w="140px" />
         </Flex>
@@ -356,6 +349,17 @@ export default function HeaderApp() {
         </Flex>
 
         <Flex h="60px" justify="center" align="center" ml={3}>
+          <Tooltip label="Clique para arrastar" hasArrow>
+            <IconButton
+              aria-label="Search database"
+              icon={<AiOutlineDrag />}
+              rounded="xl"
+              ml={3}
+              size="xs"
+              variant="ghost"
+              className="draggable"
+            />
+          </Tooltip>
           <Tooltip label="Minimizar" hasArrow>
             <IconButton
               aria-label="Search database"
