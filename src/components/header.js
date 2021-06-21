@@ -43,6 +43,7 @@ import {
 
 import {
   AiOutlineCheck,
+  AiOutlineDrag,
   AiOutlineLogout,
   AiOutlineReload,
   AiOutlineStop,
@@ -88,10 +89,8 @@ export default function HeaderApp() {
 
     const { width: currentWidth, height: currentHeight } = window.getBounds();
 
-    const {
-      width: maxWidth,
-      height: maxHeight,
-    } = remote.screen.getPrimaryDisplay().workAreaSize;
+    const { width: maxWidth, height: maxHeight } =
+      remote.screen.getPrimaryDisplay().workAreaSize;
 
     const isMaximized =
       currentWidth === maxWidth && currentHeight === maxHeight;
@@ -286,7 +285,14 @@ export default function HeaderApp() {
         pl={3}
         borderBottomWidth="1px"
       >
-        <Flex h="60px" w="220px" justify="center" align="center">
+        <Flex h="60px" w="230px" justify="center" align="center">
+          <Icon
+            as={AiOutlineDrag}
+            fontSize="30px"
+            ml={3}
+            mr={3}
+            className="draggable"
+          />
           <Image src={Icone} w="45px" h="45px" mr="10px" />
           <Image src={Logo} w="140px" />
         </Flex>
