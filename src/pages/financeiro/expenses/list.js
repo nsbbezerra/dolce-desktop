@@ -31,9 +31,18 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import InputMask from "react-input-mask";
 
 export default function ListExpenses() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const [find, setFind] = useState("1");
+
   const [modalEdit, setModalEdit] = useState(false);
   const [modalMoviment, setModalMoviment] = useState(false);
   const [modalPayment, setModalPayment] = useState(false);
+
+  const [month, setMonth] = useState("");
+  const [yearFind, setYearFind] = useState(year);
+  const [initMonth, setInitMonth] = useState("");
+  const [finalMonth, setFinalMonth] = useState("");
 
   return (
     <>
@@ -41,18 +50,110 @@ export default function ListExpenses() {
         <Select
           placeholder="Selecione uma opção de busca"
           focusBorderColor={config.inputs}
+          value={find}
+          onChange={(e) => setFind(e.target.value)}
         >
-          <option value="option1">Todas as contas</option>
-          <option value="option2">Buscar pelo nome</option>
-          <option value="option3">Buscar ativas</option>
-          <option value="option4">Buscar bloqueadas</option>
+          <option value={"1"}>Mês Atual</option>
+          <option value={"2"}>Por Período</option>
+          <option value={"3"}>Por Intervalo</option>
         </Select>
 
-        <Input
-          type="text"
-          placeholder="Digite para buscar"
-          focusBorderColor={config.inputs}
-        />
+        {find === "1" && (
+          <Input
+            type="text"
+            placeholder="Digite para buscar"
+            focusBorderColor={config.inputs}
+            isReadOnly
+            isDisabled
+          />
+        )}
+
+        {find === "2" && (
+          <Grid templateColumns="1fr 1fr" gap="15px">
+            <Select
+              placeholder="Selecione um Mês"
+              focusBorderColor={config.inputs}
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+            >
+              <option value="janeiro">Janeiro</option>
+              <option value="fevereiro">Fevereiro</option>
+              <option value="março">Março</option>
+              <option value="abril">Abril</option>
+              <option value="maio">Maio</option>
+              <option value="junho">Junho</option>
+              <option value="julho">Julho</option>
+              <option value="agosto">Agosto</option>
+              <option value="setembro">Setembro</option>
+              <option value="outubro">Outubro</option>
+              <option value="novembro">Novembro</option>
+              <option value="dezembro">Dezembro</option>
+            </Select>
+            <Select
+              placeholder="Selecione um Ano"
+              focusBorderColor={config.inputs}
+              value={yearFind}
+              onChange={(e) => setYearFind(e.target.value)}
+            >
+              <option value={year - 1}>{year - 1}</option>
+              <option value={year}>{year}</option>
+              <option value={year + 1}>{year + 1}</option>
+            </Select>
+          </Grid>
+        )}
+
+        {find === "3" && (
+          <Grid templateColumns="1fr 1fr 1fr" gap="15px">
+            <Select
+              placeholder="Mês Inicial"
+              focusBorderColor={config.inputs}
+              value={initMonth}
+              onChange={(e) => setInitMonth(e.target.value)}
+            >
+              <option value="janeiro">Janeiro</option>
+              <option value="fevereiro">Fevereiro</option>
+              <option value="março">Março</option>
+              <option value="abril">Abril</option>
+              <option value="maio">Maio</option>
+              <option value="junho">Junho</option>
+              <option value="julho">Julho</option>
+              <option value="agosto">Agosto</option>
+              <option value="setembro">Setembro</option>
+              <option value="outubro">Outubro</option>
+              <option value="novembro">Novembro</option>
+              <option value="dezembro">Dezembro</option>
+            </Select>
+            <Select
+              placeholder="Mês Final"
+              focusBorderColor={config.inputs}
+              value={finalMonth}
+              onChange={(e) => setFinalMonth(e.target.value)}
+            >
+              <option value="janeiro">Janeiro</option>
+              <option value="fevereiro">Fevereiro</option>
+              <option value="março">Março</option>
+              <option value="abril">Abril</option>
+              <option value="maio">Maio</option>
+              <option value="junho">Junho</option>
+              <option value="julho">Julho</option>
+              <option value="agosto">Agosto</option>
+              <option value="setembro">Setembro</option>
+              <option value="outubro">Outubro</option>
+              <option value="novembro">Novembro</option>
+              <option value="dezembro">Dezembro</option>
+            </Select>
+            <Select
+              placeholder="Selecione um Ano"
+              focusBorderColor={config.inputs}
+              value={yearFind}
+              onChange={(e) => setYearFind(e.target.value)}
+            >
+              <option value={year - 1}>{year - 1}</option>
+              <option value={year}>{year}</option>
+              <option value={year + 1}>{year + 1}</option>
+            </Select>
+          </Grid>
+        )}
 
         <Button
           leftIcon={<FaSearch />}
