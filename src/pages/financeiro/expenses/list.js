@@ -46,14 +46,15 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import InputMask from "react-input-mask";
 import pt_br from "date-fns/locale/pt-BR";
 import DatePicker, { registerLocale } from "react-datepicker";
 import Lottie from "../../../components/lottie";
 import emptyAnimation from "../../../animations/empty.json";
-import sendAnimation from "../../../animations/send.json";
 import api from "../../../configs/axios";
 import * as dateFns from "date-fns";
+import { useEmployee } from "../../../context/Employee";
+import { mutate as mutateGlobal } from "swr";
+import useFetch from "../../../hooks/useFetch";
 
 registerLocale("pt_br", pt_br);
 
@@ -61,7 +62,14 @@ export default function ListExpenses() {
   const date = new Date();
   const year = date.getFullYear();
   const toast = useToast();
+  const { employee } = useEmployee();
   const [find, setFind] = useState("1");
+  const [initialDate, setInitialDate] = useState("0");
+  const [finalDate, setFinalDate] = useState("0");
+
+  const { data, mutate, error } = useFetch(
+    `/expenses/${find}/${initialDate}/${finalDate}`
+  );
 
   const [loadingSearch, setLoadingSearch] = useState(false);
 
@@ -71,11 +79,10 @@ export default function ListExpenses() {
 
   const [month, setMonth] = useState("");
   const [yearFind, setYearFind] = useState(year);
-  const [initialDate, setInitialDate] = useState(new Date());
-  const [finalDate, setFinalDate] = useState(new Date());
   const [expenses, setExpenses] = useState([]);
   const [idExpense, setIdExpense] = useState(null);
   const [statusExpense, setStatusExpense] = useState("");
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
 
   const [identify, setIdentify] = useState("");
   const [due_date, setDue_date] = useState(new Date());
@@ -83,6 +90,9 @@ export default function ListExpenses() {
   const [description, setDescription] = useState("");
   const [pay_form, setPay_form] = useState("");
   const [plan_account, setPlan_account] = useState("");
+
+  const [payForms, setPayForms] = useState([]);
+  const [planAccounts, setPlanAccounts] = useState([]);
 
   function showToast(message, status, title) {
     toast({
@@ -94,15 +104,31 @@ export default function ListExpenses() {
     });
   }
 
-  async function findExpenses() {
-    setLoadingSearch(true);
+  if (error) {
+    if (error.message === "Network Error") {
+      alert(
+        "Sem conexão com o servidor, verifique sua conexão com a internet."
+      );
+    } else {
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function findDependents() {
     try {
-      const response = await api.get(`/expenses/${find}`);
-      console.log(response.data);
-      setLoadingSearch(false);
-      setExpenses(response.data);
+      const response = await api.get("/expensesDependets");
+      setPayForms(response.data.payForm);
+      setPlanAccounts(response.data.planAccounts);
     } catch (error) {
-      setLoadingSearch(false);
       if (error.message === "Network Error") {
         alert(
           "Sem conexão com o servidor, verifique sua conexão com a internet."
@@ -135,8 +161,14 @@ export default function ListExpenses() {
   );
 
   useEffect(() => {
-    findExpenses();
+    findDependents();
   }, []);
+
+  useEffect(() => {
+    if (data) {
+      setExpenses(data);
+    }
+  }, [data]);
 
   function handleUpdateStatus(type, id, info) {
     if (type === "status") {
@@ -152,12 +184,13 @@ export default function ListExpenses() {
 
   function handleEdit(id) {
     const result = expenses.find((obj) => obj.id === id);
+    setIdExpense(id);
     setIdentify(result.identify);
     setDue_date(new Date(result.due_date));
     setExp_value(result.value);
     setDescription(result.description);
-    setPay_form(result.pay_form_name);
-    setPlan_account(result.plan_accounts_name);
+    setPay_form(result.pay_form_id);
+    setPlan_account(result.plan_accounts_id);
     setModalEdit(true);
   }
 
@@ -170,14 +203,191 @@ export default function ListExpenses() {
     return joined;
   }
 
+  async function sendUpdateStatus() {
+    setLoadingUpdate(true);
+
+    try {
+      const response = await api.put(
+        `/expenseChangeStatus/${idExpense}`,
+        { status: statusExpense },
+        {
+          headers: { "x-access-token": employee.token },
+        }
+      );
+      const updated = await expenses.map((exp) => {
+        if (exp.id === idExpense) {
+          return { ...exp, status: response.data.expense[0].status };
+        }
+        return exp;
+      });
+      mutate(updated, false);
+      mutateGlobal(`/expenseChangeStatus/${idExpense}`, {
+        id: idExpense,
+        status: response.data.expense[0].status,
+      });
+      setLoadingUpdate(false);
+      setModalPayment(false);
+    } catch (error) {
+      setLoadingUpdate(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function sendUpdateMovimentation() {
+    setLoadingUpdate(true);
+
+    try {
+      const response = await api.put(
+        `/expenseChangeMovimentation/${idExpense}`,
+        { movimentation: statusExpense },
+        {
+          headers: { "x-access-token": employee.token },
+        }
+      );
+      const updated = await expenses.map((exp) => {
+        if (exp.id === idExpense) {
+          return {
+            ...exp,
+            movimentation: response.data.expense[0].movimentation,
+          };
+        }
+        return exp;
+      });
+      mutate(updated, false);
+      mutateGlobal(`/expenseChangeMovimentation/${idExpense}`, {
+        id: idExpense,
+        movimentation: response.data.expense[0].movimentation,
+      });
+      setLoadingUpdate(false);
+      setModalMoviment(false);
+    } catch (error) {
+      setLoadingUpdate(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function sendUpdateInfo() {
+    setLoadingUpdate(true);
+
+    try {
+      const response = await api.put(
+        `/expenses/${idExpense}`,
+        {
+          payForm_id: pay_form,
+          planAccounts_id: plan_account,
+          identify: identify,
+          due_date: due_date,
+          value: exp_value,
+          description: description,
+        },
+        { headers: { "x-access-token": employee.token } }
+      );
+      const updated = await expenses.map((exp) => {
+        if (exp.id === idExpense) {
+          return {
+            ...exp,
+            identify: response.data.expense[0].identify,
+            due_date: response.data.expense[0].due_date,
+            value: response.data.expense[0].value,
+            description: response.data.expense[0].description,
+            pay_form_id: response.data.expense[0].payForm_id,
+            plan_accounts_id: response.data.expense[0].planAccounts_id,
+          };
+        }
+        return exp;
+      });
+      mutate(updated, false);
+      mutateGlobal(`/expenses/${idExpense}`, {
+        id: idExpense,
+        identify: response.data.expense[0].identify,
+        due_date: response.data.expense[0].due_date,
+        value: response.data.expense[0].value,
+        description: response.data.expense[0].description,
+        pay_form_id: response.data.expense[0].payForm_id,
+        plan_accounts_id: response.data.expense[0].planAccounts_id,
+      });
+      setLoadingUpdate(false);
+      setModalEdit(false);
+    } catch (error) {
+      setLoadingUpdate(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  function handleFind(key) {
+    if (key === "1") {
+      setFind(key);
+      setInitialDate(new Date());
+      setFinalDate(new Date());
+    }
+    if (key === "2") {
+      setInitialDate(
+        new Date().toLocaleString("pt-BR", { month: "long" }).toString()
+      );
+      setFinalDate(new Date().getFullYear().toString());
+      setFind(key);
+    }
+    if (key === "3") {
+      setInitialDate(new Date());
+      setFinalDate(new Date());
+      setFind(key);
+    }
+  }
+
   return (
     <>
-      <Grid templateColumns="1fr 1fr 200px" gap="15px">
+      <Text mb={2}>Selecione uma opção de busca:</Text>
+      <Grid templateColumns="1fr 1fr" gap="15px">
         <Select
           placeholder="Selecione uma opção de busca"
           focusBorderColor={config.inputs}
           value={find}
-          onChange={(e) => setFind(e.target.value)}
+          onChange={(e) => handleFind(e.target.value)}
         >
           <option value={"1"}>Mês Atual</option>
           <option value={"2"}>Por Período</option>
@@ -199,8 +409,8 @@ export default function ListExpenses() {
             <Select
               placeholder="Selecione um Mês"
               focusBorderColor={config.inputs}
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
+              value={initialDate}
+              onChange={(e) => setInitialDate(e.target.value)}
             >
               <option value="janeiro">Janeiro</option>
               <option value="fevereiro">Fevereiro</option>
@@ -218,8 +428,8 @@ export default function ListExpenses() {
             <Select
               placeholder="Selecione um Ano"
               focusBorderColor={config.inputs}
-              value={yearFind}
-              onChange={(e) => setYearFind(e.target.value)}
+              value={finalDate}
+              onChange={(e) => setFinalDate(e.target.value.toString())}
             >
               <option value={year - 1}>{year - 1}</option>
               <option value={year}>{year}</option>
@@ -231,35 +441,29 @@ export default function ListExpenses() {
         {find === "3" && (
           <Flex justify="space-around" align="center">
             <Text mr={1}>De:</Text>
-            <DatePicker
-              selected={initialDate}
-              onChange={(date) => setInitialDate(date)}
-              customInput={<CustomInputPicker />}
-              locale="pt_br"
-              dateFormat="dd/MM/yyyy"
-            />
+            <div className="customDatePickerWidth">
+              <DatePicker
+                selected={initialDate}
+                onChange={(date) => setInitialDate(date)}
+                customInput={<CustomInputPicker />}
+                locale="pt_br"
+                dateFormat="dd/MM/yyyy"
+              />
+            </div>
             <Text ml={1} mr={1}>
               até
             </Text>
-            <DatePicker
-              selected={finalDate}
-              onChange={(date) => setFinalDate(date)}
-              customInput={<CustomInputPicker />}
-              locale="pt_br"
-              dateFormat="dd/MM/yyyy"
-            />
+            <div className="customDatePickerWidth">
+              <DatePicker
+                selected={finalDate}
+                onChange={(date) => setFinalDate(date)}
+                customInput={<CustomInputPicker />}
+                locale="pt_br"
+                dateFormat="dd/MM/yyyy"
+              />
+            </div>
           </Flex>
         )}
-
-        <Button
-          leftIcon={<FaSearch />}
-          colorScheme={config.buttons}
-          variant="outline"
-          isLoading={loadingSearch}
-          onClick={() => findExpenses()}
-        >
-          Buscar
-        </Button>
       </Grid>
 
       {expenses.length === 0 ? (
@@ -282,7 +486,7 @@ export default function ListExpenses() {
                 Status Pagamento
               </Td>
               <Td w="15%" textAlign="center">
-                Status Movimentação
+                Autorização
               </Td>
               <Td w="15%"></Td>
             </Tr>
@@ -290,7 +494,15 @@ export default function ListExpenses() {
 
           <Tbody>
             {expenses.map((exp) => (
-              <Tr key={exp.id}>
+              <Tr
+                key={exp.id}
+                bg={
+                  exp.status === "waiting" &&
+                  dateFns.isBefore(new Date(exp.due_date), new Date())
+                    ? "rgba(255, 215, 214, .2)"
+                    : ""
+                }
+              >
                 <Td>{exp.identify}</Td>
                 <Td w="10%" textAlign="center">
                   {dateFns.format(new Date(exp.due_date), "dd/MM/yyyy")}
@@ -312,7 +524,7 @@ export default function ListExpenses() {
                           (exp.status === "waiting" && "yellow.500")
                         }
                       >
-                        {(exp.status === "done" && "Concluído") ||
+                        {(exp.status === "done" && "Pago") ||
                           (exp.status === "cancel" && "Cancelado") ||
                           (exp.status === "waiting" && "Aguardando")}
                       </Text>
@@ -343,7 +555,7 @@ export default function ListExpenses() {
                           (exp.movimentation === "waiting" && "yellow.500")
                         }
                       >
-                        {(exp.movimentation === "done" && "Concluído") ||
+                        {(exp.movimentation === "done" && "Confirmado") ||
                           (exp.movimentation === "cancel" && "Cancelado") ||
                           (exp.movimentation === "waiting" && "Aguardando")}
                       </Text>
@@ -456,21 +668,33 @@ export default function ListExpenses() {
             <Grid mt={3} templateColumns="repeat(2, 1fr)" gap="15px">
               <FormControl>
                 <FormLabel>Forma de Pagamento</FormLabel>
-                <Input
-                  placeholder="Valor"
+                <Select
+                  placeholder="Selecione uma opção"
                   focusBorderColor={config.inputs}
-                  isReadOnly
                   value={pay_form}
-                />
+                  onChange={(e) => setPay_form(e.target.value)}
+                >
+                  {payForms.map((pay) => (
+                    <option value={pay.id} key={pay.id}>
+                      {pay.name}
+                    </option>
+                  ))}
+                </Select>
               </FormControl>
               <FormControl>
                 <FormLabel>Plano de Contas</FormLabel>
-                <Input
-                  placeholder="Valor"
+                <Select
+                  placeholder="Selecione uma opção"
                   focusBorderColor={config.inputs}
-                  isReadOnly
                   value={plan_account}
-                />
+                  onChange={(e) => setPlan_account(e.target.value)}
+                >
+                  {planAccounts.map((plan) => (
+                    <option value={plan.id} key={plan.id}>
+                      {plan.name}
+                    </option>
+                  ))}
+                </Select>
               </FormControl>
             </Grid>
 
@@ -492,7 +716,12 @@ export default function ListExpenses() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
+            <Button
+              colorScheme={config.buttons}
+              leftIcon={<FaSave />}
+              isLoading={loadingUpdate}
+              onClick={() => sendUpdateInfo()}
+            >
               Salvar
             </Button>
           </ModalFooter>
@@ -506,11 +735,11 @@ export default function ListExpenses() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Status da Movimentação</ModalHeader>
+          <ModalHeader>Autorização</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
-              <FormLabel>Status da Movimentação</FormLabel>
+              <FormLabel>Autorização</FormLabel>
               <Select
                 placeholder="Selecione"
                 variant="outline"
@@ -519,14 +748,19 @@ export default function ListExpenses() {
                 onChange={(e) => setStatusExpense(e.target.value)}
               >
                 <option value="waiting">Aguardando</option>
-                <option value="done">Concluído</option>
+                <option value="done">Confirmado</option>
                 <option value="cancel">Cancelado</option>
               </Select>
             </FormControl>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
+            <Button
+              colorScheme={config.buttons}
+              leftIcon={<FaSave />}
+              isLoading={loadingUpdate}
+              onClick={() => sendUpdateMovimentation()}
+            >
               Salvar
             </Button>
           </ModalFooter>
@@ -554,13 +788,18 @@ export default function ListExpenses() {
               >
                 <option value="cancel">Cancelado</option>
                 <option value="waiting">Aguardando</option>
-                <option value="done">Concluído</option>
+                <option value="done">Pago</option>
               </Select>
             </FormControl>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme={config.buttons} leftIcon={<FaSave />}>
+            <Button
+              colorScheme={config.buttons}
+              leftIcon={<FaSave />}
+              isLoading={loadingUpdate}
+              onClick={() => sendUpdateStatus()}
+            >
               Salvar
             </Button>
           </ModalFooter>

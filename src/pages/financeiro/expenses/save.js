@@ -446,7 +446,7 @@ export default function SaveExpenses() {
             >
               <option value="cancel">Cancelado</option>
               <option value="waiting">Aguardando</option>
-              <option value="done">Concluído</option>
+              <option value="done">Pago</option>
             </Select>
             <FormErrorMessage>
               {validators.find((obj) => obj.path === "status")
@@ -472,7 +472,7 @@ export default function SaveExpenses() {
               onChange={(e) => setMovimentation(e.target.value)}
             >
               <option value="waiting">Aguardando</option>
-              <option value="done">Concluído</option>
+              <option value="done">Confirmado</option>
               <option value="cancel">Cancelado</option>
             </Select>
             <FormErrorMessage>
