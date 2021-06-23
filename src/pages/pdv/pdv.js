@@ -402,7 +402,7 @@ export default function Pdv() {
             <Grid templateColumns="2fr 1fr" gap="15px">
               <Grid templateColumns="repeat(3, 1fr)" gap="10px" pl={3}>
                 <InputGroup size="lg">
-                  <InputLeftAddon>Liquido</InputLeftAddon>
+                  <InputLeftAddon>Total</InputLeftAddon>
                   <Input focusBorderColor={config.inputs} />
                 </InputGroup>
 
@@ -415,7 +415,7 @@ export default function Pdv() {
 
                 <InputGroup size="lg">
                   <InputLeftAddon>
-                    Bruto <Kbd ml={1}>F10</Kbd>
+                    A Pagar <Kbd ml={1}>F10</Kbd>
                   </InputLeftAddon>
                   <Input focusBorderColor={config.inputs} id="finalvalue" />;
                 </InputGroup>

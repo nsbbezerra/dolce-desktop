@@ -282,6 +282,15 @@ export default function SaveExpenses() {
     }
   }
 
+  function capitalizeAllFirstLetter(string) {
+    let splited = string.split(" ");
+    let toJoin = splited.map((e) => {
+      return e.charAt(0).toUpperCase() + e.slice(1);
+    });
+    let joined = toJoin.join(" ");
+    return joined;
+  }
+
   return (
     <>
       <Hotkeys
@@ -493,7 +502,9 @@ export default function SaveExpenses() {
               rows={2}
               id="description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) =>
+                setDescription(capitalizeAllFirstLetter(e.target.value))
+              }
             />
           </FormControl>
         </Grid>

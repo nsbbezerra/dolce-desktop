@@ -47,6 +47,13 @@ const customTheme = extendTheme({
     Tabs: {
       baseStyle: { tab: { _focus: { boxShadow: "none" } } },
     },
+    Menu: {
+      baseStyle: {
+        list: {
+          boxShadow: "lg",
+        },
+      },
+    },
   },
 });
 

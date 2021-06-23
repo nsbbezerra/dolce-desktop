@@ -35,13 +35,18 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
 } from "@chakra-ui/react";
 import config from "../../../configs/index";
 import {
   FaCalendarAlt,
   FaEdit,
   FaSave,
-  FaSearch,
   FaSearchPlus,
   FaTrash,
 } from "react-icons/fa";
@@ -71,14 +76,10 @@ export default function ListExpenses() {
     `/expenses/${find}/${initialDate}/${finalDate}`
   );
 
-  const [loadingSearch, setLoadingSearch] = useState(false);
-
-  const [modalEdit, setModalEdit] = useState(false);
   const [modalMoviment, setModalMoviment] = useState(false);
   const [modalPayment, setModalPayment] = useState(false);
 
-  const [month, setMonth] = useState("");
-  const [yearFind, setYearFind] = useState(year);
+  const [modalEdit, setModalEdit] = useState(false);
   const [expenses, setExpenses] = useState([]);
   const [idExpense, setIdExpense] = useState(null);
   const [statusExpense, setStatusExpense] = useState("");
@@ -93,6 +94,8 @@ export default function ListExpenses() {
 
   const [payForms, setPayForms] = useState([]);
   const [planAccounts, setPlanAccounts] = useState([]);
+
+  const [confirm, setConfirm] = useState(false);
 
   function showToast(message, status, title) {
     toast({
@@ -227,6 +230,7 @@ export default function ListExpenses() {
       });
       setLoadingUpdate(false);
       setModalPayment(false);
+      showToast("Informações alteradas com sucesso", "success", "Sucesso");
     } catch (error) {
       setLoadingUpdate(false);
       if (error.message === "Network Error") {
@@ -275,6 +279,7 @@ export default function ListExpenses() {
       });
       setLoadingUpdate(false);
       setModalMoviment(false);
+      showToast("Informações alteradas com sucesso", "success", "Sucesso");
     } catch (error) {
       setLoadingUpdate(false);
       if (error.message === "Network Error") {
@@ -338,6 +343,7 @@ export default function ListExpenses() {
       });
       setLoadingUpdate(false);
       setModalEdit(false);
+      showToast("Informações alteradas com sucesso", "success", "Sucesso");
     } catch (error) {
       setLoadingUpdate(false);
       if (error.message === "Network Error") {
@@ -376,6 +382,42 @@ export default function ListExpenses() {
       setInitialDate(new Date());
       setFinalDate(new Date());
       setFind(key);
+    }
+  }
+
+  function handleDelete(id) {
+    setIdExpense(id);
+    setConfirm(true);
+  }
+
+  async function sendDelExpense() {
+    setLoadingUpdate(true);
+    try {
+      const response = await api.delete(`/expenses/${idExpense}`, {
+        headers: { "x-access-token": employee.token },
+      });
+      const updated = await expenses.filter((obj) => obj.id !== idExpense);
+      setExpenses(updated);
+      showToast(response.data.message, "success", "Sucesso");
+      setConfirm(false);
+    } catch (error) {
+      setLoadingUpdate(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
     }
   }
 
@@ -488,7 +530,7 @@ export default function ListExpenses() {
               <Td w="15%" textAlign="center">
                 Autorização
               </Td>
-              <Td w="15%"></Td>
+              <Td w="10%"></Td>
             </Tr>
           </Thead>
 
@@ -579,7 +621,7 @@ export default function ListExpenses() {
                     </Tooltip>
                   </Flex>
                 </Td>
-                <Td w="15%">
+                <Td w="10%">
                   <Menu>
                     <MenuButton
                       isFullWidth
@@ -597,7 +639,12 @@ export default function ListExpenses() {
                       >
                         Visualizar e Editar
                       </MenuItem>
-                      <MenuItem icon={<FaTrash />}>Excluir</MenuItem>
+                      <MenuItem
+                        icon={<FaTrash />}
+                        onClick={() => handleDelete(exp.id)}
+                      >
+                        Excluir
+                      </MenuItem>
                     </MenuList>
                   </Menu>
                 </Td>
@@ -805,6 +852,40 @@ export default function ListExpenses() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <AlertDialog
+        isOpen={confirm}
+        onClose={() => setConfirm(false)}
+        isCentered
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Excluir Despesa
+            </AlertDialogHeader>
+
+            <AlertDialogBody>Deseja excluir esta despesa?</AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button
+                onClick={() => setConfirm(false)}
+                variant="outline"
+                colorScheme={config.buttons}
+              >
+                Não
+              </Button>
+              <Button
+                ml={3}
+                colorScheme={config.buttons}
+                isLoading={loadingUpdate}
+                onClick={() => sendDelExpense()}
+              >
+                Sim
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </>
   );
 }

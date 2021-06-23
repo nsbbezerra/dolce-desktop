@@ -274,7 +274,7 @@ export default function Budget() {
                 </InputGroup>
 
                 <InputGroup size="lg">
-                  <InputLeftAddon>Total a Pagar</InputLeftAddon>
+                  <InputLeftAddon>A Pagar</InputLeftAddon>
                   <Input focusBorderColor={config.inputs} />
                 </InputGroup>
               </Grid>
