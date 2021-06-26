@@ -46,7 +46,7 @@ export default function MovimentCashier() {
 
   return (
     <>
-      <HeaderApp title="Movimentação de Caixa" icon={FaCalculator} />
+      <HeaderApp title="Gerenciar Caixa" icon={FaCalculator} />
 
       <Box borderWidth="1px" shadow="md" rounded="md" p={3} mt="25px">
         <Grid templateColumns="1fr 1fr 200px" gap="15px">
@@ -138,7 +138,7 @@ export default function MovimentCashier() {
           colorScheme={config.buttons}
           onClick={() => setModalOpen(true)}
         >
-          Abrir novo Caixa
+          Novo Caixa
         </Button>
       </Box>
 

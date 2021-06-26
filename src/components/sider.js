@@ -255,7 +255,7 @@ export default function Sider() {
             icon={<FaCalculator />}
             onClick={() => routing("/cashiermoviment")}
           >
-            Movimentação de Caixa
+            Gerenciar Caixa
           </MenuItem>
           <MenuItem
             icon={<FaFileAlt />}
