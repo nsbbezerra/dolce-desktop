@@ -54,6 +54,11 @@ const customTheme = extendTheme({
         },
       },
     },
+    Popover: {
+      baseStyle: {
+        content: { boxShadow: "lg" },
+      },
+    },
   },
 });
 

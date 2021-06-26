@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -66,11 +66,12 @@ import { AiOutlineFall, AiOutlineRise } from "react-icons/ai";
 import PrintMiddleware from "../../middlewares/print";
 import PaymentMiddleware from "../../middlewares/payment";
 
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 export default function Cashier() {
   const cancelRef = useRef();
   const { push } = useHistory();
+  const { cash } = useParams();
   const [modalRevenue, setModalRevenue] = useState(false);
   const [modalExpense, setModalExpense] = useState(false);
   const [modalPrint, setModalPrint] = useState(false);
@@ -178,70 +179,67 @@ export default function Cashier() {
                         variant="ghost"
                       />
                     </Tooltip>
-                    <Tooltip label="Converter em Orçamento" hasArrow>
-                      <Popover placement="left">
-                        <PopoverTrigger>
-                          <IconButton
-                            icon={<FaClipboardList />}
-                            size="sm"
-                            rounded="full"
-                            colorScheme={config.buttons}
-                            variant="ghost"
-                          />
-                        </PopoverTrigger>
-                        <PopoverContent>
-                          <PopoverArrow />
-                          <PopoverCloseButton />
-                          <PopoverHeader>Confirmação!</PopoverHeader>
-                          <PopoverBody>
-                            Deseja converter este pedido em orçamento?
-                          </PopoverBody>
-                          <PopoverFooter d="flex" justifyContent="flex-end">
-                            <ButtonGroup size="sm">
-                              <Button
-                                variant="outline"
-                                colorScheme={config.buttons}
-                              >
-                                Não
-                              </Button>
-                              <Button colorScheme={config.buttons}>Sim</Button>
-                            </ButtonGroup>
-                          </PopoverFooter>
-                        </PopoverContent>
-                      </Popover>
-                    </Tooltip>
-                    <Tooltip label="Cancelar Pedido" hasArrow>
-                      <Popover placement="left">
-                        <PopoverTrigger>
-                          <IconButton
-                            colorScheme="red"
-                            icon={<FaTrash />}
-                            size="sm"
-                            rounded="full"
-                            variant="ghost"
-                          />
-                        </PopoverTrigger>
-                        <PopoverContent>
-                          <PopoverArrow />
-                          <PopoverCloseButton />
-                          <PopoverHeader>Confirmação!</PopoverHeader>
-                          <PopoverBody>
-                            Deseja cancelar este pedido?
-                          </PopoverBody>
-                          <PopoverFooter d="flex" justifyContent="flex-end">
-                            <ButtonGroup size="sm">
-                              <Button
-                                variant="outline"
-                                colorScheme={config.buttons}
-                              >
-                                Não
-                              </Button>
-                              <Button colorScheme={config.buttons}>Sim</Button>
-                            </ButtonGroup>
-                          </PopoverFooter>
-                        </PopoverContent>
-                      </Popover>
-                    </Tooltip>
+
+                    <Popover placement="bottom-end">
+                      <PopoverTrigger>
+                        <IconButton
+                          icon={<FaClipboardList />}
+                          size="sm"
+                          rounded="full"
+                          colorScheme={config.buttons}
+                          variant="ghost"
+                        />
+                      </PopoverTrigger>
+                      <PopoverContent _focus={{ outline: "none" }}>
+                        <PopoverArrow />
+                        <PopoverCloseButton />
+                        <PopoverHeader>Confirmação!</PopoverHeader>
+                        <PopoverBody>
+                          Deseja converter este pedido em orçamento?
+                        </PopoverBody>
+                        <PopoverFooter d="flex" justifyContent="flex-end">
+                          <ButtonGroup size="sm">
+                            <Button
+                              variant="outline"
+                              colorScheme={config.buttons}
+                            >
+                              Não
+                            </Button>
+                            <Button colorScheme={config.buttons}>Sim</Button>
+                          </ButtonGroup>
+                        </PopoverFooter>
+                      </PopoverContent>
+                    </Popover>
+
+                    <Popover placement="bottom-end">
+                      <PopoverTrigger>
+                        <IconButton
+                          colorScheme="red"
+                          icon={<FaTrash />}
+                          size="sm"
+                          rounded="full"
+                          variant="ghost"
+                        />
+                      </PopoverTrigger>
+                      <PopoverContent _focus={{ outline: "none" }}>
+                        <PopoverArrow />
+                        <PopoverCloseButton />
+                        <PopoverHeader>Confirmação!</PopoverHeader>
+                        <PopoverBody>Deseja cancelar este pedido?</PopoverBody>
+                        <PopoverFooter d="flex" justifyContent="flex-end">
+                          <ButtonGroup size="sm">
+                            <Button
+                              variant="outline"
+                              colorScheme={config.buttons}
+                            >
+                              Não
+                            </Button>
+                            <Button colorScheme={config.buttons}>Sim</Button>
+                          </ButtonGroup>
+                        </PopoverFooter>
+                      </PopoverContent>
+                    </Popover>
+
                     <Button
                       leftIcon={<FaCheck />}
                       colorScheme={config.buttons}

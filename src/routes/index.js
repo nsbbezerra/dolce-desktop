@@ -115,7 +115,7 @@ export default function Routers() {
       <Route path="/cashiermoviment">
         <CashierMoviment />
       </Route>
-      <Route path="/cashier">
+      <Route path="/cashier/:cash">
         <Cashier />
       </Route>
       <Route path="/cashierreport">
