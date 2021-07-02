@@ -8,7 +8,7 @@ const config = {
     (destak === "orange" && "#ED8936") ||
     (destak === "yellow" && "#ECC94B") ||
     (destak === "green" && "#48BB78") ||
-    (destak === "teal" && "##38B2AC") ||
+    (destak === "teal" && "#38B2AC") ||
     (destak === "blue" && "#4299E1") ||
     (destak === "cyan" && "#0BC5EA") ||
     (destak === "purple" && "#9F7AEA") ||
