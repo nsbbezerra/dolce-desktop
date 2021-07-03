@@ -41,10 +41,8 @@ import {
   AiFillBank,
   AiOutlineRise,
   AiOutlineFall,
-  AiOutlineBgColors,
 } from "react-icons/ai";
 import { MdDashboard } from "react-icons/md";
-import { BsCardChecklist } from "react-icons/bs";
 import config from "../configs";
 import { useEmployee } from "../context/Employee";
 
@@ -178,12 +176,6 @@ export default function Sider() {
             Produtos
           </MenuItem>
           <MenuItem
-            icon={<AiOutlineBgColors />}
-            onClick={() => routing("/colors")}
-          >
-            Cores
-          </MenuItem>
-          <MenuItem
             icon={<FaRulerCombined />}
             onClick={() => routing("/sizes")}
           >
@@ -191,12 +183,6 @@ export default function Sider() {
           </MenuItem>
           <MenuItem icon={<FaImages />} onClick={() => routing("/images")}>
             Imagens
-          </MenuItem>
-          <MenuItem
-            icon={<BsCardChecklist />}
-            onClick={() => routing("/details")}
-          >
-            Detalhes do Produto
           </MenuItem>
           <MenuDivider />
           <MenuItem

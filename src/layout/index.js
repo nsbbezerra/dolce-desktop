@@ -189,7 +189,13 @@ export default function Layout() {
   }
 
   return (
-    <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
       <Hotkeys
         keyName="return, enter"
         onKeyDown={onKeyDown}

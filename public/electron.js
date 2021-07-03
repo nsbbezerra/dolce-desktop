@@ -6,15 +6,11 @@ const isDev = require("electron-is-dev");
 let mainWindow;
 let slpash;
 const Menu = electron.Menu;
-const os = require("os");
 
 Menu.setApplicationMenu(false);
 
 function createWindow() {
-  const iconPath =
-    os.platform() === "darwin"
-      ? path.resolve(__dirname, "icone.icns")
-      : path.resolve(__dirname, "icone.png");
+  const iconPath = path.resolve(__dirname, "icone.png");
   mainWindow = new BrowserWindow({
     width: 1300,
     height: 700,
@@ -23,6 +19,7 @@ function createWindow() {
     show: false,
     hasShadow: false,
     resizable: false,
+    transparent: true,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,

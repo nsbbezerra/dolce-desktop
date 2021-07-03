@@ -30,6 +30,7 @@ import {
   Text,
   Heading,
   Divider,
+  Grid,
 } from "@chakra-ui/react";
 import {
   FaUserCircle,
@@ -52,7 +53,7 @@ import { FiMinus, FiMaximize, FiX } from "react-icons/fi";
 import config from "../configs";
 import { GiShop } from "react-icons/gi";
 
-import Icone from "../assets/icon-black.png";
+import Icone from "../assets/logo.svg";
 import Logo from "../assets/name-slug.png";
 
 import { useHistory } from "react-router-dom";
@@ -276,21 +277,23 @@ export default function HeaderApp() {
 
   return (
     <>
-      <Flex
-        h="60px"
-        bg={config.header.bg}
-        justify="space-between"
-        align="center"
-        pr={5}
-        pl={3}
-        borderBottomWidth="1px"
-      >
-        <Flex h="60px" w="220px" justify="center" align="center">
-          <Image src={Icone} w="45px" h="45px" mr="10px" />
-          <Image src={Logo} w="140px" />
+      <Grid h="60px" bg={config.header.bg} templateColumns="1fr 2fr 1fr" pl={3}>
+        <Flex h="60px" justify="flex-start" align="center">
+          <Image
+            userSelect="none"
+            draggable={false}
+            src={Icone}
+            w="50px"
+            h="50px"
+            mr="15px"
+          />
+
+          <Text fontSize="md" userSelect="none">
+            NKGEST - Gestor de Loja Virtual
+          </Text>
         </Flex>
 
-        <Flex w="80%" justify="flex-end" align="center">
+        <Flex align="center" justify="center">
           <Flex>
             <InputGroup>
               <InputLeftElement
@@ -298,6 +301,12 @@ export default function HeaderApp() {
                 children={<Icon as={FaUserCircle} />}
               />
               <Input
+                _focus={{
+                  bg:
+                    useColorMode().colorMode === "light"
+                      ? "gray.100"
+                      : "whiteAlpha.100",
+                }}
                 type="text"
                 variant="filled"
                 rounded="xl"
@@ -348,14 +357,15 @@ export default function HeaderApp() {
           </Flex>
         </Flex>
 
-        <Flex h="60px" justify="center" align="center" ml={3}>
+        <Flex h="60px" justify="flex-end" align="startadm">
           <Tooltip label="Clique para arrastar" hasArrow>
             <IconButton
               aria-label="Search database"
               icon={<AiOutlineDrag />}
-              rounded="xl"
-              ml={3}
-              size="xs"
+              size="sm"
+              rounded="none"
+              w="40px"
+              fontSize="sm"
               variant="ghost"
               className="draggable"
             />
@@ -364,21 +374,22 @@ export default function HeaderApp() {
             <IconButton
               aria-label="Search database"
               icon={<FiMinus />}
-              rounded="xl"
-              ml={3}
-              size="xs"
-              variant="ghost"
+              size="sm"
+              rounded="none"
+              w="40px"
+              fontSize="sm"
               onClick={() => handleMinimize()}
+              borderBottomLeftRadius="md"
             />
           </Tooltip>
           <Tooltip label={"Maximizar"} hasArrow>
             <IconButton
               aria-label="Search database"
               icon={<FiMaximize />}
-              rounded="xl"
-              ml={3}
-              size="xs"
-              variant="ghost"
+              size="sm"
+              rounded="none"
+              w="40px"
+              fontSize="sm"
               onClick={() => handleMaximize()}
             />
           </Tooltip>
@@ -386,15 +397,16 @@ export default function HeaderApp() {
             <IconButton
               aria-label="Search database"
               icon={<FiX />}
-              rounded="xl"
-              ml={3}
-              size="xs"
+              size="sm"
+              rounded="none"
+              w="40px"
+              fontSize="md"
               colorScheme="red"
               onClick={() => handleCloseWindow()}
             />
           </Tooltip>
         </Flex>
-      </Flex>
+      </Grid>
 
       <Modal
         isOpen={modalTheme}

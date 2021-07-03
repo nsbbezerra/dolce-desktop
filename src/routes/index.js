@@ -16,10 +16,8 @@ import RegisterDepartment from "../pages/cadastro/departamento";
 import RegisterCategory from "../pages/cadastro/categoria";
 import RegisterEmployee from "../pages/cadastro/colaboradores";
 import RegisterProducts from "../pages/cadastro/produtos/produtos";
-import RegisterColors from "../pages/cadastro/produtos/cores";
 import RegisterSizes from "../pages/cadastro/produtos/tamanhos";
 import RegisterImages from "../pages/cadastro/produtos/imagens";
-import RegisterList from "../pages/cadastro/produtos/details";
 import RegisterProvider from "../pages/cadastro/provider";
 
 /** ESTOQUE */
@@ -133,17 +131,11 @@ export default function Routers() {
       <Route path="/configapp">
         <ConfigApp />
       </Route>
-      <Route path="/colors">
-        <RegisterColors />
-      </Route>
       <Route path="/sizes">
         <RegisterSizes />
       </Route>
       <Route path="/images">
         <RegisterImages />
-      </Route>
-      <Route path={"/details"}>
-        <RegisterList />
       </Route>
       <Route path="/providers">
         <RegisterProvider />
