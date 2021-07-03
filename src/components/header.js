@@ -370,6 +370,7 @@ export default function HeaderApp() {
               className="draggable"
             />
           </Tooltip>
+
           <Tooltip label="Minimizar" hasArrow>
             <IconButton
               aria-label="Search database"
@@ -378,8 +379,8 @@ export default function HeaderApp() {
               rounded="none"
               w="40px"
               fontSize="sm"
+              borderBottomLeftRadius="5px"
               onClick={() => handleMinimize()}
-              borderBottomLeftRadius="md"
             />
           </Tooltip>
           <Tooltip label={"Maximizar"} hasArrow>

@@ -182,7 +182,7 @@ export default function Sider() {
             Tamanhos
           </MenuItem>
           <MenuItem icon={<FaImages />} onClick={() => routing("/images")}>
-            Imagens
+            Galeria de Imagens
           </MenuItem>
           <MenuDivider />
           <MenuItem
