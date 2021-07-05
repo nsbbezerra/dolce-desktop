@@ -67,16 +67,11 @@ export default function ImagesSave() {
   const { data, error } = useFetch("/products");
   const initialRef = useRef();
 
-  const [modalColor, setModalColor] = useState(false);
   const [thumbnail, setThumbnail] = useState(null);
   const [products, setProducts] = useState([]);
   const [validators, setValidators] = useState([]);
   const [findProducts, setFindProducts] = useState("");
   const [modalProducts, setModalProducts] = useState(false);
-  const [colors, setColors] = useState([]);
-  const [colorName, setColorName] = useState("");
-  const [colorId, setColorId] = useState(null);
-  const [colorHex, setColorHex] = useState("");
   const [nameProduct, setNameProduct] = useState("");
   const [idProduct, setIdProduct] = useState(null);
   const [images, setImages] = useState([]);
@@ -119,31 +114,7 @@ export default function ImagesSave() {
   }
 
   async function handleProduct(id) {
-    setColorId(null);
-    setColorName("");
-    setColorHex("");
     const result = await products.find((obj) => obj.id === id);
-    try {
-      const response = await api.get(`/sizeDependets/${result.id}`);
-      setColors(response.data);
-    } catch (error) {
-      if (error.message === "Network Error") {
-        alert(
-          "Sem conexão com o servidor, verifique sua conexão com a internet."
-        );
-        return false;
-      }
-      const statusCode = error.response.status || 400;
-      const typeError =
-        error.response.data.message || "Ocorreu um erro ao buscar";
-      const errorMesg = error.response.data.errorMessage || statusCode;
-      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
-      showToast(
-        errorMessageFinal,
-        "error",
-        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
-      );
-    }
     setNameProduct(result.name);
     setIdProduct(result.id);
     setModalProducts(false);
@@ -220,38 +191,6 @@ export default function ImagesSave() {
     });
   }
 
-  async function handleColor(id) {
-    setModalColor(false);
-    setSkel(true);
-    const result = await colors.find((obj) => obj.id === id);
-    setColorName(result.name);
-    setColorId(result.id);
-    setColorHex(result.hex);
-    try {
-      const response = await api.get(`/findImages/${result.products_id}`);
-
-      setImages(response.data);
-    } catch (error) {
-      if (error.message === "Network Error") {
-        alert(
-          "Sem conexão com o servidor, verifique sua conexão com a internet."
-        );
-        return false;
-      }
-      const statusCode = error.response.status || 400;
-      const typeError =
-        error.response.data.message || "Ocorreu um erro ao buscar";
-      const errorMesg = error.response.data.errorMessage || statusCode;
-      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
-      showToast(
-        errorMessageFinal,
-        "error",
-        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
-      );
-    }
-    setSkel(false);
-  }
-
   async function findImages() {
     setSkel(true);
     try {
@@ -286,10 +225,6 @@ export default function ImagesSave() {
       handleValidator("product", "Nenhum produto selecionado");
       return false;
     }
-    if (!colorId) {
-      handleValidator("color", "Nenhuma cor selecionada");
-      return false;
-    }
     if (!thumbnail) {
       handleValidator("image", "Selecione uma imagem");
       return false;
@@ -310,9 +245,6 @@ export default function ImagesSave() {
     setLoading(true);
     let data = new FormData();
     data.append("product", idProduct);
-    data.append("color", colorId);
-    data.append("name", colorName);
-    data.append("hex", colorHex);
     data.append("image", thumbnail);
     try {
       const response = await api.post("/imageColors", data, {
@@ -381,9 +313,6 @@ export default function ImagesSave() {
     if (keyName === "f2") {
       setModalProducts(true);
     }
-    if (keyName === "f3") {
-      setModalColor(true);
-    }
     if (keyName === "f12") {
       register(e);
     }
@@ -392,7 +321,7 @@ export default function ImagesSave() {
   return (
     <>
       <Hotkeys
-        keyName="f2, f3, f12"
+        keyName="f2, f12"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -402,97 +331,42 @@ export default function ImagesSave() {
         <HeaderApp title="Cadastro de Imagens" icon={FaImages} />
 
         <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
-          <Grid templateColumns={"1fr 1fr"} gap="25px">
-            <HStack spacing="15px">
-              <FormControl
-                isRequired
-                isInvalid={
-                  validators.find((obj) => obj.path === "product")
-                    ? true
-                    : false
-                }
+          <FormControl
+            isRequired
+            isInvalid={
+              validators.find((obj) => obj.path === "product") ? true : false
+            }
+          >
+            <FormLabel>Produto</FormLabel>
+            <Grid templateColumns="1fr 200px" gap="15px">
+              <Input
+                id="product"
+                focusBorderColor={config.inputs}
+                placeholder="Buscar Produtos"
+                w="100%"
+                value={nameProduct}
+                isReadOnly
+              />
+              <Button
+                isFullWidth
+                leftIcon={<FaSearch />}
+                onClick={() => setModalProducts(true)}
+                colorScheme={config.buttons}
+                variant="outline"
               >
-                <FormLabel>Produto</FormLabel>
-                <Grid templateColumns="2fr 1fr" gap="15px">
-                  <Input
-                    id="product"
-                    focusBorderColor={config.inputs}
-                    placeholder="Buscar Produtos"
-                    w="100%"
-                    value={nameProduct}
-                    isReadOnly
-                  />
-                  <Button
-                    isFullWidth
-                    leftIcon={<FaSearch />}
-                    onClick={() => setModalProducts(true)}
-                    colorScheme={config.buttons}
-                    variant="outline"
-                  >
-                    Buscar Produto
-                    <Kbd color="ButtonText" ml={3}>
-                      F2
-                    </Kbd>
-                  </Button>
-                </Grid>
-
-                <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "product")
-                    ? validators.find((obj) => obj.path === "product").message
-                    : ""}
-                </FormErrorMessage>
-              </FormControl>
-            </HStack>
-            <Grid templateColumns="1fr 120px 200px" gap="15px">
-              <FormControl
-                isRequired
-                isInvalid={
-                  validators.find((obj) => obj.path === "color") ? true : false
-                }
-              >
-                <FormLabel>Nome da Cor</FormLabel>
-
-                <Input
-                  id="color"
-                  focusBorderColor={config.inputs}
-                  placeholder="Nome da Cor"
-                  isReadOnly
-                  value={colorName}
-                />
-                <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "color")
-                    ? validators.find((obj) => obj.path === "color").message
-                    : ""}
-                </FormErrorMessage>
-              </FormControl>
-
-              <FormControl>
-                <FormLabel>Demonstração</FormLabel>
-                <Input
-                  focusBorderColor={config.inputs}
-                  bg={`#${colorHex}`}
-                  isReadOnly
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel color="transparent" userSelect="none">
-                  D
-                </FormLabel>
-                <Button
-                  isFullWidth
-                  leftIcon={<FaSearch />}
-                  onClick={() => setModalColor(true)}
-                  colorScheme={config.buttons}
-                  variant="outline"
-                >
-                  Buscar Cor
-                  <Kbd color="ButtonText" ml={3}>
-                    F2
-                  </Kbd>
-                </Button>
-              </FormControl>
+                Buscar Produto
+                <Kbd color="ButtonText" ml={3}>
+                  F2
+                </Kbd>
+              </Button>
             </Grid>
-          </Grid>
+
+            <FormErrorMessage>
+              {validators.find((obj) => obj.path === "product")
+                ? validators.find((obj) => obj.path === "product").message
+                : ""}
+            </FormErrorMessage>
+          </FormControl>
 
           <Divider mt={5} mb={5} />
 
@@ -645,65 +519,6 @@ export default function ImagesSave() {
             </Box>
           </Grid>
         </Box>
-
-        <Modal
-          isOpen={modalColor}
-          onClose={() => setModalColor(false)}
-          size="xl"
-          isCentered
-          scrollBehavior="inside"
-        >
-          <ModalOverlay />
-          <ModalContent pb={4}>
-            <ModalHeader>Selecione uma Cor</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              {!!colors.length ? (
-                <Table size="sm">
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td>Cor</Td>
-                      <Td w="40%">Demonstração</Td>
-                      <Td w="15%" isNumeric></Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {colors.map((cor) => (
-                      <Tr key={cor.id}>
-                        <Td>{cor.name}</Td>
-                        <Td w="40%">
-                          <Box
-                            bg={`#${cor.hex}`}
-                            w="100%"
-                            h="25px"
-                            rounded="md"
-                          />
-                        </Td>
-                        <Td w="15%" isNumeric>
-                          <Tooltip label="Usar esta cor" hasArrow>
-                            <IconButton
-                              aria-label="Search database"
-                              icon={<FaCheck />}
-                              size="xs"
-                              isRound
-                              colorScheme={config.buttons}
-                              onClick={() => handleColor(cor.id)}
-                            />
-                          </Tooltip>
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              ) : (
-                <Flex justify="center" align="center" direction="column">
-                  <Lottie animation={emptyAnimation} height={200} width={200} />
-                  <Text>Nenhuma cor para mostrar</Text>
-                </Flex>
-              )}
-            </ModalBody>
-          </ModalContent>
-        </Modal>
 
         <Modal
           isOpen={modalProducts}
