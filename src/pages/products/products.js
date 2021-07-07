@@ -58,10 +58,11 @@ import {
   FaTag,
   FaBoxOpen,
   FaCalculator,
+  FaArrowLeft,
+  FaArrowRight,
 } from "react-icons/fa";
 import { InputFile, File } from "../../style/uploader";
 import { AiOutlineClose } from "react-icons/ai";
-import StarRatings from "react-star-ratings";
 import { useEmployee } from "../../context/Employee";
 import useFetch from "../../hooks/useFetch";
 import api from "../../configs/axios";
@@ -75,11 +76,13 @@ import dataTrib from "../../data/data";
 import MaskedInput from "react-text-mask";
 import marge from "../../data/marge";
 
-export default function CategoryList() {
+export default function ProductList() {
   const { colorMode } = useColorMode();
   const toast = useToast();
   const { employee } = useEmployee();
-  const { data, error, mutate } = useFetch("/products");
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState("0");
+  const { data, error, mutate } = useFetch(`/products/${page}`);
 
   const [modalInfo, setModalInfo] = useState(false);
   const [modalImage, setModalImage] = useState(false);
@@ -167,7 +170,10 @@ export default function CategoryList() {
   }, []);
 
   useEffect(() => {
-    setProducts(data);
+    if (data) {
+      setProducts(data.products);
+      setPages(data.count.count);
+    }
   }, [data]);
 
   const previewThumbnail = useMemo(() => {
@@ -893,6 +899,48 @@ export default function CategoryList() {
                   </Tbody>
                 </Table>
               )}
+              <Divider mt={5} mb={5} />
+              <Flex justify="flex-end" align="center">
+                <Button
+                  size="sm"
+                  colorScheme={config.buttons}
+                  mr={2}
+                  leftIcon={<FaArrowLeft />}
+                  onClick={() => setPage(page - 1)}
+                  isDisabled={page <= 1 ? true : false}
+                >
+                  Anterior
+                </Button>
+                <Input
+                  size="sm"
+                  w="80px"
+                  focusBorderColor={config.inputs}
+                  value={page}
+                  onChange={(e) => setPage(e.target.value)}
+                  type="number"
+                />
+                <Text ml={2} mr={2}>
+                  de
+                </Text>
+                <Input
+                  size="sm"
+                  w="80px"
+                  focusBorderColor={config.inputs}
+                  value={pages}
+                  isReadOnly
+                  type="number"
+                  mr={2}
+                />
+                <Button
+                  size="sm"
+                  colorScheme={config.buttons}
+                  rightIcon={<FaArrowRight />}
+                  onClick={() => setPage(page + 1)}
+                  isDisabled={parseInt(page) >= parseInt(pages) ? true : false}
+                >
+                  Próxima
+                </Button>
+              </Flex>
             </>
           )}
         </Box>
