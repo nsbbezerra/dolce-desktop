@@ -283,8 +283,7 @@ export default function HeaderApp() {
             userSelect="none"
             draggable={false}
             src={Icone}
-            w="50px"
-            h="50px"
+            w="180px"
             mr="15px"
           />
         </Flex>
