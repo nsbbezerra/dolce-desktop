@@ -64,7 +64,7 @@ export default function ImagesSave() {
   const { colorMode } = useColorMode();
   const toast = useToast();
   const { employee } = useEmployee();
-  const { data, error } = useFetch("/products");
+  const { data, error } = useFetch("/findProducts");
   const initialRef = useRef();
 
   const [thumbnail, setThumbnail] = useState(null);
@@ -118,6 +118,7 @@ export default function ImagesSave() {
     setNameProduct(result.name);
     setIdProduct(result.id);
     setModalProducts(false);
+    findImagesById(result.id);
   }
 
   useEffect(() => {
@@ -195,6 +196,32 @@ export default function ImagesSave() {
     setSkel(true);
     try {
       const response = await api.get(`/findImages/${idProduct}`);
+      setImages(response.data);
+    } catch (error) {
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+    setSkel(false);
+  }
+
+  async function findImagesById(id) {
+    setSkel(true);
+    try {
+      const response = await api.get(`/findImages/${id}`);
       setImages(response.data);
     } catch (error) {
       if (error.message === "Network Error") {
@@ -433,7 +460,7 @@ export default function ImagesSave() {
               </Button>
             </Box>
 
-            <Box borderWidth="1px" rounded="md" p={3}>
+            <Box rounded="md" p={3}>
               {skel === false ? (
                 <Grid
                   templateColumns="repeat(auto-fit, minmax(200px, 200px))"

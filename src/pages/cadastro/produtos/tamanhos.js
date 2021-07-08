@@ -58,7 +58,7 @@ import emptyAnimation from "../../../animations/empty.json";
 export default function Tamanhos() {
   const toast = useToast();
   const { employee } = useEmployee();
-  const { data, error } = useFetch("/products");
+  const { data, error } = useFetch("/findProducts");
   const initialRef = useRef();
 
   const [sizes, setSizes] = useState([]);
@@ -127,6 +127,7 @@ export default function Tamanhos() {
     setNameProduct(result.name);
     setIdProduct(result.id);
     setModalProducts(false);
+    findSizesById(result.id);
   }
 
   if (error) {
@@ -186,6 +187,32 @@ export default function Tamanhos() {
     setSkel(true);
     try {
       const response = await api.get(`/findSizeByProduct/${idProduct}`);
+      setSizes(response.data);
+    } catch (error) {
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+    setSkel(false);
+  }
+
+  async function findSizesById(id) {
+    setSkel(true);
+    try {
+      const response = await api.get(`/findSizeByProduct/${id}`);
       setSizes(response.data);
     } catch (error) {
       if (error.message === "Network Error") {

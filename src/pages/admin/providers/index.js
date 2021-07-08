@@ -132,7 +132,6 @@ export default function ListProviders() {
   }
 
   useEffect(() => {
-    console.log(data);
     setProviders(data);
   }, [data]);
 

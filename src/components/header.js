@@ -287,10 +287,6 @@ export default function HeaderApp() {
             h="50px"
             mr="15px"
           />
-
-          <Text fontSize="md" userSelect="none">
-            NKGEST - Gestor de Loja Virtual
-          </Text>
         </Flex>
 
         <Flex align="center" justify="center">

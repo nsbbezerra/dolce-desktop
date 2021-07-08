@@ -82,7 +82,11 @@ export default function ProductList() {
   const { employee } = useEmployee();
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState("0");
-  const { data, error, mutate } = useFetch(`/products/${page}`);
+  const [advancedFind, setAdvancedFind] = useState("4");
+  const [searchProduct, setSearchProduct] = useState("Produto");
+  const { data, error, mutate } = useFetch(
+    `/products/${page}/${advancedFind}/${searchProduct}`
+  );
 
   const [modalInfo, setModalInfo] = useState(false);
   const [modalImage, setModalImage] = useState(false);
@@ -91,8 +95,6 @@ export default function ProductList() {
   const [modalGerImg, setModalGerImg] = useState(false);
   const [thumbnail, setThumbnail] = useState(null);
   const [products, setProducts] = useState([]);
-  const [searchProduct, setSearchProduct] = useState("");
-  const [advancedFind, setAdvancedFind] = useState("4");
   const [promoStatus, setPromoStatus] = useState(null);
   const [promoValue, setPromoValue] = useState("0");
   const [valueProduct, setValueProduct] = useState(0);
@@ -169,10 +171,34 @@ export default function ProductList() {
     findBaseUrl();
   }, []);
 
+  function handlePagination(num) {
+    const divisor = parseFloat(num) / 10;
+    if (divisor > parseInt(divisor) && divisor < parseInt(divisor) + 1) {
+      setPages(parseInt(divisor) + 1);
+    } else {
+      setPages(parseInt(divisor));
+    }
+  }
+
+  useEffect(() => {
+    if (page === "") {
+      setPage("1");
+    }
+    if (parseInt(page) < 1) {
+      setPage("1");
+    }
+  }, [page]);
+
+  useEffect(() => {
+    if (advancedFind !== "5" && searchProduct === "") {
+      setSearchProduct("Produto");
+    }
+  }, [advancedFind]);
+
   useEffect(() => {
     if (data) {
       setProducts(data.products);
-      setPages(data.count.count);
+      handlePagination(data.count.count);
     }
   }, [data]);
 
@@ -194,37 +220,6 @@ export default function ProductList() {
     return joined;
   }
 
-  async function finderProdBySource(text) {
-    setSearchProduct(text);
-    let index;
-    if (advancedFind === "1") {
-      const result = await data.filter((obj) => obj.active === true);
-      index = result;
-    }
-    if (advancedFind === "2") {
-      const result = await data.filter((obj) => obj.active === false);
-      index = result;
-    }
-    if (advancedFind === "3") {
-      const result = await data.filter((obj) => obj.promotional === true);
-      index = result;
-    }
-    if (advancedFind === "4") {
-      index = data;
-    }
-    if (text === "") {
-      await setProducts(index);
-    } else {
-      let termos = await text.split(" ");
-      let frasesFiltradas = await index.filter((frase) => {
-        return termos.reduce((resultadoAnterior, termoBuscado) => {
-          return resultadoAnterior && frase.name.includes(termoBuscado);
-        }, true);
-      });
-      await setProducts(frasesFiltradas);
-    }
-  }
-
   function showToast(message, status, title) {
     toast({
       title: title,
@@ -241,16 +236,20 @@ export default function ProductList() {
         "Sem conexão com o servidor, verifique sua conexão com a internet."
       );
     } else {
-      const statusCode = error.response.status || 400;
-      const typeError =
-        error.response.data.message || "Ocorreu um erro ao buscar";
-      const errorMesg = error.response.data.errorMessage || statusCode;
-      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
-      showToast(
-        errorMessageFinal,
-        "error",
-        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
-      );
+      if (searchProduct !== "") {
+        if (advancedFind !== "5") {
+          const statusCode = error.response.status || 400;
+          const typeError =
+            error.response.data.message || "Ocorreu um erro ao buscar";
+          const errorMesg = error.response.data.errorMessage || statusCode;
+          const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+          showToast(
+            errorMessageFinal,
+            "error",
+            statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+          );
+        }
+      }
     }
   }
 
@@ -258,27 +257,6 @@ export default function ProductList() {
     if (keyName === "f3") {
       const inpt = document.getElementById("search");
       inpt.focus();
-    }
-  }
-
-  async function handleSearch() {
-    if (advancedFind === "1") {
-      const result = await data.filter((obj) => obj.active === true);
-
-      await setProducts(result);
-    }
-    if (advancedFind === "2") {
-      const result = await data.filter((obj) => obj.active === false);
-
-      await setProducts(result);
-    }
-    if (advancedFind === "3") {
-      const result = await data.filter((obj) => obj.promotional === true);
-
-      await setProducts(result);
-    }
-    if (advancedFind === "4") {
-      await setProducts(data);
     }
   }
 
@@ -302,7 +280,7 @@ export default function ProductList() {
         },
         { headers: { "x-access-token": employee.token } }
       );
-      const updatedProducts = await data.map((prod) => {
+      const updatedProducts = await data.products.map((prod) => {
         if (prod.id === productId) {
           return {
             ...prod,
@@ -313,7 +291,8 @@ export default function ProductList() {
         }
         return prod;
       });
-      mutate(updatedProducts, false);
+      const info = { products: updatedProducts, count: data.count };
+      mutate(info, false);
       mutateGlobal(`/setPromotional/${productId}`, {
         id: productId,
         promotional: response.data.product[0].promotional,
@@ -350,7 +329,8 @@ export default function ProductList() {
         { active: value },
         { headers: { "x-access-token": employee.token } }
       );
-      const productsUpdated = await data.map((prod) => {
+      console.log(response);
+      const productsUpdated = await data.products.map((prod) => {
         if (prod.id === id) {
           return {
             ...prod,
@@ -359,7 +339,8 @@ export default function ProductList() {
         }
         return prod;
       });
-      mutate(productsUpdated, false);
+      const info = { products: productsUpdated, count: data.count };
+      mutate(info, false);
       mutateGlobal(`/productsActive/${id}`, {
         id: id,
         active: response.data.product[0].active,
@@ -386,7 +367,7 @@ export default function ProductList() {
   }
 
   async function handleImageProduct(id) {
-    const result = await data.find((obj) => obj.id === id);
+    const result = await data.products.find((obj) => obj.id === id);
     setProductId(result.id);
     setUrl(result.thumbnail);
     setModalImage(true);
@@ -405,8 +386,7 @@ export default function ProductList() {
         dataImage,
         { headers: { "x-access-token": employee.token } }
       );
-      console.log(response);
-      const productUpdated = await data.map((prod) => {
+      const productUpdated = await data.products.map((prod) => {
         if (prod.id === productId) {
           return {
             ...prod,
@@ -415,7 +395,8 @@ export default function ProductList() {
         }
         return prod;
       });
-      mutate(productUpdated, false);
+      const info = { products: productUpdated, count: data.count };
+      mutate(info, false);
       mutateGlobal(`/productChangeImage/${productId}`, {
         id: productId,
         thumbnail: response.data[0].thumbnail,
@@ -610,7 +591,7 @@ export default function ProductList() {
         }
       );
 
-      const updatedProducts = await data.map((prod) => {
+      const updatedProducts = await data.products.map((prod) => {
         if (prod.id === productId) {
           return {
             ...prod,
@@ -649,8 +630,8 @@ export default function ProductList() {
         }
         return prod;
       });
-
-      mutate(updatedProducts, false);
+      const info = { products: updatedProducts, count: data.count };
+      mutate(info, false);
       mutateGlobal(`/products/${productId}`, {
         id: productId,
         name: name,
@@ -735,13 +716,14 @@ export default function ProductList() {
                 focusBorderColor={config.inputs}
                 value={searchProduct}
                 onChange={(e) =>
-                  finderProdBySource(capitalizeFirstLetter(e.target.value))
+                  setSearchProduct(capitalizeFirstLetter(e.target.value))
                 }
+                isDisabled={advancedFind === "5" ? false : true}
               />
             </FormControl>
             <FormControl>
               <FormLabel>Selecione uma opção de busca:</FormLabel>
-              <Grid templateColumns="1fr 150px" gap="15px">
+              <Grid templateColumns="1fr" gap="15px">
                 <Select
                   placeholder="Selecione uma opção de busca"
                   focusBorderColor={config.inputs}
@@ -752,16 +734,8 @@ export default function ProductList() {
                   <option value={"2"}>Todos os Bloqueados</option>
                   <option value={"3"}>Todos os Promocionais</option>
                   <option value={"4"}>Todos os Produtos</option>
+                  <option value={"5"}>Pesquisar por Nome</option>
                 </Select>
-
-                <Button
-                  leftIcon={<FaSearch />}
-                  colorScheme={config.buttons}
-                  variant="outline"
-                  onClick={() => handleSearch()}
-                >
-                  Buscar
-                </Button>
               </Grid>
             </FormControl>
           </Grid>
@@ -911,20 +885,28 @@ export default function ProductList() {
                 >
                   Anterior
                 </Button>
-                <Input
-                  size="sm"
-                  w="80px"
+                <NumberInput
+                  precision={0}
+                  step={1}
                   focusBorderColor={config.inputs}
                   value={page}
-                  onChange={(e) => setPage(e.target.value)}
-                  type="number"
-                />
+                  onChange={(e) => setPage(e)}
+                  size="sm"
+                  w="70px"
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+
                 <Text ml={2} mr={2}>
                   de
                 </Text>
                 <Input
                   size="sm"
-                  w="80px"
+                  w="70px"
                   focusBorderColor={config.inputs}
                   value={pages}
                   isReadOnly
@@ -1805,7 +1787,6 @@ export default function ProductList() {
                     <Thead fontWeight="700">
                       <Tr>
                         <Td>Tamanho</Td>
-                        <Td>Cor</Td>
                         <Td isNumeric>Estoque</Td>
                         <Td w="15%" isNumeric></Td>
                       </Tr>
@@ -1814,17 +1795,6 @@ export default function ProductList() {
                       {sizes.map((siz) => (
                         <Tr key={siz.id} bg={siz.amount < 5 ? "red.100" : ""}>
                           <Td>{siz.size}</Td>
-                          <Td>
-                            <HStack spacing="10px">
-                              <Box
-                                w="60px"
-                                h="25px"
-                                bg={`#${siz.hex}`}
-                                rounded="md"
-                              />
-                              <Text>{siz.name}</Text>
-                            </HStack>
-                          </Td>
                           <Td isNumeric>{siz.amount}</Td>
                           <Td w="15%" isNumeric>
                             <Tooltip label="Ajustar Estoque / Tamanho" hasArrow>
