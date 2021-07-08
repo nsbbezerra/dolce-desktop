@@ -41,6 +41,9 @@ import {
   Image,
   useToast,
   Kbd,
+  List,
+  ListItem,
+  ListIcon,
 } from "@chakra-ui/react";
 import HeaderApp from "../../../components/headerApp";
 import {
@@ -52,6 +55,8 @@ import {
   FaSearch,
   FaArrowLeft,
   FaArrowRight,
+  FaPlus,
+  FaTrash,
 } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { File, InputFile } from "../../../style/uploader";
@@ -65,6 +70,7 @@ import marge from "../../../data/marge";
 import MaskedInput from "react-text-mask";
 import Lottie from "../../../components/lottie";
 import emptyAnimation from "../../../animations/empty.json";
+import { MdCheckCircle } from "react-icons/md";
 
 export default function Produtos() {
   const { colorMode } = useColorMode();
@@ -139,6 +145,9 @@ export default function Produtos() {
   const [categories, setCategories] = useState([]);
   const [categoriesSearched, setCategoriesSearched] = useState([]);
   const [findProvider, setFindProvider] = useState("");
+  const [information, setInformation] = useState("");
+  const [list, setList] = useState([]);
+  const [listText, setListText] = useState("");
 
   function clear() {
     setFcpRetRate(0);
@@ -179,6 +188,8 @@ export default function Produtos() {
     setProductHeight(0);
     setProductDiameter(0);
     setProductLength(0);
+    setInformation("");
+    setList([]);
   }
 
   function showToast(message, status, title) {
@@ -447,6 +458,8 @@ export default function Produtos() {
       data.append("departments_id", departmentId);
       data.append("categories_id", categoryId);
       data.append("provider", providerId);
+      data.append("information", information);
+      data.append("list", JSON.stringify(list));
 
       const response = await api.post("/products", data, {
         headers: { "x-access-token": employee.token },
@@ -500,6 +513,21 @@ export default function Produtos() {
     setProviderId(result.id);
     setProviderName(result.name);
     setModalProvider(false);
+  }
+
+  function handleList() {
+    const result = list.find((obj) => obj.text === listText);
+    if (result) {
+      showToast("Esta informação já existe", "warning", "Atenção");
+      return false;
+    }
+    setList([...list, { text: listText }]);
+    setListText("");
+  }
+
+  function removeList(text) {
+    const result = list.filter((obj) => obj.text !== text);
+    setList(result);
   }
 
   return (
@@ -1597,7 +1625,65 @@ export default function Produtos() {
                   </TabPanel>
 
                   <TabPanel>
-                    <Heading>Detalhes</Heading>
+                    <FormControl>
+                      <FormLabel>Informação sobre o Produto</FormLabel>
+                      <Textarea
+                        focusBorderColor={config.inputs}
+                        resize="none"
+                        rows={5}
+                        maxLength={250}
+                        value={information}
+                        onChange={(e) =>
+                          setInformation(capitalizeFirstLetter(e.target.value))
+                        }
+                      />
+                    </FormControl>
+
+                    <FormControl mt={5}>
+                      <FormLabel>Lista de Especificações</FormLabel>
+                      <Grid templateColumns="1fr 200px" gap="15px">
+                        <Input
+                          focusBorderColor={config.inputs}
+                          value={listText}
+                          onChange={(e) =>
+                            setListText(
+                              capitalizeAllFirstLetter(e.target.value)
+                            )
+                          }
+                        />
+                        <Button
+                          leftIcon={<FaPlus />}
+                          colorScheme={config.buttons}
+                          onClick={() => handleList()}
+                        >
+                          Adicionar
+                        </Button>
+                      </Grid>
+                    </FormControl>
+
+                    {list.length === 0 ? (
+                      ""
+                    ) : (
+                      <>
+                        <List spacing={3} mt={5}>
+                          {list.map((li) => (
+                            <ListItem key={li.text}>
+                              <ListIcon as={MdCheckCircle} color="green.500" />
+                              {li.text}{" "}
+                              <Tooltip label="Excluir Especificação" hasArrow>
+                                <IconButton
+                                  icon={<FaTrash />}
+                                  size="xs"
+                                  colorScheme="red"
+                                  ml={3}
+                                  onClick={() => removeList(li.text)}
+                                />
+                              </Tooltip>
+                            </ListItem>
+                          ))}
+                        </List>
+                      </>
+                    )}
                   </TabPanel>
                 </TabPanels>
               </Tabs>

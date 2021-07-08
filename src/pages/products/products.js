@@ -37,7 +37,6 @@ import {
   NumberDecrementStepper,
   IconButton,
   Tooltip,
-  HStack,
   Tabs,
   TabList,
   TabPanels,
@@ -46,13 +45,16 @@ import {
   Divider,
   Heading,
   Textarea,
+  List,
+  ListItem,
+  ListIcon,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
-import { MdKeyboardArrowDown } from "react-icons/md";
+import { MdCheckCircle, MdKeyboardArrowDown } from "react-icons/md";
 import {
   FaSave,
-  FaSearch,
+  FaTrash,
   FaEdit,
   FaImage,
   FaTag,
@@ -60,6 +62,8 @@ import {
   FaCalculator,
   FaArrowLeft,
   FaArrowRight,
+  FaPlus,
+  FaList,
 } from "react-icons/fa";
 import { InputFile, File } from "../../style/uploader";
 import { AiOutlineClose } from "react-icons/ai";
@@ -149,6 +153,13 @@ export default function ProductList() {
   const [productWeight, setProductWeight] = useState(0);
 
   const [baseUrl, setBaseUrl] = useState("");
+
+  const [modalInformation, setModalInformation] = useState(false);
+
+  const [information, setInformation] = useState("");
+  const [list, setList] = useState([]);
+  const [listText, setListText] = useState("");
+  const [loadingList, setLoadingList] = useState(false);
 
   async function findBaseUrl() {
     const base = await localStorage.getItem("baseUrl");
@@ -691,6 +702,97 @@ export default function ProductList() {
     }
   }
 
+  function handleList() {
+    const result = list.find((obj) => obj.text === listText);
+    if (result) {
+      showToast("Esta informação já existe", "warning", "Atenção");
+      return false;
+    }
+    setList([...list, { text: listText }]);
+    setListText("");
+  }
+
+  function removeList(text) {
+    const result = list.filter((obj) => obj.text !== text);
+    setList(result);
+  }
+
+  async function handleListInformation(id) {
+    const result = await products.find((obj) => obj.id === id);
+    if (result.list) {
+      setList(result.list);
+    } else {
+      setList([]);
+    }
+    if (result.information) {
+      setInformation(result.information);
+    }
+    setProductId(result.id);
+    setModalInformation(true);
+  }
+
+  async function UpdateList() {
+    if (information === "") {
+      showToast("Escreva uma informação sobre o produto", "warning", "Atenção");
+      return false;
+    }
+    if (list.length === 0) {
+      showToast("Insira uma lista de especificações", "warning", "Atenção");
+      return false;
+    }
+    setLoadingList(true);
+
+    try {
+      const response = await api.put(
+        `/updateInfoAndList/${productId}`,
+        { information, list: JSON.stringify(list) },
+        { headers: { "x-access-token": employee.token } }
+      );
+
+      const updatedProducts = await data.products.map((prod) => {
+        if (prod.id === productId) {
+          return {
+            ...prod,
+            information: response.data.product[0].information,
+            list: response.data.product[0].list,
+          };
+        }
+        return prod;
+      });
+
+      const info = { products: updatedProducts, count: data.count };
+
+      mutate(info, false);
+      mutateGlobal(`/updateInfoAndList/${productId}`, {
+        id: productId,
+        information: response.data.product[0].information,
+        list: response.data.product[0].list,
+      });
+
+      showToast(response.data.message, "success", "Sucesso");
+      setLoadingList(false);
+      setModalInformation(false);
+    } catch (error) {
+      setLoadingList(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
   return (
     <>
       <Hotkeys
@@ -858,6 +960,12 @@ export default function ProductList() {
                                 onClick={() => handleFindSizes(prod.id)}
                               >
                                 Ajustar Estoque / Tamanhos
+                              </MenuItem>
+                              <MenuItem
+                                icon={<FaList />}
+                                onClick={() => handleListInformation(prod.id)}
+                              >
+                                Ajustar Especificações
                               </MenuItem>
                               <MenuItem
                                 icon={<FaImage />}
@@ -1936,6 +2044,89 @@ export default function ProductList() {
                 leftIcon={<FaSave />}
                 isLoading={loadingImage}
                 onClick={() => handelUpdateImage()}
+              >
+                Salvar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        <Modal
+          isOpen={modalInformation}
+          onClose={() => setModalInformation(false)}
+          isCentered
+          scrollBehavior="inside"
+          size="2xl"
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Informação e Especificações</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel>Informação sobre o Produto</FormLabel>
+                <Textarea
+                  value={information}
+                  focusBorderColor={config.inputs}
+                  rows={5}
+                  resize="none"
+                  onChange={(e) =>
+                    setInformation(capitalizeFirstLetter(e.target.value))
+                  }
+                />
+              </FormControl>
+
+              <FormControl mt={5}>
+                <FormLabel>Lista de Especificações</FormLabel>
+                <Grid templateColumns="1fr 180px" gap="15px">
+                  <Input
+                    focusBorderColor={config.inputs}
+                    value={listText}
+                    onChange={(e) =>
+                      setListText(capitalizeFirstLetter(e.target.value))
+                    }
+                  />
+                  <Button
+                    leftIcon={<FaPlus />}
+                    colorScheme={config.buttons}
+                    onClick={() => handleList()}
+                    variant="outline"
+                  >
+                    Adicionar
+                  </Button>
+                </Grid>
+              </FormControl>
+
+              {list.length === 0 ? (
+                ""
+              ) : (
+                <>
+                  <List spacing={3} mt={5}>
+                    {list.map((li) => (
+                      <ListItem key={li.text}>
+                        <ListIcon as={MdCheckCircle} color="green.500" />
+                        {li.text}{" "}
+                        <Tooltip label="Excluir Especificação" hasArrow>
+                          <IconButton
+                            icon={<FaTrash />}
+                            size="xs"
+                            colorScheme="red"
+                            ml={3}
+                            onClick={() => removeList(li.text)}
+                          />
+                        </Tooltip>
+                      </ListItem>
+                    ))}
+                  </List>
+                </>
+              )}
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                colorScheme={config.buttons}
+                leftIcon={<FaSave />}
+                isLoading={loadingList}
+                onClick={() => UpdateList()}
               >
                 Salvar
               </Button>

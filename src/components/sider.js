@@ -113,6 +113,7 @@ export default function Sider() {
           <MenuItem
             icon={<FaShoppingBag />}
             onClick={() => routing("/listorders")}
+            isDisabled
           >
             Pedidos
           </MenuItem>
@@ -188,6 +189,7 @@ export default function Sider() {
           <MenuItem
             icon={<FaFileImport />}
             onClick={() => routing("/registerProducts")}
+            isDisabled
           >
             Importar XML
           </MenuItem>
@@ -220,7 +222,9 @@ export default function Sider() {
             Produtos
           </MenuItem>
           <MenuDivider />
-          <MenuItem icon={<FaBarcode />}>Etiquetas</MenuItem>
+          <MenuItem icon={<FaBarcode />} isDisabled>
+            Etiquetas
+          </MenuItem>
         </MenuList>
       </Menu>
 
@@ -246,6 +250,7 @@ export default function Sider() {
           <MenuItem
             icon={<FaFileAlt />}
             onClick={() => routing("/cashierreport")}
+            isDisabled
           >
             Relatório de Caixa
           </MenuItem>
@@ -262,6 +267,7 @@ export default function Sider() {
             size="lg"
             fontSize="2xl"
             variant="ghost"
+            isDisabled
           />
         </Tooltip>
         <MenuList shadow="lg">
@@ -326,12 +332,17 @@ export default function Sider() {
             Contas a Receber
           </MenuItem>
           <MenuDivider />
-          <MenuItem icon={<FaBarcode />} onClick={() => routing("/payments")}>
+          <MenuItem
+            icon={<FaBarcode />}
+            onClick={() => routing("/payments")}
+            isDisabled
+          >
             Gerenciar Pagamentos
           </MenuItem>
           <MenuItem
             icon={<FaPercentage />}
             onClick={() => routing("/comissions")}
+            isDisabled
           >
             Gerenciar Comissões
           </MenuItem>
@@ -348,6 +359,7 @@ export default function Sider() {
             size="lg"
             fontSize="2xl"
             variant="ghost"
+            isDisabled
           />
         </Tooltip>
         <MenuList shadow="lg">
@@ -367,6 +379,7 @@ export default function Sider() {
           onClick={() => routing("/")}
           variant="ghost"
           mt={3}
+          isDisabled
         />
       </Tooltip>
     </Flex>
