@@ -52,6 +52,7 @@ function createWindow() {
   });
   mainWindow.on("closed", () => (mainWindow = null));
 }
+app.setName("NKGEST - Gerenciador de Ecomerce");
 app.allowRendererProcessReuse = true;
 app.on("ready", createWindow);
 app.on("window-all-closed", () => {
