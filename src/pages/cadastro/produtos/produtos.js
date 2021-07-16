@@ -14,7 +14,6 @@ import {
   HStack,
   Divider,
   Textarea,
-  Heading,
   Select,
   Tooltip,
   Text,
@@ -199,6 +198,7 @@ export default function Produtos() {
       status: status,
       position: "bottom-right",
       duration: 8000,
+      isClosable: true,
     });
   }
 

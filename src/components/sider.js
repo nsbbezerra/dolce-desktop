@@ -186,6 +186,9 @@ export default function Sider() {
             Galeria de Imagens
           </MenuItem>
           <MenuDivider />
+          <MenuItem icon={<FaTags />} onClick={() => routing("/promotional")}>
+            Criar Promoções
+          </MenuItem>
           <MenuItem
             icon={<FaFileImport />}
             onClick={() => routing("/registerProducts")}
