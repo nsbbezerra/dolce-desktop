@@ -1,6 +1,18 @@
 const destakColor = localStorage.getItem("destak");
 const destak = !destakColor ? "blue" : destakColor;
 
+const rt = localStorage.getItem("route");
+const pt = localStorage.getItem("port");
+const tp = localStorage.getItem("typert");
+
+let route;
+
+if (pt === "" || pt === null || !pt) {
+  route = `${tp}://${rt}`;
+} else {
+  route = `${tp}://${rt}:${pt}`;
+}
+
 const config = {
   primary:
     (destak === "gray" && "#A0AEC0") ||
@@ -36,7 +48,7 @@ const config = {
     color: `${destak}.800`,
     border: `${destak}.200`,
   },
-  url: "http://localhost:3333",
+  url: route,
 };
 
 export default config;

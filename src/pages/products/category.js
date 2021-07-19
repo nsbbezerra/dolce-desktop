@@ -80,8 +80,9 @@ export default function CategoryList() {
       title: title,
       description: message,
       status: status,
-      position: "bottom-right",
+      position: "bottom",
       duration: 8000,
+      isClosable: true,
     });
   }
 
@@ -372,6 +373,7 @@ export default function CategoryList() {
                             onChange={(e) =>
                               handleActive(e.target.checked, cat.id)
                             }
+                            size="sm"
                           />
                         </Td>
                         <Td w="25%">{cat.name}</Td>

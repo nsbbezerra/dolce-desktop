@@ -196,7 +196,7 @@ export default function Produtos() {
       title: title,
       description: message,
       status: status,
-      position: "bottom-right",
+      position: "bottom",
       duration: 8000,
       isClosable: true,
     });

@@ -59,6 +59,14 @@ const customTheme = extendTheme({
         content: { boxShadow: "lg" },
       },
     },
+    Checkbox: {
+      baseStyle: { control: { _focus: { boxShadow: "none" } } },
+    },
+    Switch: {
+      baseStyle: {
+        control: { _focus: { boxShadow: "none" } },
+      },
+    },
   },
 });
 

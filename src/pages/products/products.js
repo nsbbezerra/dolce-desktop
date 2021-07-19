@@ -48,6 +48,9 @@ import {
   List,
   ListItem,
   ListIcon,
+  Checkbox,
+  Spinner,
+  Stack,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -161,6 +164,12 @@ export default function ProductList() {
   const [listText, setListText] = useState("");
   const [loadingList, setLoadingList] = useState(false);
 
+  const [promocao, setPromocao] = useState(false);
+  const [loadingPromo, setLoadingPromo] = useState(false);
+  const [tagsPromo, setTagsPromo] = useState([]);
+  const [namePromo, setNamePromo] = useState("");
+  const [idPromo, setIdPromo] = useState(0);
+
   async function findBaseUrl() {
     const base = await localStorage.getItem("baseUrl");
     setBaseUrl(base);
@@ -236,8 +245,9 @@ export default function ProductList() {
       title: title,
       description: message,
       status: status,
-      position: "bottom-right",
+      position: "bottom",
       duration: 8000,
+      isClosable: true,
     });
   }
 
@@ -288,6 +298,8 @@ export default function ProductList() {
           promotional: promoStatus,
           promotional_value: parseFloat(promoValue),
           promotional_rate: parseFloat(promoRate),
+          tag_name: namePromo,
+          tag_id: idPromo,
         },
         { headers: { "x-access-token": employee.token } }
       );
@@ -311,6 +323,11 @@ export default function ProductList() {
         promotional_rate: response.data.product[0].promotional_rate,
       });
       setLoading(false);
+      setNamePromo("");
+      setIdPromo(0);
+      setPromocao(false);
+      setPromoRate(0);
+      setPromoValue(0);
       showToast(response.data.message, "success", "Sucesso");
     } catch (error) {
       setLoading(false);
@@ -793,6 +810,46 @@ export default function ProductList() {
     }
   }
 
+  async function handleUsePromo(value) {
+    if (value === false) {
+      setPromocao(value);
+      setPromoRate(0);
+    } else {
+      setPromocao(value);
+      setLoadingPromo(true);
+
+      try {
+        const response = await api.get("/findActiveTags");
+        setTagsPromo(response.data);
+        setLoadingPromo(false);
+      } catch (error) {
+        setLoadingPromo(false);
+        if (error.message === "Network Error") {
+          alert(
+            "Sem conexão com o servidor, verifique sua conexão com a internet."
+          );
+          return false;
+        }
+        const statusCode = error.response.status || 400;
+        const typeError =
+          error.response.data.message || "Ocorreu um erro ao salvar";
+        const errorMesg = error.response.data.errorMessage || statusCode;
+        const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+        showToast(
+          errorMessageFinal,
+          "error",
+          statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+        );
+      }
+    }
+  }
+
+  function handleAddDiscount(discount, name, id) {
+    setPromoRate(discount);
+    setNamePromo(name);
+    setIdPromo(id);
+  }
+
   return (
     <>
       <Hotkeys
@@ -862,7 +919,7 @@ export default function ProductList() {
                         Ativo?
                       </Td>
                       <Td w="5%" textAlign="center">
-                        Promo?
+                        Promoção?
                       </Td>
                       <Td w="25%">Nome</Td>
                       <Td w="15%" isNumeric>
@@ -890,6 +947,7 @@ export default function ProductList() {
                             onChange={(e) =>
                               handleActive(e.target.checked, prod.id)
                             }
+                            size="sm"
                           />
                         </Td>
                         <Td w="5%" textAlign="center">
@@ -903,6 +961,7 @@ export default function ProductList() {
                                 prod.sale_value
                               )
                             }
+                            size="sm"
                           />
                         </Td>
                         <Td w="25%">{prod.name}</Td>
@@ -1806,6 +1865,36 @@ export default function ProductList() {
           <ModalContent>
             <ModalHeader>Valor Promocional</ModalHeader>
             <ModalBody>
+              {promocao && (
+                <>
+                  {loadingPromo ? (
+                    <Flex justify="center" align="center" mb={5}>
+                      <Spinner size="lg" />
+                    </Flex>
+                  ) : (
+                    <Stack mb={5}>
+                      {tagsPromo.map((tg) => (
+                        <Button
+                          w="max-content"
+                          size="sm"
+                          colorScheme={config.buttons}
+                          rounded="full"
+                          key={tg.id}
+                          onClick={() =>
+                            handleAddDiscount(
+                              parseFloat(tg.discount),
+                              tg.name,
+                              tg.id
+                            )
+                          }
+                        >
+                          {tg.name} - {parseFloat(tg.discount)}%
+                        </Button>
+                      ))}
+                    </Stack>
+                  )}
+                </>
+              )}
               <Grid templateColumns="1fr 1fr" gap="20px">
                 <FormControl>
                   <FormLabel>Desconto (%)</FormLabel>
@@ -1836,6 +1925,15 @@ export default function ProductList() {
               </Grid>
             </ModalBody>
             <ModalFooter>
+              <Checkbox
+                colorScheme={config.buttons}
+                size="lg"
+                mr={4}
+                defaultIsChecked={promocao}
+                onChange={(e) => handleUsePromo(e.target.checked)}
+              >
+                Usar Promoções
+              </Checkbox>
               <Button
                 colorScheme={config.buttons}
                 leftIcon={<FaSave />}

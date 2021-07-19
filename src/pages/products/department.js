@@ -86,8 +86,9 @@ export default function DepartmentList() {
       title: title,
       description: message,
       status: status,
-      position: "bottom-right",
+      position: "bottom",
       duration: 8000,
+      isClosable: true,
     });
   }
 
@@ -369,6 +370,7 @@ export default function DepartmentList() {
                             onChange={(e) =>
                               handleActive(e.target.checked, dep.id)
                             }
+                            size="sm"
                           />
                         </Td>
                         <Td w="35%">{dep.name}</Td>
