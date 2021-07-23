@@ -46,6 +46,7 @@ import {
   FaSave,
   FaSearch,
   FaTimes,
+  FaTrash,
 } from "react-icons/fa";
 import HeaderApp from "../../../components/headerApp";
 import { useEmployee } from "../../../context/Employee";
@@ -72,6 +73,7 @@ export default function Tamanhos() {
   const [idProduct, setIdProduct] = useState(null);
   const [skel, setSkel] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [sku, setSku] = useState("");
 
   const [findProducts, setFindProducts] = useState("");
 
@@ -99,6 +101,21 @@ export default function Tamanhos() {
     }
   }
 
+  async function finderProductsBySku(text) {
+    setSku(text);
+    if (text === "") {
+      await setProducts(data);
+    } else {
+      let termos = await text.split(" ");
+      let frasesFiltradas = await products.filter((frase) => {
+        return termos.reduce((resultadoAnterior, termoBuscado) => {
+          return resultadoAnterior && frase.sku.includes(termoBuscado);
+        }, true);
+      });
+      await setProducts(frasesFiltradas);
+    }
+  }
+
   function capitalizeFirstLetter(string) {
     let splited = string.split(" ");
     let toJoin = splited.map((e) => {
@@ -110,6 +127,7 @@ export default function Tamanhos() {
 
   useEffect(() => {
     setProducts(data);
+    console.log(data);
   }, [data]);
 
   function showToast(message, status, title) {
@@ -304,44 +322,42 @@ export default function Tamanhos() {
         <HeaderApp title="Cadastro de Tamanhos" icon={FaRulerCombined} />
 
         <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
-          <FormControl
-            isRequired
-            isInvalid={
-              validators.find((obj) => obj.path === "product") ? true : false
-            }
-          >
-            <FormLabel>Produto</FormLabel>
-            <Grid templateColumns="1fr 200px" gap="20px">
-              <Input
-                id="product"
-                focusBorderColor={config.inputs}
-                placeholder="Buscar Produtos"
-                value={nameProduct}
-                isReadOnly
-              />
-              <Button
-                isFullWidth
-                leftIcon={<FaSearch />}
-                onClick={() => setModalProducts(true)}
-                colorScheme={config.buttons}
-                variant="outline"
-              >
-                Buscar Produto
-                <Kbd ml={3} color="ButtonText">
-                  F2
-                </Kbd>
-              </Button>
-            </Grid>
-            <FormErrorMessage>
-              {validators.find((obj) => obj.path === "product")
-                ? validators.find((obj) => obj.path === "product").message
-                : ""}
-            </FormErrorMessage>
-          </FormControl>
+          <Grid templateColumns="2fr 1fr 1fr" gap="15px">
+            <FormControl
+              isRequired
+              isInvalid={
+                validators.find((obj) => obj.path === "product") ? true : false
+              }
+            >
+              <FormLabel>Produto</FormLabel>
+              <Grid templateColumns="1fr 150px" gap="15px">
+                <Input
+                  id="product"
+                  focusBorderColor={config.inputs}
+                  placeholder="Buscar Produtos"
+                  value={nameProduct}
+                  isReadOnly
+                />
+                <Button
+                  isFullWidth
+                  leftIcon={<FaSearch />}
+                  onClick={() => setModalProducts(true)}
+                  colorScheme={config.buttons}
+                  variant="outline"
+                >
+                  Buscar
+                  <Kbd ml={3} color="ButtonText">
+                    F2
+                  </Kbd>
+                </Button>
+              </Grid>
+              <FormErrorMessage>
+                {validators.find((obj) => obj.path === "product")
+                  ? validators.find((obj) => obj.path === "product").message
+                  : ""}
+              </FormErrorMessage>
+            </FormControl>
 
-          <Divider mt={5} mb={5} />
-
-          <Grid templateColumns="repeat(2, 1fr)" gap="15px">
             <FormControl
               isRequired
               isInvalid={
@@ -385,6 +401,22 @@ export default function Tamanhos() {
             </FormControl>
           </Grid>
 
+          <Button
+            leftIcon={<FaSave />}
+            colorScheme={config.buttons}
+            size="lg"
+            isLoading={loading}
+            onClick={() => register()}
+            mt={5}
+          >
+            Salvar
+            <Kbd ml={3} color="ButtonText">
+              F12
+            </Kbd>
+          </Button>
+
+          <Divider mt={5} mb={5} />
+
           {skel ? (
             <Stack mt={3}>
               <Skeleton height="30px" />
@@ -395,76 +427,77 @@ export default function Tamanhos() {
           ) : (
             <>
               {!!sizes.length ? (
-                <>
-                  <Divider mt={5} mb={5} />
-                  <Wrap spacing="15px">
-                    {sizes.map((clr) => (
-                      <WrapItem key={clr.id}>
-                        <Box w="160px" borderWidth="1px" rounded="md" p={2}>
-                          <Grid templateColumns="1fr 1fr" gap="10px">
-                            <FormControl>
-                              <FormLabel>Tamanho</FormLabel>
-                              <Input
-                                focusBorderColor={config.inputs}
-                                value={clr.size}
-                                isReadOnly
-                              />
-                            </FormControl>
-                            <FormControl>
-                              <FormLabel>QTD</FormLabel>
-                              <Input
-                                focusBorderColor={config.inputs}
-                                value={clr.amount}
-                                isReadOnly
-                              />
-                            </FormControl>
-                          </Grid>
-                          <Center mt={3} mb={1}>
-                            <Popover>
-                              <PopoverTrigger>
-                                <IconButton
-                                  aria-label="Search database"
-                                  variant="link"
-                                  colorScheme="red"
-                                  icon={<FaTimes />}
-                                  ml={1}
+                <Wrap spacing="15px">
+                  {sizes.map((clr) => (
+                    <WrapItem key={clr.id}>
+                      <Box
+                        w="160px"
+                        borderWidth="1px"
+                        rounded="md"
+                        overflow="hidden"
+                      >
+                        <Flex
+                          justify="center"
+                          align="center"
+                          p={2}
+                          bg={config.inputs}
+                          color="white"
+                        >
+                          <Text fontSize="2xl">
+                            <strong>{clr.size}</strong>
+                          </Text>
+                        </Flex>
+                        <Flex
+                          justify="center"
+                          align="center"
+                          p={2}
+                          mt={1}
+                          direction="column"
+                          textAlign="center"
+                        >
+                          <Text>Estoque:</Text>
+                          <Text fontSize="2xl" fontWeight="600">
+                            {clr.amount}
+                          </Text>
+                        </Flex>
+
+                        <Popover>
+                          <PopoverTrigger>
+                            <Button
+                              leftIcon={<FaTrash />}
+                              isFullWidth
+                              size="sm"
+                              rounded="none"
+                              colorScheme="red"
+                            >
+                              Excluir
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            _focus={{ outline: "none", boxShadow: "lg" }}
+                          >
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <PopoverHeader>Confirmação!</PopoverHeader>
+                            <PopoverBody>
+                              Deseja remover este tamanho?
+                            </PopoverBody>
+                            <PopoverFooter d="flex" justifyContent="flex-end">
+                              <ButtonGroup size="sm">
+                                <Button
                                   colorScheme={config.buttons}
-                                />
-                              </PopoverTrigger>
-                              <PopoverContent>
-                                <PopoverArrow />
-                                <PopoverCloseButton />
-                                <PopoverHeader>Confirmação!</PopoverHeader>
-                                <PopoverBody>
-                                  Deseja remover este tamanho?
-                                </PopoverBody>
-                                <PopoverFooter
-                                  d="flex"
-                                  justifyContent="flex-end"
+                                  onClick={() => deleteSize(clr.id)}
                                 >
-                                  <ButtonGroup size="sm">
-                                    <Button
-                                      variant="outline"
-                                      colorScheme={config.buttons}
-                                    >
-                                      Não
-                                    </Button>
-                                    <Button
-                                      colorScheme={config.buttons}
-                                      onClick={() => deleteSize(clr.id)}
-                                    >
-                                      Sim
-                                    </Button>
-                                  </ButtonGroup>
-                                </PopoverFooter>
-                              </PopoverContent>
-                            </Popover>
-                          </Center>
-                        </Box>
-                      </WrapItem>
-                    ))}
-                  </Wrap>
-                </>
+                                  Sim
+                                </Button>
+                              </ButtonGroup>
+                            </PopoverFooter>
+                          </PopoverContent>
+                        </Popover>
+                      </Box>
+                    </WrapItem>
+                  ))}
+                </Wrap>
               ) : (
                 <Flex justify="center" align="center" direction="column">
                   <Lottie animation={emptyAnimation} height={200} width={200} />
@@ -473,25 +506,12 @@ export default function Tamanhos() {
               )}
             </>
           )}
-          <Divider mt={5} mb={5} />
-          <Button
-            leftIcon={<FaSave />}
-            colorScheme={config.buttons}
-            size="lg"
-            isLoading={loading}
-            onClick={() => register()}
-          >
-            Salvar
-            <Kbd ml={3} color="ButtonText">
-              F12
-            </Kbd>
-          </Button>
         </Box>
 
         <Modal
           isOpen={modalProducts}
           onClose={() => setModalProducts(false)}
-          size="xl"
+          size="2xl"
           scrollBehavior="inside"
           isCentered
           initialFocusRef={initialRef}
@@ -501,15 +521,31 @@ export default function Tamanhos() {
             <ModalHeader>Produtos</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Input
-                placeholder="Digite para Buscar"
-                focusBorderColor={config.inputs}
-                value={findProducts}
-                onChange={(e) =>
-                  finderProductsBySource(capitalizeFirstLetter(e.target.value))
-                }
-                ref={initialRef}
-              />
+              <Grid templateColumns="1fr 1fr" gap="15px">
+                <FormControl>
+                  <FormLabel>Buscar por Nome:</FormLabel>
+                  <Input
+                    placeholder="Digite para Buscar"
+                    focusBorderColor={config.inputs}
+                    value={findProducts}
+                    onChange={(e) =>
+                      finderProductsBySource(
+                        capitalizeFirstLetter(e.target.value)
+                      )
+                    }
+                    ref={initialRef}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Buscar por Código:</FormLabel>
+                  <Input
+                    placeholder="Digite para Buscar"
+                    focusBorderColor={config.inputs}
+                    value={sku}
+                    onChange={(e) => finderProductsBySku(e.target.value)}
+                  />
+                </FormControl>
+              </Grid>
               {products ? (
                 <>
                   {products.length === 0 ? (
@@ -526,6 +562,7 @@ export default function Tamanhos() {
                       <Thead fontWeight="700">
                         <Tr>
                           <Td>Produto</Td>
+                          <Td w="20%">Código</Td>
                           <Td w="10%" isNumeric></Td>
                         </Tr>
                       </Thead>
@@ -533,6 +570,9 @@ export default function Tamanhos() {
                         {products.map((pro) => (
                           <Tr key={pro.id}>
                             <Td>{pro.name}</Td>
+                            <Td w="20%" isTruncated>
+                              {pro.sku}
+                            </Td>
                             <Td w="10%" isNumeric>
                               <IconButton
                                 aria-label="Search database"

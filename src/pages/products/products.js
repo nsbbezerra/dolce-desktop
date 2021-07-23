@@ -90,9 +90,11 @@ export default function ProductList() {
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState("0");
   const [advancedFind, setAdvancedFind] = useState("4");
-  const [searchProduct, setSearchProduct] = useState("Produto");
+  const [searchProduct, setSearchProduct] = useState("");
   const { data, error, mutate } = useFetch(
-    `/products/${page}/${advancedFind}/${searchProduct}`
+    `/products/${page}/${advancedFind}/${
+      searchProduct === "" ? "All" : searchProduct
+    }`
   );
 
   const [modalInfo, setModalInfo] = useState(false);
@@ -211,7 +213,7 @@ export default function ProductList() {
 
   useEffect(() => {
     if (advancedFind !== "5" && searchProduct === "") {
-      setSearchProduct("Produto");
+      setSearchProduct("");
     }
   }, [advancedFind]);
 
@@ -863,23 +865,7 @@ export default function ProductList() {
         <HeaderApp title="Gerenciar Produtos" icon={FaTag} />
 
         <Box borderWidth="1px" shadow="md" rounded="md" p={3} mt="25px">
-          <Grid templateColumns="2fr 1fr" gap="15px">
-            <FormControl>
-              <FormLabel>
-                Digite para buscar <Kbd ml={3}>F3</Kbd>
-              </FormLabel>
-              <Input
-                id="search"
-                type="text"
-                placeholder="Digite para buscar"
-                focusBorderColor={config.inputs}
-                value={searchProduct}
-                onChange={(e) =>
-                  setSearchProduct(capitalizeFirstLetter(e.target.value))
-                }
-                isDisabled={advancedFind === "5" ? false : true}
-              />
-            </FormControl>
+          <Grid templateColumns="1fr 3fr" gap="15px">
             <FormControl>
               <FormLabel>Selecione uma opção de busca:</FormLabel>
               <Grid templateColumns="1fr" gap="15px">
@@ -894,8 +880,31 @@ export default function ProductList() {
                   <option value={"3"}>Todos os Promocionais</option>
                   <option value={"4"}>Todos os Produtos</option>
                   <option value={"5"}>Pesquisar por Nome</option>
+                  <option value={"6"}>Pesquisar por Código</option>
                 </Select>
               </Grid>
+            </FormControl>
+            <FormControl>
+              <FormLabel>
+                Digite para buscar <Kbd ml={3}>F3</Kbd>
+              </FormLabel>
+              <Input
+                id="search"
+                type="text"
+                placeholder="Digite para buscar"
+                focusBorderColor={config.inputs}
+                value={searchProduct}
+                onChange={(e) =>
+                  setSearchProduct(
+                    advancedFind === "5"
+                      ? capitalizeFirstLetter(e.target.value)
+                      : e.target.value
+                  )
+                }
+                isDisabled={
+                  advancedFind === "5" || advancedFind === "6" ? false : true
+                }
+              />
             </FormControl>
           </Grid>
 
@@ -922,6 +931,7 @@ export default function ProductList() {
                         Promoção?
                       </Td>
                       <Td w="25%">Nome</Td>
+                      <Td w="15%">Código</Td>
                       <Td w="15%" isNumeric>
                         Valor de Custo
                       </Td>
@@ -965,6 +975,9 @@ export default function ProductList() {
                           />
                         </Td>
                         <Td w="25%">{prod.name}</Td>
+                        <Td w="15%" isTruncated>
+                          {prod.sku}
+                        </Td>
                         <Td w="15%" isNumeric>
                           {parseFloat(prod.cost_value).toLocaleString("pt-BR", {
                             style: "currency",
@@ -993,8 +1006,8 @@ export default function ProductList() {
                         </Td>
                         <Td w="10%" isNumeric>
                           {prod.promotional_rate !== null
-                            ? `${prod.promotional_rate}%`
-                            : "0.00%"}
+                            ? `${parseFloat(prod.promotional_rate)}%`
+                            : "0%"}
                         </Td>
                         <Td w="10%">
                           <Menu>
