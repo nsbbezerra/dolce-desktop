@@ -11,7 +11,6 @@ import {
   Button,
   FormLabel,
   FormControl,
-  HStack,
   Divider,
   Textarea,
   Select,
@@ -23,17 +22,6 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Td,
   IconButton,
   FormErrorMessage,
   Flex,
@@ -50,8 +38,6 @@ import {
   FaSave,
   FaCalculator,
   FaImage,
-  FaCheck,
-  FaSearch,
   FaArrowLeft,
   FaArrowRight,
   FaPlus,
@@ -67,8 +53,6 @@ import Hotkeys from "react-hot-keys";
 import api from "../../../configs/axios";
 import marge from "../../../data/marge";
 import MaskedInput from "react-text-mask";
-import Lottie from "../../../components/lottie";
-import emptyAnimation from "../../../animations/empty.json";
 import { MdCheckCircle } from "react-icons/md";
 
 export default function Produtos() {
@@ -82,8 +66,6 @@ export default function Produtos() {
   const [modalCategories, setModalCategories] = useState(false);
   const [modalDepartments, setModalDepartments] = useState(false);
   const [validators, setValidators] = useState([]);
-  const [findCategories, setFindCategories] = useState("");
-  const [findDepartments, setFindDepartments] = useState("");
   const [loading, setLoading] = useState(false);
   const [providers, setProviders] = useState([]);
   const [modalProvider, setModalProvider] = useState(false);
@@ -136,14 +118,12 @@ export default function Produtos() {
   const [productLength, setProductLength] = useState(0);
   const [productWeight, setProductWeight] = useState(0);
 
-  const [departmentName, setDepartmentName] = useState("");
   const [departmentId, setDepartmentId] = useState(null);
-  const [categoryName, setCategoryName] = useState("");
   const [categoryId, setCategoryId] = useState(null);
+  const [sub_cat_id, setSub_cat_id] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [categoriesSearched, setCategoriesSearched] = useState([]);
-  const [findProvider, setFindProvider] = useState("");
+  const [subCats, setSubCats] = useState([]);
   const [information, setInformation] = useState("");
   const [list, setList] = useState([]);
   const [listText, setListText] = useState("");
@@ -153,10 +133,9 @@ export default function Produtos() {
     setNcm("");
     setCest("");
     setCfop("");
-    setDepartmentName("");
     setDepartmentId(null);
-    setCategoryName("");
     setCategoryId(null);
+    setSub_cat_id(null);
     setTabIndex(0);
     setName("");
     setDescription("");
@@ -189,6 +168,67 @@ export default function Produtos() {
     setProductLength(0);
     setInformation("");
     setList([]);
+  }
+
+  function handleDepartment(value) {
+    setDepartmentId(value);
+    findCategories(value);
+    setCategoryId(null);
+    setSub_cat_id(null);
+  }
+
+  function handleCategories(value) {
+    setCategoryId(value);
+    findSubCategories(value);
+    setSub_cat_id(null);
+  }
+
+  async function findCategories(id) {
+    try {
+      const response = await api.get(`/findCatByDepartments/${id}`);
+      setCategories(response.data);
+    } catch (error) {
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+      } else {
+        const statusCode = error.response.status || 400;
+        const typeError =
+          error.response.data.message || "Ocorreu um erro ao buscar";
+        const errorMesg = error.response.data.errorMessage || statusCode;
+        const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+        showToast(
+          errorMessageFinal,
+          "error",
+          statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+        );
+      }
+    }
+  }
+
+  async function findSubCategories(id) {
+    try {
+      const response = await api.get(`/subCat/${id}`);
+      setSubCats(response.data);
+    } catch (error) {
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+      } else {
+        const statusCode = error.response.status || 400;
+        const typeError =
+          error.response.data.message || "Ocorreu um erro ao buscar";
+        const errorMesg = error.response.data.errorMessage || statusCode;
+        const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+        showToast(
+          errorMessageFinal,
+          "error",
+          statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+        );
+      }
+    }
   }
 
   function showToast(message, status, title) {
@@ -231,53 +271,6 @@ export default function Produtos() {
     setValidators([]);
   }
 
-  async function finderCategorieBySource(text) {
-    setFindCategories(text);
-    if (text === "") {
-      setCategories(categoriesSearched);
-    } else {
-      let termos = await text.split(" ");
-      let frasesFiltradas = await categories.filter((frase) => {
-        return termos.reduce((resultadoAnterior, termoBuscado) => {
-          return resultadoAnterior && frase.name.includes(termoBuscado);
-        }, true);
-      });
-      await setCategories(frasesFiltradas);
-    }
-  }
-
-  async function finderProviderBySource(text) {
-    setFindProvider(text);
-    if (text === "") {
-      setProviders(data.providers);
-    } else {
-      let termos = await text.split(" ");
-      let frasesFiltradas = await providers.filter((frase) => {
-        return termos.reduce((resultadoAnterior, termoBuscado) => {
-          return resultadoAnterior && frase.name.includes(termoBuscado);
-        }, true);
-      });
-      await setProviders(frasesFiltradas);
-    }
-  }
-
-  async function finderDepartmentsBySource(text) {
-    setFindDepartments(text);
-    if (text === "") {
-      if (data) {
-        await setDepartments(data.departments);
-      }
-    } else {
-      let termos = await text.split(" ");
-      let frasesFiltradas = await departments.filter((frase) => {
-        return termos.reduce((resultadoAnterior, termoBuscado) => {
-          return resultadoAnterior && frase.name.includes(termoBuscado);
-        }, true);
-      });
-      await setDepartments(frasesFiltradas);
-    }
-  }
-
   function capitalizeAllFirstLetter(string) {
     let splited = string.split(" ");
     let toJoin = splited.map((e) => {
@@ -309,30 +302,6 @@ export default function Produtos() {
     }
   }, [thumbnail]);
 
-  async function handleCategoryId(id) {
-    const result = await categories.find((obj) => obj.id === id);
-    setCategoryId(result.id);
-    setCategoryName(result.name);
-    setModalCategories(false);
-  }
-
-  async function handleDepartmentId(id) {
-    setCategoryId(null);
-    setCategoryName("");
-    let cat;
-    let categor;
-    if (data) {
-      cat = data.categories;
-      categor = await cat.filter((obj) => obj.departments_id === id);
-    }
-    const result = await departments.find((obj) => obj.id === id);
-    setCategories(categor);
-    setCategoriesSearched(categor);
-    setDepartmentId(result.id);
-    setDepartmentName(result.name);
-    setModalDepartments(false);
-  }
-
   function handleValidator(path, message) {
     let val = [];
     let info = { path: path, message: message };
@@ -359,6 +328,10 @@ export default function Produtos() {
     }
     if (!categoryId) {
       handleValidator("category", "Selcione uma categoria");
+      return false;
+    }
+    if (!sub_cat_id) {
+      handleValidator("sub_cat", "Selcione uma Sub-Categoria");
       return false;
     }
     if (!thumbnail) {
@@ -494,25 +467,9 @@ export default function Produtos() {
   }
 
   function onKeyDown(keyName, e, handle) {
-    if (keyName === "f3") {
-      setModalCategories(true);
-    }
-    if (keyName === "f2") {
-      setModalDepartments(true);
-    }
-    if (keyName === "f5") {
-      setModalProvider(true);
-    }
     if (keyName === "f12") {
       register(e);
     }
-  }
-
-  async function handleProvider(id) {
-    const result = await providers.find((obj) => obj.id === id);
-    setProviderId(result.id);
-    setProviderName(result.name);
-    setModalProvider(false);
   }
 
   function handleList() {
@@ -544,131 +501,127 @@ export default function Produtos() {
 
         <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
           <Grid
-            templateColumns="repeat(3, 1fr)"
+            templateColumns="repeat(4, 1fr)"
             gap="15px"
             alignContent="center"
           >
-            <HStack spacing="5px">
-              <FormControl
-                isRequired
-                mr={3}
-                isInvalid={
-                  validators.find((obj) => obj.path === "provider")
-                    ? true
-                    : false
-                }
+            <FormControl
+              isRequired
+              mr={3}
+              isInvalid={
+                validators.find((obj) => obj.path === "provider") ? true : false
+              }
+            >
+              <FormLabel>Fornecedor</FormLabel>
+              <Select
+                id="provider"
+                focusBorderColor={config.inputs}
+                placeholder="Selecione um Fornecedor"
+                value={providerId}
+                onChange={(e) => setProviderId(e.target.value)}
               >
-                <FormLabel>Fornecedor</FormLabel>
-                <Grid templateColumns="2fr 1fr" gap="15px">
-                  <Input
-                    id="provider"
-                    placeholder="Fornecedor"
-                    focusBorderColor={config.inputs}
-                    isReadOnly
-                    value={providerName}
-                  />
-                  <Button
-                    isFullWidth
-                    leftIcon={<FaSearch />}
-                    onClick={() => setModalProvider(true)}
-                    colorScheme={config.buttons}
-                    variant="outline"
-                  >
-                    Buscar{" "}
-                    <Kbd ml={3} color="ButtonText">
-                      F5
-                    </Kbd>
-                  </Button>
-                </Grid>
+                {providers.map((pro) => (
+                  <option value={pro.id} key={pro.id}>
+                    {pro.name}
+                  </option>
+                ))}
+              </Select>
 
-                <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "provider")
-                    ? validators.find((obj) => obj.path === "provider").message
-                    : ""}
-                </FormErrorMessage>
-              </FormControl>
-            </HStack>
-            <HStack spacing="5px">
-              <FormControl
-                isRequired
-                mr={3}
-                isInvalid={
-                  validators.find((obj) => obj.path === "department")
-                    ? true
-                    : false
-                }
+              <FormErrorMessage>
+                {validators.find((obj) => obj.path === "provider")
+                  ? validators.find((obj) => obj.path === "provider").message
+                  : ""}
+              </FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              isRequired
+              mr={3}
+              isInvalid={
+                validators.find((obj) => obj.path === "department")
+                  ? true
+                  : false
+              }
+            >
+              <FormLabel>Departamento</FormLabel>
+              <Select
+                id="department"
+                focusBorderColor={config.inputs}
+                placeholder="Selecione um Departamento"
+                value={departmentId}
+                onChange={(e) => handleDepartment(e.target.value)}
               >
-                <FormLabel>Departamento</FormLabel>
-                <Grid templateColumns="2fr 1fr" gap="15px">
-                  <Input
-                    id="department"
-                    placeholder="Departamento"
-                    focusBorderColor={config.inputs}
-                    isReadOnly
-                    value={departmentName}
-                  />
-                  <Button
-                    isFullWidth
-                    leftIcon={<FaSearch />}
-                    onClick={() => setModalDepartments(true)}
-                    colorScheme={config.buttons}
-                    variant="outline"
-                  >
-                    Buscar{" "}
-                    <Kbd ml={3} color="ButtonText">
-                      F2
-                    </Kbd>
-                  </Button>
-                </Grid>
+                {departments.map((dep) => (
+                  <option value={dep.id} key={dep.id}>
+                    {dep.name}
+                  </option>
+                ))}
+              </Select>
 
-                <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "department")
-                    ? validators.find((obj) => obj.path === "department")
-                        .message
-                    : ""}
-                </FormErrorMessage>
-              </FormControl>
-            </HStack>
-            <HStack spacing="5px">
-              <FormControl
-                isRequired
-                mr={3}
-                isInvalid={
-                  validators.find((obj) => obj.path === "category")
-                    ? true
-                    : false
-                }
+              <FormErrorMessage>
+                {validators.find((obj) => obj.path === "department")
+                  ? validators.find((obj) => obj.path === "department").message
+                  : ""}
+              </FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              isRequired
+              mr={3}
+              isInvalid={
+                validators.find((obj) => obj.path === "category") ? true : false
+              }
+            >
+              <FormLabel>Categoria</FormLabel>
+              <Select
+                id="category"
+                focusBorderColor={config.inputs}
+                placeholder="Selecione uma Categoria"
+                value={categoryId}
+                onChange={(e) => handleCategories(e.target.value)}
               >
-                <FormLabel>Categoria</FormLabel>
-                <Grid templateColumns="2fr 1fr" gap="15px">
-                  <Input
-                    id="category"
-                    placeholder="Departamento"
-                    focusBorderColor={config.inputs}
-                    isReadOnly
-                    value={categoryName}
-                  />
-                  <Button
-                    isFullWidth
-                    leftIcon={<FaSearch />}
-                    onClick={() => setModalCategories(true)}
-                    colorScheme={config.buttons}
-                    variant="outline"
-                  >
-                    Buscar{" "}
-                    <Kbd ml={3} color="ButtonText">
-                      F3
-                    </Kbd>
-                  </Button>
-                </Grid>
+                {categories.map((cat) => (
+                  <option value={cat.id} key={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </Select>
 
-                <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "category")
-                    ? validators.find((obj) => obj.path === "category").message
-                    : ""}
-                </FormErrorMessage>
-              </FormControl>
-            </HStack>
+              <FormErrorMessage>
+                {validators.find((obj) => obj.path === "category")
+                  ? validators.find((obj) => obj.path === "category").message
+                  : ""}
+              </FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              isRequired
+              mr={3}
+              isInvalid={
+                validators.find((obj) => obj.path === "sub_cat") ? true : false
+              }
+            >
+              <FormLabel>Sub-Categoria</FormLabel>
+              <Select
+                id="sub_cat"
+                focusBorderColor={config.inputs}
+                placeholder="Selecione uma Sub-Categoria"
+                value={sub_cat_id}
+                onChange={(e) => setSub_cat_id(e.target.value)}
+              >
+                {subCats.map((cat) => (
+                  <option value={cat.id} key={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </Select>
+
+              <FormErrorMessage>
+                {validators.find((obj) => obj.path === "sub_cat")
+                  ? validators.find((obj) => obj.path === "sub_cat").message
+                  : ""}
+              </FormErrorMessage>
+            </FormControl>
           </Grid>
 
           <Divider mt={5} mb={5} />
@@ -1731,187 +1684,6 @@ export default function Produtos() {
             )}
           </Box>
         </Box>
-
-        <Modal
-          isOpen={modalCategories}
-          onClose={() => setModalCategories(false)}
-          size="xl"
-          scrollBehavior="inside"
-          isCentered
-          initialFocusRef={initialRef}
-        >
-          <ModalOverlay />
-          <ModalContent pb={4}>
-            <ModalHeader>Categorias</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Input
-                placeholder="Digite para Buscar"
-                focusBorderColor={config.inputs}
-                value={findCategories}
-                onChange={(e) =>
-                  finderCategorieBySource(
-                    capitalizeAllFirstLetter(e.target.value)
-                  )
-                }
-                ref={initialRef}
-              />
-
-              {!!categories.length ? (
-                <Table size="sm" mt={3}>
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td>Categoria</Td>
-                      <Td w="10%" isNumeric></Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {categories.map((cat) => (
-                      <Tr key={cat.id}>
-                        <Td>{cat.name}</Td>
-                        <Td w="10%" isNumeric>
-                          <IconButton
-                            aria-label="Search database"
-                            icon={<FaCheck />}
-                            size="xs"
-                            isRound
-                            colorScheme={config.buttons}
-                            onClick={() => handleCategoryId(cat.id)}
-                          />
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              ) : (
-                <Flex justify="center" align="center" direction="column">
-                  <Lottie animation={emptyAnimation} height={200} width={200} />
-                  <Text>Nenhuma categoria para mostrar</Text>
-                </Flex>
-              )}
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-
-        <Modal
-          isOpen={modalDepartments}
-          onClose={() => setModalDepartments(false)}
-          size="xl"
-          scrollBehavior="inside"
-          isCentered
-          initialFocusRef={initialRef}
-        >
-          <ModalOverlay />
-          <ModalContent pb={4}>
-            <ModalHeader>Departamentos</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Input
-                placeholder="Digite para Buscar"
-                focusBorderColor={config.inputs}
-                value={findDepartments}
-                onChange={(e) =>
-                  finderDepartmentsBySource(
-                    capitalizeAllFirstLetter(e.target.value)
-                  )
-                }
-                ref={initialRef}
-              />
-              {!!departments.length ? (
-                <Table size="sm" mt={3}>
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td>Departamento</Td>
-                      <Td w="10%" isNumeric></Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {departments.map((dep) => (
-                      <Tr key={dep.id}>
-                        <Td>{dep.name}</Td>
-                        <Td w="10%" isNumeric>
-                          <IconButton
-                            aria-label="Search database"
-                            icon={<FaCheck />}
-                            size="xs"
-                            isRound
-                            colorScheme={config.buttons}
-                            onClick={() => handleDepartmentId(dep.id)}
-                          />
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              ) : (
-                <Flex justify="center" align="center" direction="column">
-                  <Lottie animation={emptyAnimation} height={200} width={200} />
-                  <Text>Nenhum departamento para mostrar</Text>
-                </Flex>
-              )}
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-
-        <Modal
-          isOpen={modalProvider}
-          onClose={() => setModalProvider(false)}
-          size="xl"
-          scrollBehavior="inside"
-          isCentered
-          initialFocusRef={initialRef}
-        >
-          <ModalOverlay />
-          <ModalContent pb={4}>
-            <ModalHeader>Fornecedores</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Input
-                placeholder="Digite para Buscar"
-                focusBorderColor={config.inputs}
-                value={findProvider}
-                onChange={(e) =>
-                  finderProviderBySource(
-                    capitalizeAllFirstLetter(e.target.value)
-                  )
-                }
-                ref={initialRef}
-              />
-              {!!providers.length ? (
-                <Table size="sm" mt={3}>
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td>Fornecedor</Td>
-                      <Td w="10%" isNumeric></Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {providers.map((dep) => (
-                      <Tr key={dep.id}>
-                        <Td>{dep.name}</Td>
-                        <Td w="10%" isNumeric>
-                          <IconButton
-                            aria-label="Search database"
-                            icon={<FaCheck />}
-                            size="xs"
-                            isRound
-                            colorScheme={config.buttons}
-                            onClick={() => handleProvider(dep.id)}
-                          />
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              ) : (
-                <Flex justify="center" align="center" direction="column">
-                  <Lottie animation={emptyAnimation} height={200} width={200} />
-                  <Text>Nenhum fornecedor para mostrar</Text>
-                </Flex>
-              )}
-            </ModalBody>
-          </ModalContent>
-        </Modal>
       </Hotkeys>
     </>
   );

@@ -2131,7 +2131,7 @@ export default function ProductList() {
                         </Flex>
                       </Box>
                     ) : (
-                      <InputFile alt={310} lar={280} cor={colorMode}>
+                      <InputFile alt={300} lar={300} cor={colorMode}>
                         <File
                           type="file"
                           onChange={(event) =>
@@ -2140,7 +2140,7 @@ export default function ProductList() {
                         />
                         <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
                         <Text>
-                          Insira uma imagem 280x310 pixels, de até 500kb
+                          Insira uma imagem 300x300 pixels, de até 500kb
                         </Text>
                       </InputFile>
                     )}

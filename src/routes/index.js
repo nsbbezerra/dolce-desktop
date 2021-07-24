@@ -20,6 +20,7 @@ import RegisterSizes from "../pages/cadastro/produtos/tamanhos";
 import RegisterImages from "../pages/cadastro/produtos/imagens";
 import RegisterProvider from "../pages/cadastro/provider";
 import MakePromotional from "../pages/cadastro/promotional";
+import SubCategories from "../pages/cadastro/subCategories";
 
 /** ESTOQUE */
 import ListDepartment from "../pages/products/department";
@@ -146,6 +147,9 @@ export default function Routers() {
       </Route>
       <Route path="/promotional">
         <MakePromotional />
+      </Route>
+      <Route path="/subCategories">
+        <SubCategories />
       </Route>
     </Switch>
   );

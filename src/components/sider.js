@@ -42,6 +42,7 @@ import {
   AiOutlineRise,
   AiOutlineFall,
 } from "react-icons/ai";
+import { RiPriceTag2Fill } from "react-icons/ri";
 import { MdDashboard } from "react-icons/md";
 import config from "../configs";
 import { useEmployee } from "../context/Employee";
@@ -169,6 +170,12 @@ export default function Sider() {
             onClick={() => routing("/registerCategory")}
           >
             Categorias
+          </MenuItem>
+          <MenuItem
+            icon={<RiPriceTag2Fill />}
+            onClick={() => routing("/subCategories")}
+          >
+            Sub-Categorias
           </MenuItem>
           <MenuItem
             icon={<FaTag />}
