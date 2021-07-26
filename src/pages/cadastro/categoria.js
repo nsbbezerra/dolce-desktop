@@ -1,61 +1,36 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Flex,
-  IconButton,
   Box,
   Grid,
-  Text,
   FormLabel,
   FormControl,
   Input,
   Textarea,
   Divider,
   Button,
-  useColorMode,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  Table,
-  Tbody,
-  Thead,
-  Tr,
-  Td,
-  Tooltip,
   useToast,
   FormErrorMessage,
-  Image,
   Kbd,
+  Select,
 } from "@chakra-ui/react";
-import { FaSave, FaImage, FaTags, FaSearch, FaCheck } from "react-icons/fa";
-import { AiOutlineClose } from "react-icons/ai";
+import { FaSave, FaTags } from "react-icons/fa";
 import config from "../../configs";
 import HeaderApp from "../../components/headerApp";
-import { InputFile, File } from "../../style/uploader";
 import useFetch from "../../hooks/useFetch";
 import Hotkeys from "react-hot-keys";
 import api from "../../configs/axios";
 import { useEmployee } from "../../context/Employee";
-import Lottie from "../../components/lottie";
-import emptyAnimation from "../../animations/empty.json";
 
 export default function Categoria() {
   const { data, error } = useFetch("/departments");
   const toast = useToast();
-  const { colorMode } = useColorMode();
-  const initialRef = useRef();
   const { employee } = useEmployee();
 
-  const [modalDepartment, setModalDepartment] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [validators, setValidators] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [idDepartment, setIdDepartment] = useState(null);
-  const [nameDepartment, setNameDepartment] = useState("");
-  const [handleSearch, setHandleSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
   function showToast(message, status, title) {
@@ -70,7 +45,9 @@ export default function Categoria() {
   }
 
   useEffect(() => {
-    setDepartments(data);
+    if (data) {
+      setDepartments(data);
+    }
   }, [data]);
 
   if (error) {
@@ -119,32 +96,7 @@ export default function Categoria() {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-  async function handleDepartment(id) {
-    const result = await departments.find((obj) => obj.id === id);
-    setIdDepartment(result.id);
-    setNameDepartment(result.name);
-    setModalDepartment(false);
-  }
-
-  async function finderClientsBySource(text) {
-    setHandleSearch(text);
-    if (text === "") {
-      await setDepartments(data);
-    } else {
-      let termos = await text.split(" ");
-      let frasesFiltradas = await departments.filter((frase) => {
-        return termos.reduce((resultadoAnterior, termoBuscado) => {
-          return resultadoAnterior && frase.name.includes(termoBuscado);
-        }, true);
-      });
-      await setDepartments(frasesFiltradas);
-    }
-  }
-
   function onKeyDown(keyName, e, handle) {
-    if (keyName === "f3") {
-      setModalDepartment(true);
-    }
     if (keyName === "f12") {
       register(e);
     }
@@ -156,7 +108,6 @@ export default function Categoria() {
     }
     if (!idDepartment || idDepartment === null) {
       handleValidator("department", "Selecione um departamento");
-      setModalDepartment(true);
       return false;
     }
     if (!name || name === "") {
@@ -181,7 +132,6 @@ export default function Categoria() {
       setLoading(false);
       showToast(response.data.message, "success", "Sucesso");
       setIdDepartment(null);
-      setNameDepartment("");
       setName("");
       setDescription("");
     } catch (error) {
@@ -208,7 +158,7 @@ export default function Categoria() {
   return (
     <>
       <Hotkeys
-        keyName="f3, f12"
+        keyName="f12"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -218,7 +168,7 @@ export default function Categoria() {
         <HeaderApp title="Cadastro de Categorias" icon={FaTags} />
 
         <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
-          <Grid templateColumns="1fr 250px" gap="15px">
+          <Grid templateColumns="1fr 1fr" gap="15px">
             <FormControl
               isRequired
               isInvalid={
@@ -227,59 +177,53 @@ export default function Categoria() {
                   : false
               }
             >
-              <Input
+              <FormLabel>Selecione um Departamento</FormLabel>
+              <Select
                 id="department"
-                placeholder="Departamento"
                 focusBorderColor={config.inputs}
-                isReadOnly
-                value={nameDepartment}
-              />
+                placeholder="Selecione um Departamento"
+                value={idDepartment}
+                onChange={(e) => setIdDepartment(e.target.value)}
+              >
+                {departments.map((dep) => (
+                  <option key={dep.id} value={dep.id}>
+                    {dep.name}
+                  </option>
+                ))}
+              </Select>
               <FormErrorMessage>
                 {validators.find((obj) => obj.path === "department")
                   ? validators.find((obj) => obj.path === "department").message
                   : ""}
               </FormErrorMessage>
             </FormControl>
-            <Button
-              leftIcon={<FaSearch />}
-              onClick={() => setModalDepartment(true)}
-              colorScheme={config.buttons}
-              variant="outline"
+            <FormControl
+              isRequired
+              isInvalid={
+                validators.find((obj) => obj.path === "name") ? true : false
+              }
             >
-              Buscar Departamento{" "}
-              <Kbd ml={3} color="ButtonText">
-                F3
-              </Kbd>
-            </Button>
+              <FormLabel>Nome da Categoria</FormLabel>
+              <Input
+                id="name"
+                placeholder="Nome"
+                focusBorderColor={config.inputs}
+                value={name}
+                onChange={(e) =>
+                  setName(capitalizeAllFirstLetter(e.target.value))
+                }
+              />
+              <FormErrorMessage>
+                {validators.find((obj) => obj.path === "name")
+                  ? validators.find((obj) => obj.path === "name").message
+                  : ""}
+              </FormErrorMessage>
+            </FormControl>
           </Grid>
-          <Divider mt={5} mb={5} />
-          <Grid templateColumns="1fr" gap="15px">
+          <Grid templateColumns="1fr" gap="15px" mt={5}>
             <Box>
               <FormControl
                 isRequired
-                isInvalid={
-                  validators.find((obj) => obj.path === "name") ? true : false
-                }
-              >
-                <FormLabel>Nome da Categoria</FormLabel>
-                <Input
-                  id="name"
-                  placeholder="Nome"
-                  focusBorderColor={config.inputs}
-                  value={name}
-                  onChange={(e) =>
-                    setName(capitalizeAllFirstLetter(e.target.value))
-                  }
-                />
-                <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "name")
-                    ? validators.find((obj) => obj.path === "name").message
-                    : ""}
-                </FormErrorMessage>
-              </FormControl>
-              <FormControl
-                isRequired
-                mt={3}
                 isInvalid={
                   validators.find((obj) => obj.path === "description")
                     ? true
@@ -321,86 +265,6 @@ export default function Categoria() {
             </Box>
           </Grid>
         </Box>
-
-        <Modal
-          isOpen={modalDepartment}
-          onClose={() => setModalDepartment(false)}
-          size="xl"
-          isCentered
-          scrollBehavior="inside"
-          initialFocusRef={initialRef}
-        >
-          <ModalOverlay />
-          <ModalContent maxW="50rem">
-            <ModalHeader>Buscar Departamento</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody pb={5}>
-              <Input
-                placeholder="Digite um nome para buscar"
-                focusBorderColor={config.inputs}
-                ref={initialRef}
-                value={handleSearch}
-                onChange={(e) =>
-                  finderClientsBySource(
-                    capitalizeAllFirstLetter(e.target.value)
-                  )
-                }
-              />
-
-              {departments && (
-                <>
-                  {departments.length === 0 ? (
-                    <Flex justify="center" align="center" direction="column">
-                      <Lottie
-                        animation={emptyAnimation}
-                        height={200}
-                        width={200}
-                      />
-                      <Text>Nenhum departamento para mostrar</Text>
-                    </Flex>
-                  ) : (
-                    <Box mt={3}>
-                      <Table size="sm">
-                        <Thead fontWeight="700">
-                          <Tr>
-                            <Td>Nome</Td>
-                            <Td w="10%">Ações</Td>
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          {departments && (
-                            <>
-                              {departments.map((dep) => (
-                                <Tr key={dep.id}>
-                                  <Td>{dep.name}</Td>
-                                  <Td w="10%" textAlign="center">
-                                    <Tooltip
-                                      label="Selecionar departamento"
-                                      hasArrow
-                                    >
-                                      <IconButton
-                                        aria-label="Search database"
-                                        icon={<FaCheck />}
-                                        size="xs"
-                                        isRound
-                                        colorScheme={config.buttons}
-                                        onClick={() => handleDepartment(dep.id)}
-                                      />
-                                    </Tooltip>
-                                  </Td>
-                                </Tr>
-                              ))}
-                            </>
-                          )}
-                        </Tbody>
-                      </Table>
-                    </Box>
-                  )}
-                </>
-              )}
-            </ModalBody>
-          </ModalContent>
-        </Modal>
       </Hotkeys>
     </>
   );

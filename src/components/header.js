@@ -283,7 +283,7 @@ export default function HeaderApp() {
             userSelect="none"
             draggable={false}
             src={Icone}
-            w="180px"
+            w="250px"
             mr="15px"
           />
         </Flex>
@@ -373,6 +373,7 @@ export default function HeaderApp() {
               size="sm"
               rounded="none"
               w="40px"
+              variant="ghost"
               fontSize="sm"
               borderBottomLeftRadius="5px"
               onClick={() => handleMinimize()}
@@ -384,6 +385,7 @@ export default function HeaderApp() {
               icon={<FiMaximize />}
               size="sm"
               rounded="none"
+              variant="ghost"
               w="40px"
               fontSize="sm"
               onClick={() => handleMaximize()}
@@ -395,6 +397,7 @@ export default function HeaderApp() {
               icon={<FiX />}
               size="sm"
               rounded="none"
+              variant="ghost"
               w="40px"
               fontSize="md"
               colorScheme="red"
@@ -426,15 +429,6 @@ export default function HeaderApp() {
             <ExampleColors />
           </ModalBody>
           <ModalFooter>
-            <Button
-              leftIcon={<FaTimes />}
-              colorScheme={config.buttons}
-              variant="outline"
-              mr={3}
-              onClick={() => setModalTheme(false)}
-            >
-              Fechar
-            </Button>
             <Button
               leftIcon={<FaSave />}
               colorScheme={config.buttons}

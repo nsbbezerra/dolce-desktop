@@ -228,6 +228,12 @@ export default function Sider() {
           <MenuItem icon={<FaTags />} onClick={() => routing("/listcategory")}>
             Categorias
           </MenuItem>
+          <MenuItem
+            icon={<RiPriceTag2Fill />}
+            onClick={() => routing("/listSubCategories")}
+          >
+            Sub-Categorias
+          </MenuItem>
           <MenuItem icon={<FaTag />} onClick={() => routing("/listproduct")}>
             Produtos
           </MenuItem>

@@ -12,7 +12,6 @@ import {
   Divider,
   useToast,
   FormErrorMessage,
-  Icon,
 } from "@chakra-ui/react";
 import HeaderApp from "../../components/headerApp";
 import { useEmployee } from "../../context/Employee";
@@ -21,6 +20,7 @@ import { RiPriceTag2Fill } from "react-icons/ri";
 import useFetch from "../../hooks/useFetch";
 import config from "../../configs/index";
 import { FaSave } from "react-icons/fa";
+import Hotkeys from "react-hot-keys";
 
 export default function SubCategories() {
   const toast = useToast();
@@ -146,91 +146,110 @@ export default function SubCategories() {
     }
   }
 
+  function onKeyDown(keyName, e, handle) {
+    if (keyName === "f12") {
+      register(e);
+    }
+  }
+
   return (
     <>
-      <HeaderApp title="Cadastro de Sub-Categorias" icon={RiPriceTag2Fill} />
+      <Hotkeys
+        keyName="f12"
+        onKeyDown={onKeyDown}
+        allowRepeat
+        filter={(event) => {
+          return true;
+        }}
+      >
+        <HeaderApp title="Cadastro de Sub-Categorias" icon={RiPriceTag2Fill} />
 
-      <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
-        <Grid templateColumns="1fr 1fr" gap="20px" mb={3}>
-          <FormControl
-            isRequired
-            isInvalid={
-              validators.find((obj) => obj.path === "categories") ? true : false
-            }
-          >
-            <FormLabel htmlFor="categories">Selecione uma Categoria</FormLabel>
-            <Select
-              id="categories"
-              focusBorderColor={config.inputs}
-              placeholder="Selecione uma Categoria"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+        <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
+          <Grid templateColumns="1fr 1fr" gap="20px" mb={3}>
+            <FormControl
+              isRequired
+              isInvalid={
+                validators.find((obj) => obj.path === "categories")
+                  ? true
+                  : false
+              }
             >
-              {categories.map((cat) => (
-                <option value={cat.id} key={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </Select>
-            <FormErrorMessage>
-              {validators.find((obj) => obj.path === "categories")
-                ? validators.find((obj) => obj.path === "categories").message
-                : ""}
-            </FormErrorMessage>
-          </FormControl>
-          <FormControl
-            isRequired
-            isInvalid={
-              validators.find((obj) => obj.path === "name") ? true : false
-            }
-          >
-            <FormLabel>Nome</FormLabel>
+              <FormLabel htmlFor="categories">
+                Selecione uma Categoria
+              </FormLabel>
+              <Select
+                id="categories"
+                focusBorderColor={config.inputs}
+                placeholder="Selecione uma Categoria"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {categories.map((cat) => (
+                  <option value={cat.id} key={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </Select>
+              <FormErrorMessage>
+                {validators.find((obj) => obj.path === "categories")
+                  ? validators.find((obj) => obj.path === "categories").message
+                  : ""}
+              </FormErrorMessage>
+            </FormControl>
+            <FormControl
+              isRequired
+              isInvalid={
+                validators.find((obj) => obj.path === "name") ? true : false
+              }
+            >
+              <FormLabel>Nome</FormLabel>
 
-            <Input
-              id="name"
+              <Input
+                id="name"
+                focusBorderColor={config.inputs}
+                placeholder="Nome"
+                value={name}
+                onChange={(e) =>
+                  setName(capitalizeAllFirstLetter(e.target.value))
+                }
+              />
+
+              <FormErrorMessage>
+                {validators.find((obj) => obj.path === "name")
+                  ? validators.find((obj) => obj.path === "name").message
+                  : ""}
+              </FormErrorMessage>
+            </FormControl>
+          </Grid>
+          <FormControl>
+            <FormLabel>Descrição</FormLabel>
+
+            <Textarea
               focusBorderColor={config.inputs}
-              placeholder="Nome"
-              value={name}
+              placeholder="Descrição"
+              rows={3}
+              resize="none"
+              value={description}
               onChange={(e) =>
-                setName(capitalizeAllFirstLetter(e.target.value))
+                setDescription(capitalizeAllFirstLetter(e.target.value))
               }
             />
-
-            <FormErrorMessage>
-              {validators.find((obj) => obj.path === "name")
-                ? validators.find((obj) => obj.path === "name").message
-                : ""}
-            </FormErrorMessage>
           </FormControl>
-        </Grid>
-        <FormControl>
-          <FormLabel>Descrição</FormLabel>
-
-          <Textarea
-            focusBorderColor={config.inputs}
-            placeholder="Descrição"
-            rows={3}
-            resize="none"
-            value={description}
-            onChange={(e) =>
-              setDescription(capitalizeAllFirstLetter(e.target.value))
-            }
-          />
-        </FormControl>
-        <Divider mt={5} mb={5} />
-        <Button
-          leftIcon={<FaSave />}
-          colorScheme={config.buttons}
-          size="lg"
-          isLoading={loading}
-          onClick={() => register()}
-        >
-          Salvar{" "}
-          <Kbd ml={3} color="ButtonText">
-            F12
-          </Kbd>
-        </Button>
-      </Box>
+          <Divider mt={5} mb={5} />
+          <Button
+            leftIcon={<FaSave />}
+            colorScheme={config.buttons}
+            size="lg"
+            isLoading={loading}
+            onClick={() => register()}
+          >
+            Salvar{" "}
+            <Kbd ml={3} color="ButtonText">
+              F12
+            </Kbd>
+          </Button>
+        </Box>
+      </Hotkeys>
     </>
   );
 }

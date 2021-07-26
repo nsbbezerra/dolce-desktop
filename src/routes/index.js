@@ -26,6 +26,7 @@ import SubCategories from "../pages/cadastro/subCategories";
 import ListDepartment from "../pages/products/department";
 import ListCategory from "../pages/products/category";
 import ListProduct from "../pages/products/products";
+import ListSubCat from "../pages/products/subCategories";
 
 /** CAIXA */
 import CashierMoviment from "../pages/cashier/moviment";
@@ -150,6 +151,9 @@ export default function Routers() {
       </Route>
       <Route path="/subCategories">
         <SubCategories />
+      </Route>
+      <Route path="/listSubCategories">
+        <ListSubCat />
       </Route>
     </Switch>
   );
