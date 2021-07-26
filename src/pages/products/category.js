@@ -32,11 +32,24 @@ import {
   Kbd,
   IconButton,
   Tooltip,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  Divider,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { FaSave, FaEdit, FaImage, FaTags } from "react-icons/fa";
+import {
+  FaSave,
+  FaEdit,
+  FaImage,
+  FaTags,
+  FaArrowLeft,
+  FaArrowRight,
+} from "react-icons/fa";
 import { InputFile, File } from "../../style/uploader";
 import { AiOutlineClose } from "react-icons/ai";
 import api from "../../configs/axios";
@@ -51,7 +64,12 @@ import Hotkeys from "react-hot-keys";
 export default function CategoryList() {
   const { colorMode } = useColorMode();
   const { employee } = useEmployee();
-  const { data, error, mutate } = useFetch("/categories");
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState("0");
+  const [searchText, setSearchText] = useState("");
+  const { data, error, mutate } = useFetch(
+    `/categoriesPagination/${page}/${searchText === "" ? "All" : searchText}`
+  );
   const toast = useToast();
 
   const [modalInfo, setModalInfo] = useState(false);
@@ -106,8 +124,20 @@ export default function CategoryList() {
   }
 
   useEffect(() => {
-    setCategories(data);
+    if (data) {
+      setCategories(data.categories);
+      handlePagination(data.count.count);
+    }
   }, [data]);
+
+  function handlePagination(num) {
+    const divisor = parseFloat(num) / 10;
+    if (divisor > parseInt(divisor) && divisor < parseInt(divisor) + 1) {
+      setPages(parseInt(divisor) + 1);
+    } else {
+      setPages(parseInt(divisor));
+    }
+  }
 
   function capitalizeFirstLetter(string) {
     let splited = string.split(" ");
@@ -122,34 +152,12 @@ export default function CategoryList() {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-  async function finderCatBySource(text) {
-    setSearch(text);
-    if (text === "") {
-      await setCategories(data);
-    } else {
-      let termos = await text.split(" ");
-      let frasesFiltradas = await categories.filter((frase) => {
-        return termos.reduce((resultadoAnterior, termoBuscado) => {
-          return resultadoAnterior && frase.name.includes(termoBuscado);
-        }, true);
-      });
-      await setCategories(frasesFiltradas);
-    }
-  }
-
   async function handleInfo(id) {
     const result = await categories.find((obj) => obj.id === id);
     setIdCategory(result.id);
     setNameCategory(result.name);
     setDescription(result.description);
     setModalInfo(true);
-  }
-
-  async function handleImage(id) {
-    const result = await categories.find((obj) => obj.id === id);
-    setIdCategory(result.id);
-    setUrl(result.thumbnail);
-    setModalImage(true);
   }
 
   async function handleUpdateInfo() {
@@ -170,7 +178,7 @@ export default function CategoryList() {
         },
         { headers: { "x-access-token": employee.token } }
       );
-      const updatedCategories = await data.map((cat) => {
+      const updatedCategories = await data.categories.map((cat) => {
         if (cat.id === idCategory) {
           return {
             ...cat,
@@ -180,7 +188,10 @@ export default function CategoryList() {
         }
         return cat;
       });
-      mutate(updatedCategories, false);
+
+      let info = { categories: updatedCategories, count: data.count };
+
+      mutate(info, false);
       mutateGlobal(`/categories/${idCategory}`, {
         id: idCategory,
         name: response.data.category[0].name,
@@ -217,7 +228,7 @@ export default function CategoryList() {
         { active: value },
         { headers: { "x-access-token": employee.token } }
       );
-      const updatedCategories = await data.map((cat) => {
+      const updatedCategories = await data.categories.map((cat) => {
         if (cat.id === id) {
           return {
             ...cat,
@@ -226,7 +237,10 @@ export default function CategoryList() {
         }
         return cat;
       });
-      mutate(updatedCategories, false);
+
+      let info = { categories: updatedCategories, count: data.count };
+
+      mutate(info, false);
       mutateGlobal(`/activeCategory/${id}`, {
         id: id,
         active: response.data.category[0].active,
@@ -336,9 +350,9 @@ export default function CategoryList() {
               type="text"
               placeholder="Digite para buscar"
               focusBorderColor={config.inputs}
-              value={search}
+              value={searchText}
               onChange={(e) =>
-                finderCatBySource(capitalizeFirstLetter(e.target.value))
+                setSearchText(capitalizeFirstLetter(e.target.value))
               }
             />
           </FormControl>
@@ -351,63 +365,118 @@ export default function CategoryList() {
                   <Text>Nenhuma categoria para mostrar</Text>
                 </Flex>
               ) : (
-                <Table size="sm" mt="25px">
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td w="5%" textAlign="center">
-                        Ativo?
-                      </Td>
-                      <Td w="25%">Nome</Td>
-                      <Td w="25%">Departamento</Td>
-                      <Td w="45%">Descrição</Td>
-                      <Td w="10%"></Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {categories.map((cat) => (
-                      <Tr key={cat.id}>
+                <>
+                  <Table size="sm" mt="25px">
+                    <Thead fontWeight="700">
+                      <Tr>
                         <Td w="5%" textAlign="center">
-                          <Switch
-                            colorScheme={config.switchs}
-                            defaultIsChecked={cat.active}
-                            onChange={(e) =>
-                              handleActive(e.target.checked, cat.id)
-                            }
-                            size="sm"
-                          />
+                          Ativo?
                         </Td>
-                        <Td w="25%">{cat.name}</Td>
-                        <Td w="25%">{cat.dep_name}</Td>
-                        <Td w="45%">
-                          <Text w="45vw" isTruncated noOfLines={1}>
-                            {cat.description}
-                          </Text>
-                        </Td>
-                        <Td w="10%">
-                          <Menu>
-                            <MenuButton
-                              isFullWidth
-                              as={Button}
-                              rightIcon={<MdKeyboardArrowDown />}
-                              size="sm"
-                              colorScheme={config.buttons}
-                            >
-                              Opções
-                            </MenuButton>
-                            <MenuList>
-                              <MenuItem
-                                icon={<FaEdit />}
-                                onClick={() => handleInfo(cat.id)}
-                              >
-                                Editar Informações
-                              </MenuItem>
-                            </MenuList>
-                          </Menu>
-                        </Td>
+                        <Td w="25%">Nome</Td>
+                        <Td w="25%">Departamento</Td>
+                        <Td w="45%">Descrição</Td>
+                        <Td w="10%"></Td>
                       </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
+                    </Thead>
+                    <Tbody>
+                      {categories.map((cat) => (
+                        <Tr key={cat.id}>
+                          <Td w="5%" textAlign="center">
+                            <Switch
+                              colorScheme={config.switchs}
+                              defaultIsChecked={cat.active}
+                              onChange={(e) =>
+                                handleActive(e.target.checked, cat.id)
+                              }
+                              size="sm"
+                            />
+                          </Td>
+                          <Td w="25%">{cat.name}</Td>
+                          <Td w="25%">{cat.dep_name}</Td>
+                          <Td w="45%">
+                            <Text w="45vw" isTruncated noOfLines={1}>
+                              {cat.description}
+                            </Text>
+                          </Td>
+                          <Td w="10%">
+                            <Menu>
+                              <MenuButton
+                                isFullWidth
+                                as={Button}
+                                rightIcon={<MdKeyboardArrowDown />}
+                                size="sm"
+                                colorScheme={config.buttons}
+                              >
+                                Opções
+                              </MenuButton>
+                              <MenuList>
+                                <MenuItem
+                                  icon={<FaEdit />}
+                                  onClick={() => handleInfo(cat.id)}
+                                >
+                                  Editar Informações
+                                </MenuItem>
+                              </MenuList>
+                            </Menu>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                  <Divider mt={5} mb={5} />
+
+                  <Flex justify="flex-end" align="center">
+                    <Button
+                      size="sm"
+                      colorScheme={config.buttons}
+                      mr={2}
+                      leftIcon={<FaArrowLeft />}
+                      onClick={() => setPage(page - 1)}
+                      isDisabled={page <= 1 ? true : false}
+                    >
+                      Anterior
+                    </Button>
+                    <NumberInput
+                      precision={0}
+                      step={1}
+                      focusBorderColor={config.inputs}
+                      value={page}
+                      onChange={(e) => setPage(e)}
+                      size="sm"
+                      w="70px"
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+
+                    <Text ml={2} mr={2}>
+                      de
+                    </Text>
+                    <Input
+                      size="sm"
+                      w="70px"
+                      focusBorderColor={config.inputs}
+                      value={pages}
+                      isReadOnly
+                      type="number"
+                      mr={2}
+                    />
+                    <Button
+                      size="sm"
+                      colorScheme={config.buttons}
+                      rightIcon={<FaArrowRight />}
+                      onClick={() => setPage(page + 1)}
+                      isDisabled={
+                        parseInt(page) >= parseInt(pages) ? true : false
+                      }
+                    >
+                      Próxima
+                    </Button>
+                  </Flex>
+                </>
               )}
             </>
           ) : (

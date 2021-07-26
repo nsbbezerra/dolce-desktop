@@ -24,12 +24,14 @@ import Hotkeys from "react-hot-keys";
 
 export default function SubCategories() {
   const toast = useToast();
-  const { data, error } = useFetch("/categories");
+  const { data, error } = useFetch("/departments");
   const { employee } = useEmployee();
 
   const [categories, setCategories] = useState([]);
+  const [departments, setDepartments] = useState([]);
 
   const [category, setCategory] = useState("");
+  const [department, setDepartment] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,6 +41,7 @@ export default function SubCategories() {
     setCategory("");
     setName("");
     setDescription("");
+    setDepartment("");
   }
 
   function handleValidator(path, message) {
@@ -57,7 +60,7 @@ export default function SubCategories() {
 
   useEffect(() => {
     if (data) {
-      setCategories(data);
+      setDepartments(data);
     }
   }, [data]);
 
@@ -70,6 +73,31 @@ export default function SubCategories() {
       duration: 8000,
       isClosable: true,
     });
+  }
+
+  async function findCategories(id) {
+    setDepartment(id);
+    try {
+      const response = await api.get(`/findCatByDepartments/${id}`);
+      setCategories(response.data);
+    } catch (error) {
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
   }
 
   if (error) {
@@ -165,7 +193,38 @@ export default function SubCategories() {
         <HeaderApp title="Cadastro de Sub-Categorias" icon={RiPriceTag2Fill} />
 
         <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
-          <Grid templateColumns="1fr 1fr" gap="20px" mb={3}>
+          <Grid templateColumns="1fr 1fr 1fr" gap="20px" mb={3}>
+            <FormControl
+              isRequired
+              isInvalid={
+                validators.find((obj) => obj.path === "categories")
+                  ? true
+                  : false
+              }
+            >
+              <FormLabel htmlFor="department">
+                Selecione um Departamento
+              </FormLabel>
+              <Select
+                id="department"
+                focusBorderColor={config.inputs}
+                placeholder="Selecione um Departamento"
+                value={department}
+                onChange={(e) => findCategories(e.target.value)}
+              >
+                {departments.map((cat) => (
+                  <option value={cat.id} key={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </Select>
+              <FormErrorMessage>
+                {validators.find((obj) => obj.path === "department")
+                  ? validators.find((obj) => obj.path === "department").message
+                  : ""}
+              </FormErrorMessage>
+            </FormControl>
+
             <FormControl
               isRequired
               isInvalid={
@@ -196,6 +255,7 @@ export default function SubCategories() {
                   : ""}
               </FormErrorMessage>
             </FormControl>
+
             <FormControl
               isRequired
               isInvalid={

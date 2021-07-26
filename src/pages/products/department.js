@@ -32,12 +32,23 @@ import {
   Flex,
   IconButton,
   Tooltip,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
 import { AiFillShop, AiOutlineClose } from "react-icons/ai";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { FaSave, FaEdit, FaImage } from "react-icons/fa";
+import {
+  FaSave,
+  FaEdit,
+  FaImage,
+  FaArrowLeft,
+  FaArrowRight,
+} from "react-icons/fa";
 import { InputFile, File } from "../../style/uploader";
 import Hotkeys from "react-hot-keys";
 import useFetch from "../../hooks/useFetch";
@@ -50,14 +61,18 @@ import searchAnimation from "../../animations/search.json";
 
 export default function DepartmentList() {
   const { colorMode } = useColorMode();
-  const { data, error, mutate } = useFetch("/departments");
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState("0");
+  const [searchText, setSearchText] = useState("");
+  const { data, error, mutate } = useFetch(
+    `/departmentsPagination/${page}/${searchText === "" ? "All" : searchText}`
+  );
   const toast = useToast();
   const { employee } = useEmployee();
 
   const [modalInfo, setModalInfo] = useState(false);
   const [modalImage, setModalImage] = useState(false);
   const [departments, setDepartments] = useState([]);
-  const [findDep, setFindDep] = useState("");
   const [idDepartment, setIdDepartment] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -67,8 +82,20 @@ export default function DepartmentList() {
   const [loadingImage, setLoadingImage] = useState(false);
 
   useEffect(() => {
-    setDepartments(data);
+    if (data) {
+      setDepartments(data.departments);
+      handlePagination(data.count.count);
+    }
   }, [data]);
+
+  function handlePagination(num) {
+    const divisor = parseFloat(num) / 10;
+    if (divisor > parseInt(divisor) && divisor < parseInt(divisor) + 1) {
+      setPages(parseInt(divisor) + 1);
+    } else {
+      setPages(parseInt(divisor));
+    }
+  }
 
   const previewThumbnail = useMemo(() => {
     return thumbnail ? URL.createObjectURL(thumbnail) : null;
@@ -116,21 +143,6 @@ export default function DepartmentList() {
     }
   }
 
-  async function finderDepBySource(text) {
-    setFindDep(text);
-    if (text === "") {
-      await setDepartments(data);
-    } else {
-      let termos = await text.split(" ");
-      let frasesFiltradas = await departments.filter((frase) => {
-        return termos.reduce((resultadoAnterior, termoBuscado) => {
-          return resultadoAnterior && frase.name.includes(termoBuscado);
-        }, true);
-      });
-      await setDepartments(frasesFiltradas);
-    }
-  }
-
   function capitalizeFirstLetter(string) {
     let splited = string.split(" ");
     let toJoin = splited.map((e) => {
@@ -170,7 +182,7 @@ export default function DepartmentList() {
         },
         { headers: { "x-access-token": employee.token } }
       );
-      const updatedDepartments = await data.map((dep) => {
+      const updatedDepartments = await data.departments.map((dep) => {
         if (dep.id === idDepartment) {
           return {
             ...dep,
@@ -180,7 +192,10 @@ export default function DepartmentList() {
         }
         return dep;
       });
-      mutate(updatedDepartments, false);
+
+      let info = { departments: updatedDepartments, count: data.count };
+
+      mutate(info, false);
       mutateGlobal(`/departments/${idDepartment}`, {
         id: idDepartment,
         name: response.data.department[0].name,
@@ -217,7 +232,7 @@ export default function DepartmentList() {
         { active: value },
         { headers: { "x-access-token": employee.token } }
       );
-      const updatedDepartments = await data.map((dep) => {
+      const updatedDepartments = await data.departments.map((dep) => {
         if (dep.id === id) {
           return {
             ...dep,
@@ -226,13 +241,17 @@ export default function DepartmentList() {
         }
         return dep;
       });
-      mutate(updatedDepartments, false);
+
+      let info = { departments: updatedDepartments, count: data.count };
+
+      mutate(info, false);
       mutateGlobal(`/activeDepartment/${id}`, {
         id: id,
         active: response.data.department[0].active,
       });
       showToast(response.data.message, "success", "Sucesso");
     } catch (error) {
+      console.log("ERRO", error);
       if (error.message === "Network Error") {
         alert(
           "Sem conexão com o servidor, verifique sua conexão com a internet."
@@ -267,7 +286,7 @@ export default function DepartmentList() {
       );
       setThumbnail(null);
       removeThumbnail();
-      const updatedDepartments = await data.map((dep) => {
+      const updatedDepartments = await data.departments.map((dep) => {
         if (dep.id === idDepartment) {
           return {
             ...dep,
@@ -277,7 +296,10 @@ export default function DepartmentList() {
         }
         return dep;
       });
-      mutate(updatedDepartments, false);
+
+      let info = { departments: updatedDepartments, count: data.count };
+
+      mutate(info, false);
       mutateGlobal(`/departmentsChangeImage/${idDepartment}`, {
         id: idDepartment,
         thumbnail: response.data.url,
@@ -327,9 +349,9 @@ export default function DepartmentList() {
               type="text"
               placeholder="Digite para buscar"
               focusBorderColor={config.inputs}
-              value={findDep}
+              value={searchText}
               onChange={(e) =>
-                finderDepBySource(capitalizeFirstLetter(e.target.value))
+                setSearchText(capitalizeFirstLetter(e.target.value))
               }
             />
           </FormControl>
@@ -347,61 +369,117 @@ export default function DepartmentList() {
                   <Text>Nenhum departamento para mostrar</Text>
                 </Flex>
               ) : (
-                <Table size="sm">
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td w="5%" textAlign="center">
-                        Ativo?
-                      </Td>
-                      <Td w="35%">Nome</Td>
-                      <Td w="50%">Descrição</Td>
-                      <Td w="10%"></Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {departments.map((dep) => (
-                      <Tr key={dep.id}>
+                <>
+                  <Table size="sm">
+                    <Thead fontWeight="700">
+                      <Tr>
                         <Td w="5%" textAlign="center">
-                          <Switch
-                            colorScheme={config.switchs}
-                            defaultIsChecked={dep.active}
-                            onChange={(e) =>
-                              handleActive(e.target.checked, dep.id)
-                            }
-                            size="sm"
-                          />
+                          Ativo?
                         </Td>
-                        <Td w="35%">{dep.name}</Td>
-                        <Td w="50%">
-                          <Text w="60vw" isTruncated noOfLines={1}>
-                            {dep.description}
-                          </Text>
-                        </Td>
-                        <Td w="10%">
-                          <Menu>
-                            <MenuButton
-                              isFullWidth
-                              as={Button}
-                              rightIcon={<MdKeyboardArrowDown />}
-                              size="sm"
-                              colorScheme={config.buttons}
-                            >
-                              Opções
-                            </MenuButton>
-                            <MenuList>
-                              <MenuItem
-                                icon={<FaEdit />}
-                                onClick={() => handleDepartment(dep.id)}
-                              >
-                                Editar Informações
-                              </MenuItem>
-                            </MenuList>
-                          </Menu>
-                        </Td>
+                        <Td w="35%">Nome</Td>
+                        <Td w="50%">Descrição</Td>
+                        <Td w="10%"></Td>
                       </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
+                    </Thead>
+                    <Tbody>
+                      {departments.map((dep) => (
+                        <Tr key={dep.id}>
+                          <Td w="5%" textAlign="center">
+                            <Switch
+                              colorScheme={config.switchs}
+                              defaultIsChecked={dep.active}
+                              onChange={(e) =>
+                                handleActive(e.target.checked, dep.id)
+                              }
+                              size="sm"
+                            />
+                          </Td>
+                          <Td w="35%">{dep.name}</Td>
+                          <Td w="50%">
+                            <Text w="60vw" isTruncated noOfLines={1}>
+                              {dep.description}
+                            </Text>
+                          </Td>
+                          <Td w="10%">
+                            <Menu>
+                              <MenuButton
+                                isFullWidth
+                                as={Button}
+                                rightIcon={<MdKeyboardArrowDown />}
+                                size="sm"
+                                colorScheme={config.buttons}
+                              >
+                                Opções
+                              </MenuButton>
+                              <MenuList>
+                                <MenuItem
+                                  icon={<FaEdit />}
+                                  onClick={() => handleDepartment(dep.id)}
+                                >
+                                  Editar Informações
+                                </MenuItem>
+                              </MenuList>
+                            </Menu>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+
+                  <Divider mt={5} mb={5} />
+
+                  <Flex justify="flex-end" align="center">
+                    <Button
+                      size="sm"
+                      colorScheme={config.buttons}
+                      mr={2}
+                      leftIcon={<FaArrowLeft />}
+                      onClick={() => setPage(page - 1)}
+                      isDisabled={page <= 1 ? true : false}
+                    >
+                      Anterior
+                    </Button>
+                    <NumberInput
+                      precision={0}
+                      step={1}
+                      focusBorderColor={config.inputs}
+                      value={page}
+                      onChange={(e) => setPage(e)}
+                      size="sm"
+                      w="70px"
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+
+                    <Text ml={2} mr={2}>
+                      de
+                    </Text>
+                    <Input
+                      size="sm"
+                      w="70px"
+                      focusBorderColor={config.inputs}
+                      value={pages}
+                      isReadOnly
+                      type="number"
+                      mr={2}
+                    />
+                    <Button
+                      size="sm"
+                      colorScheme={config.buttons}
+                      rightIcon={<FaArrowRight />}
+                      onClick={() => setPage(page + 1)}
+                      isDisabled={
+                        parseInt(page) >= parseInt(pages) ? true : false
+                      }
+                    >
+                      Próxima
+                    </Button>
+                  </Flex>
+                </>
               )}
             </>
           )}

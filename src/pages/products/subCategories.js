@@ -28,6 +28,11 @@ import {
   ModalBody,
   ModalCloseButton,
   Textarea,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 import useFetch from "../../hooks/useFetch";
 import { useEmployee } from "../../context/Employee";
@@ -39,14 +44,18 @@ import { RiPriceTag2Fill } from "react-icons/ri";
 import { mutate as mutateGlobal } from "swr";
 import config from "../../configs";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { FaEdit, FaSave } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaEdit, FaSave } from "react-icons/fa";
 import Hotkeys from "react-hot-keys";
 
 export default function ListSubCat() {
   const toast = useToast();
   const { employee } = useEmployee();
-
-  const { data, mutate, error } = useFetch("/findSubCat");
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState("0");
+  const [searchText, setSearchText] = useState("");
+  const { data, mutate, error } = useFetch(
+    `/subCatPagination/${page}/${searchText === "" ? "All" : searchText}`
+  );
 
   const [subCats, setSubCats] = useState([]);
   const [modalEdit, setModalEdit] = useState(false);
@@ -57,26 +66,21 @@ export default function ListSubCat() {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
-  async function finderCatBySource(text) {
-    setSearch(text);
-    if (text === "") {
-      await setSubCats(data);
-    } else {
-      let termos = await text.split(" ");
-      let frasesFiltradas = await subCats.filter((frase) => {
-        return termos.reduce((resultadoAnterior, termoBuscado) => {
-          return resultadoAnterior && frase.name.includes(termoBuscado);
-        }, true);
-      });
-      await setSubCats(frasesFiltradas);
-    }
-  }
-
   useEffect(() => {
     if (data) {
-      setSubCats(data);
+      setSubCats(data.sub_cat);
+      handlePagination(data.count.count);
     }
   }, [data]);
+
+  function handlePagination(num) {
+    const divisor = parseFloat(num) / 10;
+    if (divisor > parseInt(divisor) && divisor < parseInt(divisor) + 1) {
+      setPages(parseInt(divisor) + 1);
+    } else {
+      setPages(parseInt(divisor));
+    }
+  }
 
   function showToast(message, status, title) {
     toast({
@@ -134,7 +138,7 @@ export default function ListSubCat() {
         { headers: { "x-access-token": employee.token } }
       );
 
-      const updated = await data.map((sub) => {
+      const updated = await data.sub_cat.map((sub) => {
         if (sub.id === idSubCat) {
           return {
             ...sub,
@@ -144,8 +148,8 @@ export default function ListSubCat() {
         }
         return sub;
       });
-
-      mutate(updated, false);
+      let info = { sub_cat: updated, count: data.count };
+      mutate(info, false);
       mutateGlobal(`/subCat/${idSubCat}`, {
         id: idSubCat,
         name: response.data.subCat[0].name,
@@ -184,14 +188,14 @@ export default function ListSubCat() {
         { headers: { "x-access-token": employee.token } }
       );
 
-      const updated = await data.map((sub) => {
+      const updated = await data.sub_cat.map((sub) => {
         if (sub.id === id) {
           return { ...sub, active: response.data.sub_cat[0].active };
         }
         return sub;
       });
-
-      mutate(updated, false);
+      let info = { sub_cat: updated, count: data.count };
+      mutate(info, false);
       mutateGlobal(`/activeSubCat/${id}`, {
         id: id,
         active: response.data.sub_cat[0].active,
@@ -246,9 +250,9 @@ export default function ListSubCat() {
               id="search"
               focusBorderColor={config.inputs}
               placeholder="Digite para Buscar"
-              value={search}
+              value={searchText}
               onChange={(e) =>
-                finderCatBySource(capitalizeFirstLetter(e.target.value))
+                setSearchText(capitalizeFirstLetter(e.target.value))
               }
             />
           </FormControl>
@@ -310,6 +314,58 @@ export default function ListSubCat() {
                   ))}
                 </Tbody>
               </Table>
+
+              <Divider mt={5} mb={5} />
+
+              <Flex justify="flex-end" align="center">
+                <Button
+                  size="sm"
+                  colorScheme={config.buttons}
+                  mr={2}
+                  leftIcon={<FaArrowLeft />}
+                  onClick={() => setPage(page - 1)}
+                  isDisabled={page <= 1 ? true : false}
+                >
+                  Anterior
+                </Button>
+                <NumberInput
+                  precision={0}
+                  step={1}
+                  focusBorderColor={config.inputs}
+                  value={page}
+                  onChange={(e) => setPage(e)}
+                  size="sm"
+                  w="70px"
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+
+                <Text ml={2} mr={2}>
+                  de
+                </Text>
+                <Input
+                  size="sm"
+                  w="70px"
+                  focusBorderColor={config.inputs}
+                  value={pages}
+                  isReadOnly
+                  type="number"
+                  mr={2}
+                />
+                <Button
+                  size="sm"
+                  colorScheme={config.buttons}
+                  rightIcon={<FaArrowRight />}
+                  onClick={() => setPage(page + 1)}
+                  isDisabled={parseInt(page) >= parseInt(pages) ? true : false}
+                >
+                  Próxima
+                </Button>
+              </Flex>
             </>
           )}
         </Box>
