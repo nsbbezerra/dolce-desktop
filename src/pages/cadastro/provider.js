@@ -118,6 +118,9 @@ export default function RegisterProvider() {
       const inpt = document.getElementById(path);
       inpt.focus();
     }
+    setTimeout(() => {
+      setValidators([]);
+    }, 4000);
   }
 
   function capitalizeFirstLetter(string) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Tabs,
@@ -59,18 +59,13 @@ export default function Produtos() {
   const { colorMode } = useColorMode();
   const { employee } = useEmployee();
   const { data, error } = useFetch("/findDependents");
-  const initialRef = useRef();
   const toast = useToast();
 
   const [tabIndex, setTabIndex] = useState(0);
-  const [modalCategories, setModalCategories] = useState(false);
-  const [modalDepartments, setModalDepartments] = useState(false);
   const [validators, setValidators] = useState([]);
   const [loading, setLoading] = useState(false);
   const [providers, setProviders] = useState([]);
-  const [modalProvider, setModalProvider] = useState(false);
   const [providerId, setProviderId] = useState(null);
-  const [providerName, setProviderName] = useState("");
 
   useEffect(() => {
     if (data) {

@@ -85,6 +85,9 @@ export default function Promotional() {
       const inpt = document.getElementById(path);
       inpt.focus();
     }
+    setTimeout(() => {
+      setValidators([]);
+    }, 4000);
   }
 
   const previewThumbnail = useMemo(() => {

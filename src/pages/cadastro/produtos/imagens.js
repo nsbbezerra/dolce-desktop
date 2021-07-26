@@ -180,6 +180,9 @@ export default function ImagesSave() {
       const inpt = document.getElementById(path);
       inpt.focus();
     }
+    setTimeout(() => {
+      setValidators([]);
+    }, 4000);
   }
 
   function showToast(message, status, title) {

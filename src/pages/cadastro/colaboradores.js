@@ -85,6 +85,9 @@ export default function Colaboradores() {
       const inpt = document.getElementById(path);
       inpt.focus();
     }
+    setTimeout(() => {
+      setValidators([]);
+    }, 4000);
   }
 
   function handleSwitch(path, e) {

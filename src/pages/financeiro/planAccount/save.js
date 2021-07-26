@@ -48,6 +48,9 @@ export default function PlanAccountSave() {
     setValidators(val);
     const inpt = document.getElementById(path);
     inpt.focus();
+    setTimeout(() => {
+      setValidators([]);
+    }, 4000);
   }
 
   useEffect(() => {

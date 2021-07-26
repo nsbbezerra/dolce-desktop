@@ -90,6 +90,9 @@ export default function SaveBankAccount() {
       const inpt = document.getElementById(path);
       inpt.focus();
     }
+    setTimeout(() => {
+      setValidators([]);
+    }, 4000);
   }
 
   function capitalizeAllFirstLetter(string) {
