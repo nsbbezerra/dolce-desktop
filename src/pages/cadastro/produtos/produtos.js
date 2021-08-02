@@ -42,6 +42,7 @@ import {
   FaArrowRight,
   FaPlus,
   FaTrash,
+  FaShippingFast,
 } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { File, InputFile } from "../../../style/uploader";
@@ -1412,7 +1413,7 @@ export default function Produtos() {
                       item.
                     </Text>
 
-                    <Grid templateColumns="repeat(5, 1fr)" gap="15px">
+                    <Grid templateColumns="repeat(6, 1fr)" gap="15px">
                       <FormControl
                         isRequired
                         mr={3}
@@ -1422,7 +1423,7 @@ export default function Produtos() {
                             : false
                         }
                       >
-                        <FormLabel>Altura</FormLabel>
+                        <FormLabel>Altura (cm)</FormLabel>
                         <NumberInput
                           id="height"
                           precision={2}
@@ -1454,7 +1455,7 @@ export default function Produtos() {
                             : false
                         }
                       >
-                        <FormLabel>Largura</FormLabel>
+                        <FormLabel>Largura (cm)</FormLabel>
                         <NumberInput
                           id="width"
                           precision={2}
@@ -1485,7 +1486,7 @@ export default function Produtos() {
                             : false
                         }
                       >
-                        <FormLabel>Comprimento</FormLabel>
+                        <FormLabel>Comprimento (cm)</FormLabel>
                         <NumberInput
                           id="lenght"
                           precision={2}
@@ -1516,7 +1517,7 @@ export default function Produtos() {
                             : false
                         }
                       >
-                        <FormLabel>Diâmetro</FormLabel>
+                        <FormLabel>Diâmetro (cm)</FormLabel>
                         <NumberInput
                           id="diameter"
                           precision={2}
@@ -1547,7 +1548,7 @@ export default function Produtos() {
                             : false
                         }
                       >
-                        <FormLabel>Peso</FormLabel>
+                        <FormLabel>Peso (kg)</FormLabel>
                         <NumberInput
                           id="weight"
                           precision={2}
@@ -1569,7 +1570,43 @@ export default function Produtos() {
                             : ""}
                         </FormErrorMessage>
                       </FormControl>
+
+                      <FormControl
+                        isRequired
+                        mr={3}
+                        isInvalid={
+                          validators.find((obj) => obj.path === "format")
+                            ? true
+                            : false
+                        }
+                      >
+                        <FormLabel>Formato da Encomenda</FormLabel>
+                        <Select
+                          id="format"
+                          focusBorderColor={config.inputs}
+                          placeholder="Formato da Encomenda"
+                        >
+                          <option value={1}>Formato Caixa/Pacote</option>
+                          <option value={2}>Formato Rolo/Prisma</option>
+                          <option value={3}>Envelope</option>
+                        </Select>
+                        <FormErrorMessage>
+                          {validators.find((obj) => obj.path === "format")
+                            ? validators.find((obj) => obj.path === "format")
+                                .message
+                            : ""}
+                        </FormErrorMessage>
+                      </FormControl>
                     </Grid>
+
+                    <Button
+                      colorScheme={config.buttons}
+                      leftIcon={<FaShippingFast />}
+                      mt={3}
+                      variant="outline"
+                    >
+                      Simular Frete
+                    </Button>
                   </TabPanel>
 
                   <TabPanel>
