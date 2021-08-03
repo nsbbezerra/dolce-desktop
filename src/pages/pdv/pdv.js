@@ -51,6 +51,7 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  ModalFooter,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -70,7 +71,6 @@ import {
   FaArrowRight,
   FaArrowLeft,
 } from "react-icons/fa";
-import { MdKeyboardArrowUp } from "react-icons/md";
 import DatePicker, { registerLocale } from "react-datepicker";
 import Hotkeys from "react-hot-keys";
 import pt_br from "date-fns/locale/pt-BR";
@@ -109,8 +109,10 @@ export default function Pdv() {
   const [modalPrint, setModalPrint] = useState(false);
   const [modalClients, setModalClients] = useState(false);
   const [modalProducts, setModalProducts] = useState(false);
+  const [modalSizes, setModalSizes] = useState(false);
   const [qtd, setQtd] = useState(1);
   const [startDate, setStartDate] = useState(new Date());
+  const [loadingModal, setLoadingModal] = useState(false);
 
   const [clients, setClients] = useState([]);
   const [clientsSearch, setClientsSearch] = useState([]);
@@ -119,6 +121,13 @@ export default function Pdv() {
   const [cpf, setCpf] = useState("");
   const [name, setName] = useState("");
   const [client, setClient] = useState({});
+
+  const [orderProducts, setOrderProducts] = useState([]);
+  const [productId, setProductId] = useState(null);
+
+  function clear() {
+    setClient({});
+  }
 
   function handleInput(id) {
     const inpt = document.getElementById(id);
@@ -189,6 +198,7 @@ export default function Pdv() {
     if (data) {
       setProducts(data.products);
       handlePagination(data.count.count);
+      console.log(data.products);
     }
   }, [data]);
 
@@ -320,6 +330,78 @@ export default function Pdv() {
       setNameProduct("");
     }
     setBarcode(value);
+  }
+
+  async function handleProducts(id, name) {
+    const result = await products.find((obj) => obj.id === productId);
+    const findDuplicate = await orderProducts.find(
+      (obj) => obj.id === result.id
+    );
+    if (findDuplicate) {
+      if (findDuplicate.size_id === id) {
+        showToast("Este produto já foi inserido", "warning", "Atenção");
+        return false;
+      }
+    }
+    const coast =
+      result.promotional === true
+        ? result.promotional_value
+        : result.sale_value;
+    let product = {
+      id: result.id,
+      name: result.name,
+      value: parseFloat(coast),
+      quantity: qtd,
+      size_id: id,
+      size_name: name,
+      thumbnail: result.thumbnail,
+      total_value: parseFloat(coast) * qtd,
+    };
+    setOrderProducts([...orderProducts, product]);
+    setQtd(1);
+    setProductId(null);
+    showToast("Produto adicionado ao pedido", "success", "Sucesso");
+  }
+
+  async function findSizes(id) {
+    setLoadingModal(true);
+    setProductId(id);
+    try {
+      const response = await api.get(`/sizeByProduct/${id}`);
+      setSizes(response.data);
+      console.log(response.data);
+      setLoadingModal(false);
+      setModalSizes(true);
+    } catch (error) {
+      setLoadingModal(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+      } else {
+        const statusCode = error.response.status || 400;
+        const typeError =
+          error.response.data.message || "Ocorreu um erro ao buscar";
+        const errorMesg = error.response.data.errorMessage || statusCode;
+        const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+        showToast(
+          errorMessageFinal,
+          "error",
+          statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+        );
+      }
+    }
+  }
+
+  useEffect(() => {
+    console.log(orderProducts);
+  }, [orderProducts]);
+
+  async function handleSizes(id) {
+    const result = await sizes.find((obj) => obj.id === id);
+    console.log(result);
+    setModalSizes(false);
+    handleProducts(result.id, result.size);
   }
 
   return (
@@ -622,6 +704,25 @@ export default function Pdv() {
         </Modal>
 
         <Modal
+          isOpen={loadingModal}
+          isCentered
+          closeOnEsc={false}
+          closeOnOverlayClick={false}
+        >
+          <ModalOverlay />
+          <ModalContent maxW="60rem" pb={4} bg="transparent" boxShadow="none">
+            <ModalBody bg="transparent" boxShadow="none">
+              <Flex justify="center" align="center" direction="column">
+                <Lottie animation={sendAnimation} height={250} width={250} />
+                <Text fontSize="2xl" color="gray.100">
+                  Aguarde...
+                </Text>
+              </Flex>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+
+        <Modal
           isOpen={modalPrint}
           onClose={() => setModalPrint(false)}
           isCentered
@@ -635,6 +736,102 @@ export default function Pdv() {
             <ModalBody pb={4}>
               {modalPrint === true && <PrintMiddleware />}
             </ModalBody>
+          </ModalContent>
+        </Modal>
+
+        <Modal
+          isOpen={modalSizes}
+          onClose={() => setModalSizes(false)}
+          isCentered
+          scrollBehavior="inside"
+          size="lg"
+          initialFocusRef={initialRef}
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Tamanhos</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel>Quantidade</FormLabel>
+                <Input
+                  ref={initialRef}
+                  type="number"
+                  placeholder="Qtd"
+                  focusBorderColor={config.inputs}
+                  id="qtd"
+                  value={qtd}
+                  onChange={(e) => setQtd(parseInt(e.target.value))}
+                />
+              </FormControl>
+
+              <Grid
+                templateColumns="repeat(auto-fit, minmax(140px, 140px))"
+                gap="20px"
+                justifyContent="center"
+                mt={5}
+              >
+                {sizes.length === 0 ? (
+                  <Flex justify="center" align="center" direction="column">
+                    <Lottie
+                      animation={emptyAnimation}
+                      height={200}
+                      width={200}
+                    />
+                    <Text>Nenhum tamanho para mostrar</Text>
+                  </Flex>
+                ) : (
+                  <>
+                    {sizes.map((siz) => (
+                      <Box
+                        rounded="md"
+                        borderWidth="1px"
+                        overflow="hidden"
+                        key={siz.id}
+                      >
+                        <Flex
+                          p={1}
+                          textAlign="center"
+                          fontSize="xl"
+                          justify="center"
+                          align="center"
+                          fontWeight="700"
+                          borderBottomWidth="1px"
+                        >
+                          {siz.size}
+                        </Flex>
+                        <Flex
+                          justify="center"
+                          align="center"
+                          p={1}
+                          mt={1}
+                          direction="column"
+                          textAlign="center"
+                        >
+                          <Text fontSize="sm">Estoque:</Text>
+                          <Text fontSize="xl" fontWeight="600">
+                            {siz.amount}
+                          </Text>
+                        </Flex>
+
+                        <Button
+                          colorScheme={config.buttons}
+                          size="sm"
+                          leftIcon={<FaCheck />}
+                          isFullWidth
+                          rounded="none"
+                          onClick={() => handleSizes(siz.id)}
+                          isDisabled={siz.amount <= 0 ? true : false}
+                        >
+                          Selecionar
+                        </Button>
+                      </Box>
+                    ))}
+                  </>
+                )}
+              </Grid>
+            </ModalBody>
+            <ModalFooter></ModalFooter>
           </ModalContent>
         </Modal>
 
@@ -832,6 +1029,7 @@ export default function Pdv() {
                                 colorScheme={config.buttons}
                                 icon={<FaCheck />}
                                 rounded="full"
+                                onClick={() => findSizes(pro.id)}
                               />
                             </Tooltip>
                           </Td>
