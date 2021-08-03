@@ -13,7 +13,6 @@ import {
   Tooltip,
   Flex,
   IconButton,
-  Divider,
   Text,
   Popover,
   PopoverTrigger,
@@ -28,15 +27,9 @@ import {
   Heading,
   FormControl,
   FormLabel,
-  Image,
   InputGroup,
   InputLeftAddon,
   InputRightElement,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuDivider,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -52,6 +45,7 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
   ModalFooter,
+  InputRightAddon,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -59,7 +53,6 @@ import {
   FaShoppingBag,
   FaSearch,
   FaTimes,
-  FaPlus,
   FaSearchPlus,
   FaSave,
   FaCheck,
@@ -82,6 +75,7 @@ import { useEmployee } from "../../context/Employee";
 import useFetch from "../../hooks/useFetch";
 import { mutate as mutateGlobal } from "swr";
 import api from "../../configs/axios";
+import uniqid from "uniqid";
 
 import Lottie from "../../components/lottie";
 import sendAnimation from "../../animations/search.json";
@@ -124,6 +118,9 @@ export default function Pdv() {
 
   const [orderProducts, setOrderProducts] = useState([]);
   const [productId, setProductId] = useState(null);
+  const [total, setTotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [totalToPay, setTotalToPay] = useState(0);
 
   function clear() {
     setClient({});
@@ -334,22 +331,15 @@ export default function Pdv() {
 
   async function handleProducts(id, name) {
     const result = await products.find((obj) => obj.id === productId);
-    const findDuplicate = await orderProducts.find(
-      (obj) => obj.id === result.id
-    );
-    if (findDuplicate) {
-      if (findDuplicate.size_id === id) {
-        showToast("Este produto já foi inserido", "warning", "Atenção");
-        return false;
-      }
-    }
     const coast =
       result.promotional === true
         ? result.promotional_value
         : result.sale_value;
     let product = {
-      id: result.id,
+      id: uniqid(),
+      product_id: result.id,
       name: result.name,
+      promotional: result.promotional,
       value: parseFloat(coast),
       quantity: qtd,
       size_id: id,
@@ -360,6 +350,7 @@ export default function Pdv() {
     setOrderProducts([...orderProducts, product]);
     setQtd(1);
     setProductId(null);
+    setModalSizes(false);
     showToast("Produto adicionado ao pedido", "success", "Sucesso");
   }
 
@@ -394,14 +385,30 @@ export default function Pdv() {
   }
 
   useEffect(() => {
-    console.log(orderProducts);
+    let valor = orderProducts.reduce(
+      (total, numeros) => total + numeros.total_value,
+      0
+    );
+    setTotal(valor);
+    setTotalToPay(valor);
   }, [orderProducts]);
 
   async function handleSizes(id) {
     const result = await sizes.find((obj) => obj.id === id);
-    console.log(result);
-    setModalSizes(false);
+    if (result.amount < qtd) {
+      showToast(
+        "Este produto não tem a quantidade suficiente pedida",
+        "warning",
+        "Atenção"
+      );
+      return false;
+    }
     handleProducts(result.id, result.size);
+  }
+
+  function removeProduct(id) {
+    const result = orderProducts.filter((obj) => obj.id !== id);
+    setOrderProducts(result);
   }
 
   return (
@@ -490,23 +497,11 @@ export default function Pdv() {
                   leftIcon={<FaTrash />}
                   variant="outline"
                 >
-                  Cancelar Pedido{" "}
-                  <Kbd ml={1} color="ButtonText">
-                    F5
-                  </Kbd>
+                  Cancelar Pedido <Kbd ml={1}>F5</Kbd>
                 </Button>
               </Stack>
             </Box>
-            <Box
-              borderWidth="1px"
-              shadow="md"
-              rounded="md"
-              p={3}
-              h="100%"
-              minH="100%"
-              maxH="100%"
-              overflow="auto"
-            >
+            <Box borderWidth="1px" shadow="md" rounded="md" p={3}>
               <Center rounded="md" p={2} bg="rgba(160, 174, 192, 0.1)" mb={3}>
                 <Heading fontSize="sm">Informações do Pedido</Heading>
               </Center>
@@ -517,6 +512,7 @@ export default function Pdv() {
                   focusBorderColor={config.inputs}
                   isReadOnly
                   value={JSON.stringify(client) !== "{}" ? client.name : ""}
+                  variant="filled"
                 />
                 <Tooltip label="Buscar Cliente" hasArrow>
                   <Button
@@ -541,6 +537,7 @@ export default function Pdv() {
                       : ""
                   }
                   isReadOnly
+                  variant="filled"
                 />
                 <Input
                   size="sm"
@@ -549,96 +546,111 @@ export default function Pdv() {
                   w="30%"
                   value={JSON.stringify(client) !== "{}" ? client.contact : ""}
                   isReadOnly
+                  variant="filled"
                 />
               </HStack>
 
-              <Divider mt={3} mb={3} />
-
-              <Table size="sm" maxW="100%">
-                <Thead fontWeight="700">
-                  <Tr>
-                    <Td w="2%" textAlign="center">
-                      Qtd
-                    </Td>
-                    <Td isTruncated>Produto</Td>
-                    <Td w="7%" textAlign="center">
-                      Cor
-                    </Td>
-                    <Td w="7%" textAlign="center">
-                      Tamanho
-                    </Td>
-                    <Td w="14%" isNumeric>
-                      V. Uni
-                    </Td>
-                    <Td w="14%" isNumeric>
-                      V. Tot
-                    </Td>
-                    <Td w="1%"></Td>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  <Tr>
-                    <Td w="2%" textAlign="center">
-                      10
-                    </Td>
-                    <Td isTruncated>
-                      <Tooltip
-                        label="Camiseta Masculina Masculina Topper adasdasdasda"
-                        hasArrow
-                      >
-                        <Text fontSize="sm" isTruncated noOfLines={1} w="10vw">
-                          Camiseta Masculina Masculina Topper adasdasdasda
-                        </Text>
-                      </Tooltip>
-                    </Td>
-                    <Td w="7%" textAlign="center">
-                      <Box w="100%" h="20px" bg="yellow.400" rounded="md" />
-                    </Td>
-                    <Td w="7%" textAlign="center">
-                      PP
-                    </Td>
-                    <Td w="14%" isNumeric>
-                      400,00
-                    </Td>
-                    <Td w="14%" isNumeric>
-                      400,00
-                    </Td>
-                    <Td w="1%">
-                      <Tooltip label="Remover Item" hasArrow>
-                        <Popover>
-                          <PopoverTrigger>
-                            <IconButton
-                              colorScheme="red"
-                              icon={<FaTimes />}
-                              size="xs"
-                              variant="link"
-                            />
-                          </PopoverTrigger>
-                          <PopoverContent>
-                            <PopoverArrow />
-                            <PopoverCloseButton />
-                            <PopoverHeader>Confirmação!</PopoverHeader>
-                            <PopoverBody>Deseja remover este item?</PopoverBody>
-                            <PopoverFooter d="flex" justifyContent="flex-end">
-                              <ButtonGroup size="sm">
-                                <Button
-                                  variant="outline"
-                                  colorScheme={config.buttons}
+              {orderProducts.length === 0 ? (
+                <Flex justify="center" align="center" direction="column">
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Seu pedido está vazio!</Text>
+                </Flex>
+              ) : (
+                <Table size="sm" maxW="100%" mt={5} variant="striped">
+                  <Thead fontWeight="700">
+                    <Tr>
+                      <Td w="2%" textAlign="center">
+                        Qtd
+                      </Td>
+                      <Td isTruncated>Produto</Td>
+                      <Td w="7%" textAlign="center">
+                        Tamanho
+                      </Td>
+                      <Td w="14%" isNumeric>
+                        V. Uni
+                      </Td>
+                      <Td w="14%" isNumeric>
+                        V. Tot
+                      </Td>
+                      <Td w="1%"></Td>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {orderProducts.map((prod) => (
+                      <Tr key={prod.id}>
+                        <Td w="2%" textAlign="center">
+                          {prod.quantity}
+                        </Td>
+                        <Td isTruncated>
+                          <Tooltip label={prod.name} hasArrow>
+                            <Text
+                              fontSize="sm"
+                              isTruncated
+                              noOfLines={1}
+                              w="33vw"
+                            >
+                              {prod.name}
+                            </Text>
+                          </Tooltip>
+                        </Td>
+                        <Td w="7%" textAlign="center">
+                          {prod.size_name}
+                        </Td>
+                        <Td w="14%" isNumeric>
+                          {parseFloat(prod.value).toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
+                        </Td>
+                        <Td w="14%" isNumeric>
+                          {parseFloat(prod.total_value).toLocaleString(
+                            "pt-BR",
+                            {
+                              style: "currency",
+                              currency: "BRL",
+                            }
+                          )}
+                        </Td>
+                        <Td w="1%">
+                          <Tooltip label="Remover Item" hasArrow>
+                            <Popover placement="bottom-end">
+                              <PopoverTrigger>
+                                <IconButton
+                                  colorScheme="red"
+                                  icon={<FaTimes />}
+                                  size="xs"
+                                  variant="link"
+                                />
+                              </PopoverTrigger>
+                              <PopoverContent _focus={{ outline: "none" }}>
+                                <PopoverArrow />
+                                <PopoverCloseButton />
+                                <PopoverHeader>Confirmação!</PopoverHeader>
+                                <PopoverBody>
+                                  Deseja remover este item?
+                                </PopoverBody>
+                                <PopoverFooter
+                                  d="flex"
+                                  justifyContent="flex-end"
                                 >
-                                  Não
-                                </Button>
-                                <Button colorScheme={config.buttons}>
-                                  Sim
-                                </Button>
-                              </ButtonGroup>
-                            </PopoverFooter>
-                          </PopoverContent>
-                        </Popover>
-                      </Tooltip>
-                    </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
+                                  <ButtonGroup size="sm">
+                                    <Button
+                                      colorScheme={config.buttons}
+                                      onClick={() => removeProduct(prod.id)}
+                                    >
+                                      Sim
+                                    </Button>
+                                  </ButtonGroup>
+                                </PopoverFooter>
+                              </PopoverContent>
+                            </Popover>
+                          </Tooltip>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              )}
             </Box>
           </Grid>
 
@@ -649,25 +661,67 @@ export default function Pdv() {
             rounded="md"
             align="center"
           >
-            <Grid templateColumns="3fr 1fr" gap="15px">
-              <Grid templateColumns="repeat(3, 1fr)" gap="10px" pl={3}>
+            <Grid templateColumns="4fr 1fr" gap="15px">
+              <Grid templateColumns="1fr 1fr 1fr" gap="10px" pl={3}>
                 <InputGroup size="lg">
-                  <InputLeftAddon>Total</InputLeftAddon>
-                  <Input focusBorderColor={config.inputs} />
+                  <InputLeftAddon>R$</InputLeftAddon>
+                  <NumberInput
+                    precision={2}
+                    step={0.01}
+                    focusBorderColor={config.inputs}
+                    value={total}
+                    isReadOnly
+                    size="lg"
+                  >
+                    <NumberInputField rounded="none" />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                  <InputRightAddon>Total</InputRightAddon>
                 </InputGroup>
 
                 <InputGroup size="lg">
-                  <InputLeftAddon>
+                  <InputLeftAddon>%</InputLeftAddon>
+                  <NumberInput
+                    precision={2}
+                    step={0.01}
+                    focusBorderColor={config.inputs}
+                    value={discount}
+                    size="lg"
+                    id="discount"
+                  >
+                    <NumberInputField rounded="none" />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                  <InputRightAddon>
                     Desconto <Kbd ml={1}>F9</Kbd>
-                  </InputLeftAddon>
-                  <Input focusBorderColor={config.inputs} id="discount" />
+                  </InputRightAddon>
                 </InputGroup>
 
                 <InputGroup size="lg">
-                  <InputLeftAddon>
+                  <InputLeftAddon>R$</InputLeftAddon>
+                  <NumberInput
+                    precision={2}
+                    step={0.01}
+                    focusBorderColor={config.inputs}
+                    value={totalToPay}
+                    size="lg"
+                    id="finalvalue"
+                  >
+                    <NumberInputField rounded="none" />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                  <InputRightAddon>
                     A Pagar <Kbd ml={1}>F10</Kbd>
-                  </InputLeftAddon>
-                  <Input focusBorderColor={config.inputs} id="finalvalue" />;
+                  </InputRightAddon>
                 </InputGroup>
               </Grid>
               <Grid templateColumns="1fr" gap="15px" pr={3}>
@@ -744,7 +798,7 @@ export default function Pdv() {
           onClose={() => setModalSizes(false)}
           isCentered
           scrollBehavior="inside"
-          size="lg"
+          size="xl"
           initialFocusRef={initialRef}
         >
           <ModalOverlay />
@@ -765,23 +819,24 @@ export default function Pdv() {
                 />
               </FormControl>
 
-              <Grid
-                templateColumns="repeat(auto-fit, minmax(140px, 140px))"
-                gap="20px"
-                justifyContent="center"
-                mt={5}
-              >
-                {sizes.length === 0 ? (
-                  <Flex justify="center" align="center" direction="column">
-                    <Lottie
-                      animation={emptyAnimation}
-                      height={200}
-                      width={200}
-                    />
-                    <Text>Nenhum tamanho para mostrar</Text>
-                  </Flex>
-                ) : (
-                  <>
+              {sizes.length === 0 ? (
+                <Flex
+                  justify="center"
+                  align="center"
+                  direction="column"
+                  w="100%"
+                >
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Nenhum tamanho para mostrar</Text>
+                </Flex>
+              ) : (
+                <>
+                  <Grid
+                    templateColumns="repeat(auto-fit, minmax(140px, 140px))"
+                    gap="20px"
+                    justifyContent="center"
+                    mt={5}
+                  >
                     {sizes.map((siz) => (
                       <Box
                         rounded="md"
@@ -827,9 +882,9 @@ export default function Pdv() {
                         </Button>
                       </Box>
                     ))}
-                  </>
-                )}
-              </Grid>
+                  </Grid>
+                </>
+              )}
             </ModalBody>
             <ModalFooter></ModalFooter>
           </ModalContent>
