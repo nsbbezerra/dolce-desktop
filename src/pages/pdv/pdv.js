@@ -47,6 +47,8 @@ import {
   ModalFooter,
   InputRightAddon,
   Icon,
+  Divider,
+  Textarea,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -64,6 +66,7 @@ import {
   FaTags,
   FaArrowRight,
   FaArrowLeft,
+  FaEdit,
 } from "react-icons/fa";
 import DatePicker, { registerLocale } from "react-datepicker";
 import Hotkeys from "react-hot-keys";
@@ -74,7 +77,6 @@ import PrintMiddleware from "../../middlewares/print";
 
 import { useEmployee } from "../../context/Employee";
 import useFetch from "../../hooks/useFetch";
-import { mutate as mutateGlobal } from "swr";
 import api from "../../configs/axios";
 import uniqid from "uniqid";
 
@@ -108,6 +110,9 @@ export default function Pdv() {
   const [qtd, setQtd] = useState(1);
   const [startDate, setStartDate] = useState(new Date());
   const [loadingModal, setLoadingModal] = useState(false);
+  const [modalObs, setModalObs] = useState(false);
+  const [modalShow, setModalShow] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [clients, setClients] = useState([]);
   const [clientsSearch, setClientsSearch] = useState([]);
@@ -122,10 +127,14 @@ export default function Pdv() {
   const [total, setTotal] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [totalToPay, setTotalToPay] = useState(0);
+  const [obs, setObs] = useState("");
+  const [order, setOrder] = useState({});
 
   function clear() {
     setClient({});
     setOrderProducts([]);
+    setObs("");
+    setOrder({});
   }
 
   function handleInput(id) {
@@ -251,6 +260,9 @@ export default function Pdv() {
     switch (keyName) {
       case "ctrl+p":
         setModalPrint(true);
+        break;
+      case "ctrl+o":
+        setModalObs(true);
         break;
       case "f11":
         setModalProducts(true);
@@ -446,10 +458,63 @@ export default function Pdv() {
     }
   }
 
+  async function store() {
+    if (JSON.stringify(client) === "{}") {
+      showToast("Por favor, selecione um cliente", "warning", "Atenção");
+      setModalClients(true);
+      return false;
+    }
+    if (orderProducts.length === 0) {
+      showToast("Por favor, insira produtos ao pedido", "warning", "Atenção");
+      setModalProducts(true);
+      return false;
+    }
+    setLoading(true);
+
+    try {
+      const response = await api.post(
+        "/order",
+        {
+          client_id: client.id,
+          employee_id: employee.user,
+          products: orderProducts,
+          grand_total: total,
+          discount: discount,
+          total_to_pay: totalToPay,
+          order_date: startDate,
+          waiting: "none",
+          obs: obs,
+        },
+        { headers: { "x-access-token": employee.token } }
+      );
+      setLoading(false);
+      setOrder(response.data[0]);
+      console.log(response.data[0]);
+    } catch (error) {
+      setLoading(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
   return (
     <>
       <Hotkeys
-        keyName="f2, ctrl+p, f6, f3, f7, f8, f9, f10, f12, f1, f4, f5, f11"
+        keyName="f2, ctrl+p, f6, f3, f7, f8, f9, f10, f12, f1, f4, f5, f11, ctrl+o, ctrl+v"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -502,13 +567,17 @@ export default function Pdv() {
                 >
                   Produtos <Kbd ml={1}>F11</Kbd>
                 </Button>
+              </Stack>
+              <Divider mt={3} mb={3} />
+              <Stack spacing={3}>
                 <Button
                   isFullWidth
                   colorScheme={config.buttons}
-                  leftIcon={<FaSearchPlus />}
+                  leftIcon={<FaEdit />}
                   variant="outline"
+                  onClick={() => setModalObs(true)}
                 >
-                  Buscar Orçamento <Kbd ml={1}>F1</Kbd>
+                  Adicionar Observação <Kbd ml={1}>Ctrl+O</Kbd>
                 </Button>
                 <Button
                   isFullWidth
@@ -517,6 +586,14 @@ export default function Pdv() {
                   variant="outline"
                 >
                   Salvar como Orçamento <Kbd ml={1}>F4</Kbd>
+                </Button>
+                <Button
+                  isFullWidth
+                  colorScheme={config.buttons}
+                  leftIcon={<FaSearch />}
+                  variant="outline"
+                >
+                  Visualizar Pedido <Kbd ml={1}>Ctrl+V</Kbd>
                 </Button>
                 <Button
                   isFullWidth
@@ -534,6 +611,17 @@ export default function Pdv() {
                   onClick={() => clear()}
                 >
                   Cancelar Pedido <Kbd ml={1}>F5</Kbd>
+                </Button>
+              </Stack>
+              <Divider mt={3} mb={3} />
+              <Stack spacing={3}>
+                <Button
+                  isFullWidth
+                  colorScheme={config.buttons}
+                  leftIcon={<FaSearchPlus />}
+                  variant="outline"
+                >
+                  Buscar Orçamento <Kbd ml={1}>F1</Kbd>
                 </Button>
               </Stack>
             </Box>
@@ -749,8 +837,9 @@ export default function Pdv() {
                 <Button
                   leftIcon={<FaCheck />}
                   colorScheme={config.buttons}
-                  onClick={() => setModalPayment(true)}
+                  onClick={() => store()}
                   size="lg"
+                  isLoading={loading}
                 >
                   Finalizar Pedido{" "}
                   <Kbd color="ButtonText" ml={1}>
@@ -810,6 +899,31 @@ export default function Pdv() {
             <ModalCloseButton />
             <ModalBody pb={4}>
               {modalPrint === true && <PrintMiddleware />}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+
+        <Modal
+          isOpen={modalObs}
+          onClose={() => setModalObs(false)}
+          isCentered
+          scrollBehavior="inside"
+          size="2xl"
+          initialFocusRef={initialRef}
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Observação</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={4}>
+              <Textarea
+                ref={initialRef}
+                rows={5}
+                value={obs}
+                onChange={(e) => setObs(e.target.value)}
+                focusBorderColor={config.inputs}
+                resize="none"
+              />
             </ModalBody>
           </ModalContent>
         </Modal>
