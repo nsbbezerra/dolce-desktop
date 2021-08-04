@@ -46,6 +46,7 @@ import {
   NumberDecrementStepper,
   ModalFooter,
   InputRightAddon,
+  Icon,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -124,6 +125,7 @@ export default function Pdv() {
 
   function clear() {
     setClient({});
+    setOrderProducts([]);
   }
 
   function handleInput(id) {
@@ -256,19 +258,19 @@ export default function Pdv() {
         setModalProducts(true);
         break;
       case "f6":
-        handleInput("qtd");
+        modalProducts === true && handleInput("qtd");
         break;
       case "f12":
         setModalPayment(true);
         break;
       case "f3":
-        handleInput("name");
+        modalProducts === true && handleInput("name");
         break;
       case "f7":
-        handleInput("codebar");
+        modalProducts === true && handleInput("codebar");
         break;
       case "f8":
-        handleInput("sku");
+        modalProducts === true && handleInput("sku");
         break;
       case "f9":
         handleInput("discount");
@@ -411,6 +413,24 @@ export default function Pdv() {
     setOrderProducts(result);
   }
 
+  function calcDesc(value) {
+    const desc = parseFloat(value);
+    if (!isNaN(desc) || desc >= 0) {
+      setDiscount(desc);
+      const rest = parseFloat((total * desc) / 100);
+      const soma = total - rest;
+      setTotalToPay(parseFloat(soma.toFixed(2)));
+    } else {
+      setDiscount(value);
+      setTotalToPay(total);
+      if (value === "") {
+        setTimeout(() => {
+          setDiscount(0);
+        }, 2500);
+      }
+    }
+  }
+
   return (
     <>
       <Hotkeys
@@ -496,6 +516,7 @@ export default function Pdv() {
                   colorScheme={config.buttons}
                   leftIcon={<FaTrash />}
                   variant="outline"
+                  onClick={() => clear()}
                 >
                   Cancelar Pedido <Kbd ml={1}>F5</Kbd>
                 </Button>
@@ -564,6 +585,9 @@ export default function Pdv() {
                       </Td>
                       <Td isTruncated>Produto</Td>
                       <Td w="7%" textAlign="center">
+                        Promoção?
+                      </Td>
+                      <Td w="7%" textAlign="center">
                         Tamanho
                       </Td>
                       <Td w="14%" isNumeric>
@@ -594,6 +618,13 @@ export default function Pdv() {
                           </Tooltip>
                         </Td>
                         <Td w="7%" textAlign="center">
+                          {prod.promotional === true ? (
+                            <Icon as={FaCheck} color="green.500" />
+                          ) : (
+                            <Icon as={FaTimes} color="red.500" />
+                          )}
+                        </Td>
+                        <Td w="7%" textAlign="center">
                           {prod.size_name}
                         </Td>
                         <Td w="14%" isNumeric>
@@ -613,11 +644,11 @@ export default function Pdv() {
                         </Td>
                         <Td w="1%">
                           <Tooltip label="Remover Item" hasArrow>
-                            <Popover placement="bottom-end">
+                            <Popover placement="left">
                               <PopoverTrigger>
                                 <IconButton
                                   colorScheme="red"
-                                  icon={<FaTimes />}
+                                  icon={<FaTrash />}
                                   size="xs"
                                   variant="link"
                                 />
@@ -665,39 +696,24 @@ export default function Pdv() {
               <Grid templateColumns="1fr 1fr 1fr" gap="10px" pl={3}>
                 <InputGroup size="lg">
                   <InputLeftAddon>R$</InputLeftAddon>
-                  <NumberInput
-                    precision={2}
-                    step={0.01}
+                  <Input
                     focusBorderColor={config.inputs}
                     value={total}
-                    isReadOnly
                     size="lg"
-                  >
-                    <NumberInputField rounded="none" />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
+                    isReadOnly
+                  />
                   <InputRightAddon>Total</InputRightAddon>
                 </InputGroup>
 
                 <InputGroup size="lg">
                   <InputLeftAddon>%</InputLeftAddon>
-                  <NumberInput
-                    precision={2}
-                    step={0.01}
+                  <Input
                     focusBorderColor={config.inputs}
                     value={discount}
                     size="lg"
                     id="discount"
-                  >
-                    <NumberInputField rounded="none" />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
+                    onChange={(e) => calcDesc(e.target.value)}
+                  />
                   <InputRightAddon>
                     Desconto <Kbd ml={1}>F9</Kbd>
                   </InputRightAddon>
@@ -705,20 +721,12 @@ export default function Pdv() {
 
                 <InputGroup size="lg">
                   <InputLeftAddon>R$</InputLeftAddon>
-                  <NumberInput
-                    precision={2}
-                    step={0.01}
+                  <Input
                     focusBorderColor={config.inputs}
                     value={totalToPay}
                     size="lg"
                     id="finalvalue"
-                  >
-                    <NumberInputField rounded="none" />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
+                  />
                   <InputRightAddon>
                     A Pagar <Kbd ml={1}>F10</Kbd>
                   </InputRightAddon>
