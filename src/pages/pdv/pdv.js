@@ -137,7 +137,6 @@ export default function Pdv() {
     try {
       const response = await api.get("/clientsWithAddress");
       setClients(response.data);
-      console.log(response.data);
       setClientsSearch(response.data);
     } catch (error) {
       if (error.message === "Network Error") {
@@ -197,7 +196,6 @@ export default function Pdv() {
     if (data) {
       setProducts(data.products);
       handlePagination(data.count.count);
-      console.log(data.products);
     }
   }, [data]);
 
@@ -333,27 +331,29 @@ export default function Pdv() {
 
   async function handleProducts(id, name) {
     const result = await products.find((obj) => obj.id === productId);
-    const coast =
-      result.promotional === true
-        ? result.promotional_value
-        : result.sale_value;
-    let product = {
-      id: uniqid(),
-      product_id: result.id,
-      name: result.name,
-      promotional: result.promotional,
-      value: parseFloat(coast),
-      quantity: qtd,
-      size_id: id,
-      size_name: name,
-      thumbnail: result.thumbnail,
-      total_value: parseFloat(coast) * qtd,
-    };
-    setOrderProducts([...orderProducts, product]);
-    setQtd(1);
-    setProductId(null);
-    setModalSizes(false);
-    showToast("Produto adicionado ao pedido", "success", "Sucesso");
+    if (result) {
+      const coast =
+        result.promotional === true
+          ? result.promotional_value
+          : result.sale_value;
+      let product = {
+        id: uniqid(),
+        product_id: result.id,
+        name: result.name,
+        promotional: result.promotional,
+        value: parseFloat(coast),
+        quantity: qtd,
+        size_id: id,
+        size_name: name,
+        thumbnail: result.thumbnail,
+        total_value: parseFloat(coast) * qtd,
+      };
+      setOrderProducts([...orderProducts, product]);
+      setQtd(1);
+      setProductId(null);
+      setModalSizes(false);
+      showToast("Produto adicionado ao pedido", "success", "Sucesso");
+    }
   }
 
   async function findSizes(id) {
@@ -362,7 +362,6 @@ export default function Pdv() {
     try {
       const response = await api.get(`/sizeByProduct/${id}`);
       setSizes(response.data);
-      console.log(response.data);
       setLoadingModal(false);
       setModalSizes(true);
     } catch (error) {
@@ -397,15 +396,17 @@ export default function Pdv() {
 
   async function handleSizes(id) {
     const result = await sizes.find((obj) => obj.id === id);
-    if (result.amount < qtd) {
-      showToast(
-        "Este produto não tem a quantidade suficiente pedida",
-        "warning",
-        "Atenção"
-      );
-      return false;
+    if (result) {
+      if (result.amount < qtd) {
+        showToast(
+          "Este produto não tem a quantidade suficiente pedida",
+          "warning",
+          "Atenção"
+        );
+        return false;
+      }
+      handleProducts(result.id, result.size);
     }
-    handleProducts(result.id, result.size);
   }
 
   function removeProduct(id) {
@@ -424,9 +425,23 @@ export default function Pdv() {
       setDiscount(value);
       setTotalToPay(total);
       if (value === "") {
-        setTimeout(() => {
-          setDiscount(0);
-        }, 2500);
+        setDiscount(0);
+      }
+    }
+  }
+
+  function calcTotalToPay(value) {
+    setTotalToPay(value);
+    const valueToPay = parseFloat(value);
+    if (!isNaN(valueToPay) || valueToPay >= 0) {
+      const rest = valueToPay / total;
+      const calcPercent = rest * 100;
+      const soma = 100 - calcPercent;
+      setDiscount(parseFloat(soma.toFixed(2)));
+    } else {
+      setDiscount(0);
+      if (value === "") {
+        setTotalToPay(total);
       }
     }
   }
@@ -533,7 +548,6 @@ export default function Pdv() {
                   focusBorderColor={config.inputs}
                   isReadOnly
                   value={JSON.stringify(client) !== "{}" ? client.name : ""}
-                  variant="filled"
                 />
                 <Tooltip label="Buscar Cliente" hasArrow>
                   <Button
@@ -558,7 +572,6 @@ export default function Pdv() {
                       : ""
                   }
                   isReadOnly
-                  variant="filled"
                 />
                 <Input
                   size="sm"
@@ -567,7 +580,6 @@ export default function Pdv() {
                   w="30%"
                   value={JSON.stringify(client) !== "{}" ? client.contact : ""}
                   isReadOnly
-                  variant="filled"
                 />
               </HStack>
 
@@ -611,7 +623,7 @@ export default function Pdv() {
                               fontSize="sm"
                               isTruncated
                               noOfLines={1}
-                              w="33vw"
+                              w="29vw"
                             >
                               {prod.name}
                             </Text>
@@ -726,6 +738,7 @@ export default function Pdv() {
                     value={totalToPay}
                     size="lg"
                     id="finalvalue"
+                    onChange={(e) => calcTotalToPay(e.target.value)}
                   />
                   <InputRightAddon>
                     A Pagar <Kbd ml={1}>F10</Kbd>
