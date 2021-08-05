@@ -639,7 +639,7 @@ export default function Produtos() {
                 <TabPanels>
                   {/** INFORMAÇÕES */}
                   <TabPanel>
-                    <Grid templateColumns="280px 1fr" gap="15px">
+                    <Grid templateColumns="300px 1fr" gap="15px">
                       <FormControl
                         isRequired
                         isInvalid={
@@ -649,7 +649,7 @@ export default function Produtos() {
                         }
                       >
                         <FormLabel>Imagem</FormLabel>
-                        <Box w="280px" h="310px">
+                        <Box w="300px" h="300px">
                           {thumbnail ? (
                             <Box
                               rounded="md"
@@ -658,8 +658,8 @@ export default function Produtos() {
                             >
                               <Image
                                 src={previewThumbnail}
-                                w="280px"
-                                h="310px"
+                                w="300px"
+                                h="300px"
                               />
                               <Flex justify="center" mt="-30px">
                                 <Tooltip label="Remover Imagem" hasArrow>
@@ -675,7 +675,7 @@ export default function Produtos() {
                               </Flex>
                             </Box>
                           ) : (
-                            <InputFile alt={310} lar={280} cor={colorMode}>
+                            <InputFile alt={300} lar={300} cor={colorMode}>
                               <File
                                 type="file"
                                 onChange={(event) =>
@@ -686,7 +686,7 @@ export default function Produtos() {
                                 style={{ fontSize: 50, marginBottom: 20 }}
                               />
                               <Text>
-                                Insira uma imagem 280x310 pixels, de até 500kb
+                                Insira uma imagem 300x300 pixels, de até 500kb
                               </Text>
                             </InputFile>
                           )}
