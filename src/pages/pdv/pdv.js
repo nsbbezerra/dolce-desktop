@@ -489,8 +489,9 @@ export default function Pdv() {
       );
       setLoading(false);
       setOrder(response.data[0]);
-      console.log(response.data[0]);
+      setModalPayment(true);
     } catch (error) {
+      console.log(error);
       setLoading(false);
       if (error.message === "Network Error") {
         alert(
@@ -862,7 +863,9 @@ export default function Pdv() {
             <ModalHeader>Adicionar Forma de Pagamento</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              {modalPayment === true && <PaymentMiddleware />}
+              {modalPayment === true && (
+                <PaymentMiddleware order={order} />
+              )}
             </ModalBody>
           </ModalContent>
         </Modal>
