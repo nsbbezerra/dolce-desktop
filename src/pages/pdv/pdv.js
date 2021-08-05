@@ -271,7 +271,7 @@ export default function Pdv() {
         modalProducts === true && handleInput("qtd");
         break;
       case "f12":
-        setModalPayment(true);
+        store();
         break;
       case "f3":
         modalProducts === true && handleInput("name");
@@ -581,6 +581,7 @@ export default function Pdv() {
                   leftIcon={<FaTags />}
                   variant="outline"
                   onClick={() => setModalProducts(true)}
+                  size="sm"
                 >
                   Produtos <Kbd ml={1}>F11</Kbd>
                 </Button>
@@ -593,6 +594,7 @@ export default function Pdv() {
                   leftIcon={<FaEdit />}
                   variant="outline"
                   onClick={() => setModalObs(true)}
+                  size="sm"
                 >
                   Adicionar Observação <Kbd ml={1}>Ctrl+O</Kbd>
                 </Button>
@@ -601,6 +603,7 @@ export default function Pdv() {
                   colorScheme={config.buttons}
                   leftIcon={<FaSave />}
                   variant="outline"
+                  size="sm"
                 >
                   Salvar como Orçamento <Kbd ml={1}>F4</Kbd>
                 </Button>
@@ -609,6 +612,7 @@ export default function Pdv() {
                   colorScheme={config.buttons}
                   leftIcon={<FaSearch />}
                   variant="outline"
+                  size="sm"
                 >
                   Visualizar Pedido <Kbd ml={1}>Ctrl+V</Kbd>
                 </Button>
@@ -617,6 +621,7 @@ export default function Pdv() {
                   colorScheme={config.buttons}
                   leftIcon={<FaPrint />}
                   variant="outline"
+                  size="sm"
                 >
                   Imprimir Pedido <Kbd ml={1}>Ctrl+P</Kbd>
                 </Button>
@@ -626,6 +631,7 @@ export default function Pdv() {
                   leftIcon={<FaTrash />}
                   variant="outline"
                   onClick={() => clear()}
+                  size="sm"
                 >
                   Cancelar Pedido <Kbd ml={1}>F5</Kbd>
                 </Button>
@@ -637,6 +643,7 @@ export default function Pdv() {
                   colorScheme={config.buttons}
                   leftIcon={<FaSearchPlus />}
                   variant="outline"
+                  size="sm"
                 >
                   Buscar Orçamento <Kbd ml={1}>F1</Kbd>
                 </Button>
