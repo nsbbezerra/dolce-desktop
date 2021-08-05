@@ -343,6 +343,13 @@ export default function Pdv() {
 
   async function handleProducts(id, name) {
     const result = await products.find((obj) => obj.id === productId);
+    const findDuplicate = await orderProducts.find(
+      (obj) => obj.product_id === result.id && obj.size_id === id
+    );
+    if (findDuplicate) {
+      showToast("Este produto já foi inserido ao pedido", "warning", "Atenção");
+      return false;
+    }
     if (result) {
       const coast =
         result.promotional === true
@@ -509,6 +516,15 @@ export default function Pdv() {
         "error",
         statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
       );
+    }
+  }
+
+  function handleStock(id, stock) {
+    const result = orderProducts.find((obj) => obj.size_id === id);
+    if (result) {
+      return stock - result.quantity;
+    } else {
+      return stock;
     }
   }
 
@@ -707,16 +723,14 @@ export default function Pdv() {
                           {prod.quantity}
                         </Td>
                         <Td isTruncated>
-                          <Tooltip label={prod.name} hasArrow>
-                            <Text
-                              fontSize="sm"
-                              isTruncated
-                              noOfLines={1}
-                              w="29vw"
-                            >
-                              {prod.name}
-                            </Text>
-                          </Tooltip>
+                          <Text
+                            fontSize="sm"
+                            isTruncated
+                            noOfLines={1}
+                            w="29vw"
+                          >
+                            {prod.name}
+                          </Text>
                         </Td>
                         <Td w="7%" textAlign="center">
                           {prod.promotional === true ? (
@@ -854,18 +868,16 @@ export default function Pdv() {
 
         <Modal
           isOpen={modalPayment}
-          onClose={() => setModalPayment(false)}
+          closeOnEsc={false}
+          closeOnOverlayClick={false}
           isCentered
           scrollBehavior="inside"
         >
           <ModalOverlay />
           <ModalContent maxW="60rem" pb={4}>
             <ModalHeader>Adicionar Forma de Pagamento</ModalHeader>
-            <ModalCloseButton />
             <ModalBody>
-              {modalPayment === true && (
-                <PaymentMiddleware order={order} />
-              )}
+              {modalPayment === true && <PaymentMiddleware order={order} />}
             </ModalBody>
           </ModalContent>
         </Modal>
@@ -1003,7 +1015,7 @@ export default function Pdv() {
                         >
                           <Text fontSize="sm">Estoque:</Text>
                           <Text fontSize="xl" fontWeight="600">
-                            {siz.amount}
+                            {handleStock(siz.id, siz.amount)}
                           </Text>
                         </Flex>
 
@@ -1014,7 +1026,9 @@ export default function Pdv() {
                           isFullWidth
                           rounded="none"
                           onClick={() => handleSizes(siz.id)}
-                          isDisabled={siz.amount <= 0 ? true : false}
+                          isDisabled={
+                            handleStock(siz.id, siz.amount) <= 0 ? true : false
+                          }
                         >
                           Selecionar
                         </Button>

@@ -3,8 +3,6 @@ import {
   Grid,
   InputLeftAddon,
   InputGroup,
-  Input,
-  InputRightAddon,
   Box,
   Flex,
   Text,
@@ -17,22 +15,26 @@ import {
   Button,
   HStack,
   useToast,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 import config from "../configs/index";
-import { FaSave, FaCalculator } from "react-icons/fa";
+import { FaSave } from "react-icons/fa";
 import api from "../configs/axios";
 import useFetch from "../hooks/useFetch";
+import uniqid from "uniqid";
 
 export default function PaymentMiddleware({ order }) {
   const toast = useToast();
   const { data, error } = useFetch("/payFormPdv");
-  console.log(order);
 
   const [firstPayment, setFirstPayment] = useState(0);
   const [secontPayment, setSecontPayment] = useState(0);
 
   const [showSecondPayment, setShowSecondPayment] = useState(false);
-  const [calculatePayment, setCalculatePayment] = useState(false);
 
   const [firstInstallment, setFirtsInstallment] = useState(1);
   const [firstInstallmentList, setFirstInstallmentList] = useState([]);
@@ -46,6 +48,8 @@ export default function PaymentMiddleware({ order }) {
 
   const [payments, setPayments] = useState([]);
   const [payForms, setPayForms] = useState([]);
+  const [firstPaymentObject, setFirstPaymentObject] = useState({});
+  const [secondPaymentObject, setSecondPaymentObject] = useState({});
 
   useEffect(() => {
     let initialInstallment = [1];
@@ -86,6 +90,66 @@ export default function PaymentMiddleware({ order }) {
     setFirstPayForm(result);
     setFirstPayFormId(result.id);
   }
+
+  useEffect(() => {
+    if (JSON.stringify(firstPayForm) !== "{}") {
+      let calc = parseFloat(firstPayment) / parseInt(firstInstallment);
+      let info = {
+        id: uniqid(),
+        pay_form_id: firstPayForm.id,
+        pay_form_name: firstPayForm.name,
+        pay_form_status: firstPayForm.status,
+        installment_total: firstPayment,
+        installment_value: parseFloat(calc.toFixed(2)),
+        installment_amount: firstInstallment,
+      };
+      setFirstPaymentObject(info);
+    }
+  }, [firstInstallment, firstPayment, firstPayForm]);
+
+  useEffect(() => {
+    if (JSON.stringify(secondPayForm) !== "{}") {
+      let calc = parseFloat(secontPayment) / parseInt(secondInstallment);
+      let info = {
+        id: uniqid(),
+        pay_form_id: secondPayForm.id,
+        pay_form_name: secondPayForm.name,
+        pay_form_status: secondPayForm.status,
+        installment_total: secontPayment,
+        installment_value: parseFloat(calc.toFixed(2)),
+        installment_amount: secondInstallment,
+      };
+      setSecondPaymentObject(info);
+    }
+  }, [secondInstallment, secontPayment, secondPayForm]);
+
+  useEffect(() => {
+    console.log("PAGAMENTOS", payments);
+  }, [payments]);
+
+  useEffect(() => {
+    if (showSecondPayment) {
+      if (
+        JSON.stringify(firstPayForm) !== "{}" &&
+        JSON.stringify(secondPayForm) === "{}"
+      ) {
+        let info = [firstPaymentObject];
+        setPayments(info);
+      }
+      if (
+        JSON.stringify(firstPayForm) !== "{}" &&
+        JSON.stringify(secondPayForm) !== "{}"
+      ) {
+        let info = [firstPaymentObject, secondPaymentObject];
+        setPayments(info);
+      }
+    } else {
+      if (JSON.stringify(firstPayForm) !== "{}") {
+        let info = [firstPaymentObject];
+        setPayments(info);
+      }
+    }
+  }, [firstPaymentObject, secondPaymentObject]);
 
   function handleSecondPayForm(id) {
     let ident = parseInt(id);
@@ -134,23 +198,23 @@ export default function PaymentMiddleware({ order }) {
     let total = parseFloat(value);
     setFirstPayment(total);
     if (isNaN(total) || total === "" || !total) {
-      setFirstPayment(parseFloat(order.grand_total));
+      setFirstPayment(parseFloat(order.total_to_pay));
       setShowSecondPayment(false);
       setSecontPayment(0);
     }
-    if (total === parseFloat(order.grand_total)) {
+    if (total === parseFloat(order.total_to_pay)) {
       setShowSecondPayment(false);
       setSecontPayment(0);
       setFirstPayment(total);
     }
-    if (parseFloat(value) < parseFloat(order.grand_total)) {
-      let calc = parseFloat(order.grand_total) - parseFloat(value);
+    if (parseFloat(value) < parseFloat(order.total_to_pay)) {
+      let calc = parseFloat(order.total_to_pay) - parseFloat(value);
       setShowSecondPayment(true);
       setSecontPayment(calc);
     }
-    if (parseFloat(value) > parseFloat(order.grand_total)) {
+    if (parseFloat(value) > parseFloat(order.total_to_pay)) {
       setShowSecondPayment(false);
-      setFirstPayment(parseFloat(order.grand_total));
+      setFirstPayment(parseFloat(order.total_to_pay));
       setSecontPayment(0);
     }
   }
@@ -162,15 +226,26 @@ export default function PaymentMiddleware({ order }) {
           <Center rounded="md" p={2} bg="rgba(160, 174, 192, 0.1)" mb={5}>
             <Heading fontSize="md">Pagamento Principal</Heading>
           </Center>
-          <InputGroup size="lg">
-            <InputLeftAddon>Valor</InputLeftAddon>
-            <Input
+          <InputGroup size="lg" w="100%">
+            <InputLeftAddon>R$</InputLeftAddon>
+            <NumberInput
+              precision={2}
+              step={1}
               focusBorderColor={config.inputs}
-              type="number"
               value={firstPayment}
-              onChange={(e) => handleFirstPayment(e.target.value)}
-            />
-            <InputRightAddon>R$</InputRightAddon>
+              onChange={(e) => handleFirstPayment(e)}
+              size="lg"
+              w="100%"
+            >
+              <NumberInputField
+                borderTopLeftRadius="none"
+                borderBottomLeftRadius="none"
+              />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
           </InputGroup>
           <Grid templateColumns="2fr 1fr" gap="15px" mt={3}>
             <FormControl isRequired>
@@ -214,14 +289,26 @@ export default function PaymentMiddleware({ order }) {
               <Center rounded="md" p={2} bg="rgba(160, 174, 192, 0.1)" mb={5}>
                 <Heading fontSize="md">Pagamento Secundário</Heading>
               </Center>
-              <InputGroup size="lg">
-                <InputLeftAddon>Valor</InputLeftAddon>
-                <Input
+              <InputGroup size="lg" w="100%">
+                <InputLeftAddon>R$</InputLeftAddon>
+                <NumberInput
+                  precision={2}
+                  step={1}
                   focusBorderColor={config.inputs}
-                  isReadOnly
                   value={secontPayment}
-                />
-                <InputRightAddon>R$</InputRightAddon>
+                  isReadOnly
+                  size="lg"
+                  w="100%"
+                >
+                  <NumberInputField
+                    borderTopLeftRadius="none"
+                    borderBottomLeftRadius="none"
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
               </InputGroup>
               <Grid templateColumns="2fr 1fr" gap="15px" mt={3}>
                 <FormControl isRequired>
@@ -307,16 +394,29 @@ export default function PaymentMiddleware({ order }) {
             ""
           ) : (
             <Box borderWidth="1px" rounded="md" mt={5}>
-              <Grid templateColumns="2fr 1fr 1fr" gap="10px" p={2}>
-                <Text>Dinheiro</Text>
-                <Text fontWeight="700">R$ 200,00</Text>
-                <Text>3x de R$100,00</Text>
-              </Grid>
-              <Grid templateColumns="2fr 1fr 1fr" gap="10px" p={2}>
-                <Text>Dinheiro</Text>
-                <Text fontWeight="700">R$ 200,00</Text>
-                <Text>3x de R$100,00</Text>
-              </Grid>
+              {payments.map((pay) => (
+                <Grid
+                  templateColumns="1fr 1fr 1fr"
+                  gap="10px"
+                  p={2}
+                  key={pay.id}
+                >
+                  <Text>{pay.pay_form_name}</Text>
+                  <Text fontWeight="700" w="100%" textAlign="center">
+                    {parseFloat(pay.installment_total).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </Text>
+                  <Text w="100%" textAlign="right">
+                    {pay.installment_amount}x de{" "}
+                    {parseFloat(pay.installment_value).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </Text>
+                </Grid>
+              ))}
             </Box>
           )}
         </Box>
@@ -324,13 +424,6 @@ export default function PaymentMiddleware({ order }) {
 
       <Flex justify="flex-end" mt={5}>
         <HStack spacing={3}>
-          <Button
-            leftIcon={<FaCalculator />}
-            colorScheme={config.buttons}
-            variant="outline"
-          >
-            Calcular Pagamento
-          </Button>
           <Button
             leftIcon={<FaSave />}
             colorScheme={config.buttons}
