@@ -26,9 +26,11 @@ import { FaSave } from "react-icons/fa";
 import api from "../configs/axios";
 import useFetch from "../hooks/useFetch";
 import uniqid from "uniqid";
+import { useEmployee } from "../context/Employee";
 
-export default function PaymentMiddleware({ order }) {
+export default function PaymentMiddleware({ order, handleClose }) {
   const toast = useToast();
+  const { employee } = useEmployee();
   const { data, error } = useFetch("/payFormPdv");
 
   const [firstPayment, setFirstPayment] = useState(0);
@@ -50,6 +52,7 @@ export default function PaymentMiddleware({ order }) {
   const [payForms, setPayForms] = useState([]);
   const [firstPaymentObject, setFirstPaymentObject] = useState({});
   const [secondPaymentObject, setSecondPaymentObject] = useState({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let initialInstallment = [1];
@@ -216,6 +219,66 @@ export default function PaymentMiddleware({ order }) {
       setShowSecondPayment(false);
       setFirstPayment(parseFloat(order.total_to_pay));
       setSecontPayment(0);
+    }
+  }
+
+  async function Store() {
+    if (payments.length === 0) {
+      showToast("Calcule as formas de pagamento", "warning", "Atenção");
+      return false;
+    }
+    if (
+      showSecondPayment === false &&
+      JSON.stringify(firstPaymentObject) === "{}"
+    ) {
+      showToast("Insira uma forma de pagamento", "warning", "Atenção");
+      return false;
+    }
+    if (
+      showSecondPayment === true &&
+      JSON.stringify(secondPaymentObject) === "{}"
+    ) {
+      showToast(
+        "Calcule o pagamento secundário corretamente",
+        "warning",
+        "Atenção"
+      );
+      return false;
+    }
+    setLoading(true);
+
+    try {
+      const response = await api.post(
+        "/payments",
+        {
+          order_id: order.id,
+          payments: payments,
+          employee_id: employee.user,
+          client_id: order.client_id,
+        },
+        { headers: { "x-access-token": employee.token } }
+      );
+      setLoading(false);
+      showToast(response.data.message, "success", "Sucesso");
+      handleClose();
+    } catch (error) {
+      setLoading(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
     }
   }
 
@@ -428,6 +491,8 @@ export default function PaymentMiddleware({ order }) {
             leftIcon={<FaSave />}
             colorScheme={config.buttons}
             isDisabled={payments.length === 0 ? true : false}
+            isLoading={loading}
+            onClick={() => Store()}
           >
             Salvar
           </Button>

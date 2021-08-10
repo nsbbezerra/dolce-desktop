@@ -49,6 +49,12 @@ import {
   Icon,
   Divider,
   Textarea,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -111,7 +117,6 @@ export default function Pdv() {
   const [startDate, setStartDate] = useState(new Date());
   const [loadingModal, setLoadingModal] = useState(false);
   const [modalObs, setModalObs] = useState(false);
-  const [modalShow, setModalShow] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [clients, setClients] = useState([]);
@@ -129,6 +134,8 @@ export default function Pdv() {
   const [totalToPay, setTotalToPay] = useState(0);
   const [obs, setObs] = useState("");
   const [order, setOrder] = useState({});
+
+  const [alertModal, setAlertModal] = useState(false);
 
   function clear() {
     setClient({});
@@ -250,7 +257,7 @@ export default function Pdv() {
       title: title,
       description: message,
       status: status,
-      position: "bottom",
+      position: "bottom-right",
       duration: 8000,
       isClosable: true,
     });
@@ -528,6 +535,26 @@ export default function Pdv() {
     }
   }
 
+  const handleClosePaymentModal = () => {
+    setModalPayment(false);
+    setAlertModal(true);
+  };
+
+  function handleAlert(mode) {
+    if (mode === "no") {
+      clear();
+      setAlertModal(false);
+    } else {
+      setModalPrint(true);
+      setAlertModal(false);
+    }
+  }
+
+  function handleClosePrint() {
+    setModalPrint(false);
+    clear();
+  }
+
   return (
     <>
       <Hotkeys
@@ -606,15 +633,6 @@ export default function Pdv() {
                   size="sm"
                 >
                   Salvar como Orçamento <Kbd ml={1}>F4</Kbd>
-                </Button>
-                <Button
-                  isFullWidth
-                  colorScheme={config.buttons}
-                  leftIcon={<FaSearch />}
-                  variant="outline"
-                  size="sm"
-                >
-                  Visualizar Pedido <Kbd ml={1}>Ctrl+V</Kbd>
                 </Button>
                 <Button
                   isFullWidth
@@ -884,7 +902,12 @@ export default function Pdv() {
           <ModalContent maxW="60rem" pb={4}>
             <ModalHeader>Adicionar Forma de Pagamento</ModalHeader>
             <ModalBody>
-              {modalPayment === true && <PaymentMiddleware order={order} />}
+              {modalPayment === true && (
+                <PaymentMiddleware
+                  order={order}
+                  handleClose={handleClosePaymentModal}
+                />
+              )}
             </ModalBody>
           </ModalContent>
         </Modal>
@@ -910,7 +933,7 @@ export default function Pdv() {
 
         <Modal
           isOpen={modalPrint}
-          onClose={() => setModalPrint(false)}
+          onClose={() => handleClosePrint()}
           isCentered
           scrollBehavior="inside"
           size="lg"
@@ -1334,6 +1357,40 @@ export default function Pdv() {
             </ModalBody>
           </ModalContent>
         </Modal>
+
+        <AlertDialog
+          isOpen={alertModal}
+          isCentered
+          closeOnEsc={false}
+          closeOnOverlayClick={false}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Imprimir Pedido
+              </AlertDialogHeader>
+
+              <AlertDialogBody>Deseja imprimir este pedido?</AlertDialogBody>
+
+              <AlertDialogFooter>
+                <Button
+                  onClick={() => handleAlert("no")}
+                  colorScheme={config.buttons}
+                  variant="outline"
+                >
+                  Não
+                </Button>
+                <Button
+                  colorScheme={config.buttons}
+                  ml={3}
+                  onClick={() => handleAlert("yes")}
+                >
+                  Sim
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
       </Hotkeys>
     </>
   );
