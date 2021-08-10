@@ -136,6 +136,7 @@ export default function Pdv() {
   const [order, setOrder] = useState({});
 
   const [alertModal, setAlertModal] = useState(false);
+  const [alertSave, setAlertSave] = useState(false);
 
   function clear() {
     setClient({});
@@ -273,6 +274,9 @@ export default function Pdv() {
         break;
       case "f11":
         setModalProducts(true);
+        break;
+      case "f4":
+        setAlertSave(true);
         break;
       case "f6":
         modalProducts === true && handleInput("qtd");
@@ -526,6 +530,63 @@ export default function Pdv() {
     }
   }
 
+  async function storeWithBudget() {
+    if (JSON.stringify(client) === "{}") {
+      showToast("Por favor, selecione um cliente", "warning", "Atenção");
+      setModalClients(true);
+      return false;
+    }
+    if (orderProducts.length === 0) {
+      showToast(
+        "Por favor, insira produtos ao orçamento",
+        "warning",
+        "Atenção"
+      );
+      setModalProducts(true);
+      return false;
+    }
+    setLoadingModal(true);
+
+    try {
+      const response = await api.post(
+        "/budget",
+        {
+          client_id: client.id,
+          employee_id: employee.user,
+          products: orderProducts,
+          grand_total: total,
+          discount: discount,
+          total_to_pay: totalToPay,
+          order_date: startDate,
+          waiting: "none",
+          obs: obs,
+        },
+        { headers: { "x-access-token": employee.token } }
+      );
+      setLoadingModal(false);
+      showToast(response.data.message, "success", "Sucesso");
+      clear();
+    } catch (error) {
+      setLoadingModal(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
   function handleStock(id, stock) {
     const result = orderProducts.find((obj) => obj.size_id === id);
     if (result) {
@@ -555,10 +616,15 @@ export default function Pdv() {
     clear();
   }
 
+  function handleAlertSave() {
+    setAlertSave(false);
+    storeWithBudget();
+  }
+
   return (
     <>
       <Hotkeys
-        keyName="f2, ctrl+p, f6, f3, f7, f8, f9, f10, f12, f1, f4, f5, f11, ctrl+o, ctrl+v"
+        keyName="f2, ctrl+p, f6, f3, f7, f8, f9, f10, f12, f1, f4, f5, f11, ctrl+o, ctrl+v, f4"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -631,6 +697,7 @@ export default function Pdv() {
                   leftIcon={<FaSave />}
                   variant="outline"
                   size="sm"
+                  onClick={() => setAlertSave(true)}
                 >
                   Salvar como Orçamento <Kbd ml={1}>F4</Kbd>
                 </Button>
@@ -1384,6 +1451,42 @@ export default function Pdv() {
                   colorScheme={config.buttons}
                   ml={3}
                   onClick={() => handleAlert("yes")}
+                >
+                  Sim
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
+
+        <AlertDialog
+          isOpen={alertSave}
+          isCentered
+          closeOnEsc={false}
+          closeOnOverlayClick={false}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Salvar como Orçamento
+              </AlertDialogHeader>
+
+              <AlertDialogBody>
+                Deseja salvar este pedido como orçamento?
+              </AlertDialogBody>
+
+              <AlertDialogFooter>
+                <Button
+                  onClick={() => setAlertSave(false)}
+                  colorScheme={config.buttons}
+                  variant="outline"
+                >
+                  Não
+                </Button>
+                <Button
+                  colorScheme={config.buttons}
+                  ml={3}
+                  onClick={() => handleAlertSave()}
                 >
                   Sim
                 </Button>
