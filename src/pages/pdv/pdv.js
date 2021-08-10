@@ -77,6 +77,7 @@ import {
 import DatePicker, { registerLocale } from "react-datepicker";
 import Hotkeys from "react-hot-keys";
 import pt_br from "date-fns/locale/pt-BR";
+import { format } from "date-fns";
 
 import PaymentMiddleware from "../../middlewares/payment";
 import PrintMiddleware from "../../middlewares/print";
@@ -137,12 +138,48 @@ export default function Pdv() {
 
   const [alertModal, setAlertModal] = useState(false);
   const [alertSave, setAlertSave] = useState(false);
+  const [modalBudget, setModalBudget] = useState(false);
+  const [budgets, setBudgets] = useState([]);
+  const [budgetsFind, setBudgetsFind] = useState([]);
+
+  const [numberOrder, setNumberOrder] = useState("");
+  const [nameClient, setNameClient] = useState("");
+  const [isBudget, setIsBudget] = useState(false);
+  const [orderID, setOrderID] = useState(null);
+
+  async function finderOrderByClient(text) {
+    setNameClient(text);
+    if (text === "") {
+      await setBudgets(budgetsFind);
+    } else {
+      let termos = await text.split(" ");
+      let frasesFiltradas = await budgetsFind.filter((frase) => {
+        return termos.reduce((resultadoAnterior, termoBuscado) => {
+          return resultadoAnterior && frase.client_name.includes(termoBuscado);
+        }, true);
+      });
+      await setBudgets(frasesFiltradas);
+    }
+  }
+
+  async function finderOrderByID(text) {
+    setNumberOrder(text);
+    if (text === "") {
+      await setBudgets(budgetsFind);
+    } else {
+      let int = parseInt(text);
+      let frasesFiltradas = await budgetsFind.filter((obj) => obj.id === int);
+      await setBudgets(frasesFiltradas);
+    }
+  }
 
   function clear() {
     setClient({});
     setOrderProducts([]);
     setObs("");
     setOrder({});
+    setIsBudget(false);
+    setOrderID(null);
   }
 
   function handleInput(id) {
@@ -277,6 +314,9 @@ export default function Pdv() {
         break;
       case "f4":
         setAlertSave(true);
+        break;
+      case "f1":
+        findBudgets();
         break;
       case "f6":
         modalProducts === true && handleInput("qtd");
@@ -502,6 +542,8 @@ export default function Pdv() {
           order_date: startDate,
           waiting: "none",
           obs: obs,
+          isBudget,
+          orderID,
         },
         { headers: { "x-access-token": employee.token } }
       );
@@ -621,10 +663,52 @@ export default function Pdv() {
     storeWithBudget();
   }
 
+  async function findBudgets() {
+    setLoadingModal(true);
+
+    try {
+      const response = await api.get("/findBudget");
+      console.log(response);
+      setBudgets(response.data);
+      setBudgetsFind(response.data);
+      setLoadingModal(false);
+      setModalBudget(true);
+    } catch (error) {
+      console.log(error);
+      setLoadingModal(false);
+      if (error.message === "Network Error") {
+        alert(
+          "Sem conexão com o servidor, verifique sua conexão com a internet."
+        );
+        return false;
+      }
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao salvar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function handleBudgets(client, budget) {
+    const cli = await clients.find((obj) => obj.id === client);
+    const bud = await budgetsFind.find((obj) => obj.id === budget);
+    setClient(cli);
+    setOrderProducts(bud.products);
+    setModalBudget(false);
+    setOrderID(bud.id);
+    setIsBudget(true);
+  }
+
   return (
     <>
       <Hotkeys
-        keyName="f2, ctrl+p, f6, f3, f7, f8, f9, f10, f12, f1, f4, f5, f11, ctrl+o, ctrl+v, f4"
+        keyName="f2, ctrl+p, f6, f3, f7, f8, f9, f10, f12, f1, f4, f5, f11, ctrl+o, ctrl+v"
         onKeyDown={onKeyDown}
         allowRepeat
         filter={(event) => {
@@ -729,6 +813,7 @@ export default function Pdv() {
                   leftIcon={<FaSearchPlus />}
                   variant="outline"
                   size="sm"
+                  onClick={() => findBudgets()}
                 >
                   Buscar Orçamento <Kbd ml={1}>F1</Kbd>
                 </Button>
@@ -1494,6 +1579,101 @@ export default function Pdv() {
             </AlertDialogContent>
           </AlertDialogOverlay>
         </AlertDialog>
+
+        <Modal
+          isOpen={modalBudget}
+          onClose={() => setModalBudget(false)}
+          isCentered
+          scrollBehavior="inside"
+          size="6xl"
+          initialFocusRef={initialRef}
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Buscar Orçamentos</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={4}>
+              <Grid templateColumns="1fr 1fr" gap="20px">
+                <FormControl>
+                  <FormLabel>Buscar por Número</FormLabel>
+                  <Input
+                    focusBorderColor={config.inputs}
+                    placeholder="Buscar por Número"
+                    value={numberOrder}
+                    onChange={(e) => finderOrderByID(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Buscar por Nome</FormLabel>
+                  <Input
+                    focusBorderColor={config.inputs}
+                    placeholder="Buscar por Número"
+                    ref={initialRef}
+                    value={nameClient}
+                    onChange={(e) =>
+                      finderOrderByClient(
+                        capitalizeAllFirstLetter(e.target.value)
+                      )
+                    }
+                  />
+                </FormControl>
+              </Grid>
+              {budgets.length === 0 ? (
+                <Flex
+                  justify="center"
+                  align="center"
+                  direction="column"
+                  w="100%"
+                >
+                  <Lottie animation={emptyAnimation} height={200} width={200} />
+                  <Text>Nenhum orçamento para mostrar</Text>
+                </Flex>
+              ) : (
+                <Table mt={5} size="sm">
+                  <Thead fontWeight="700">
+                    <Tr>
+                      <Td w="5%"></Td>
+                      <Td w="5%">Nº</Td>
+                      <Td w="50%">Cliente</Td>
+                      <Td isNumeric>Total</Td>
+                      <Td isNumeric>Desconto</Td>
+                      <Td isNumeric>A Pagar</Td>
+                      <Td textAlign="center" w="11%">
+                        Data
+                      </Td>
+                    </Tr>
+                  </Thead>
+
+                  <Tbody>
+                    {budgets.map((bug) => (
+                      <Tr key={bug.id}>
+                        <Td w="5%">
+                          <IconButton
+                            colorScheme={config.buttons}
+                            size="xs"
+                            rounded="full"
+                            icon={<FaCheck />}
+                            onClick={() => handleBudgets(bug.client_id, bug.id)}
+                          />
+                        </Td>
+                        <Td w="5%">{bug.id}</Td>
+                        <Td w="50%">{bug.client_name}</Td>
+                        <Td isNumeric>{bug.grand_total}</Td>
+                        <Td isNumeric>{bug.discount}</Td>
+                        <Td isNumeric>{bug.total_to_pay}</Td>
+                        <Td textAlign="center" w="11%">
+                          {format(new Date(bug.order_date), "dd/MM/yyyy", {
+                            locale: pt_br,
+                          })}
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              )}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       </Hotkeys>
     </>
   );
