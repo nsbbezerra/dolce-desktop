@@ -985,7 +985,7 @@ export default function ListProviders() {
             size="xl"
           >
             <ModalOverlay />
-            <ModalContent maxW="650px">
+            <ModalContent maxW="670px">
               <ModalHeader>Alterar Imagem</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
@@ -994,21 +994,21 @@ export default function ListProviders() {
                   gap="20px"
                   justifyItems="center"
                 >
-                  <Box w="280px" h="320px">
+                  <Box w="300px" h="300px">
                     <Text>Imagem atual:</Text>
                     <Image
                       src={`${baseUrl}/imagem/${url}`}
-                      w="280px"
-                      h="310px"
+                      w="300px"
+                      h="300px"
                       rounded="md"
                     />
                   </Box>
                   <Box>
                     <Text>Nova imagem:</Text>
-                    <Box w="280px" h="310px">
+                    <Box w="300px" h="300px">
                       {thumbnail ? (
                         <Box rounded="md" borderWidth="1px" overflow="hidden">
-                          <Image src={previewThumbnail} w="280px" h="310px" />
+                          <Image src={previewThumbnail} w="300px" h="300px" />
                           <Flex justify="center" mt="-30px">
                             <Tooltip label="Remover Imagem" hasArrow>
                               <IconButton
@@ -1023,7 +1023,7 @@ export default function ListProviders() {
                           </Flex>
                         </Box>
                       ) : (
-                        <InputFile alt={310} lar={280} cor={colorMode}>
+                        <InputFile alt={300} lar={300} cor={colorMode}>
                           <File
                             type="file"
                             onChange={(event) =>
@@ -1032,7 +1032,7 @@ export default function ListProviders() {
                           />
                           <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
                           <Text>
-                            Insira uma imagem 280x310 pixels, de até 500kb
+                            Insira uma imagem 300x300 pixels, de até 500kb
                           </Text>
                         </InputFile>
                       )}

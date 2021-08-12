@@ -2097,23 +2097,23 @@ export default function ProductList() {
           size="xl"
         >
           <ModalOverlay />
-          <ModalContent maxW="650px">
+          <ModalContent maxW="670px">
             <ModalHeader>Alterar Imagem</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Grid templateColumns="1fr 1fr" gap="20px" justifyItems="center">
-                <Box w="280px" h="320px">
+                <Box w="300px" h="300px">
                   <Text>Imagem atual:</Text>
                   <Image
                     src={`${baseUrl}/imagem/${url}`}
-                    w="280px"
-                    h="310px"
+                    w="300px"
+                    h="300px"
                     rounded="md"
                   />
                 </Box>
                 <Box>
                   <Text>Nova imagem:</Text>
-                  <Box w="280px" h="310px">
+                  <Box w="300px" h="300px">
                     {thumbnail ? (
                       <Box rounded="md" borderWidth="1px" overflow="hidden">
                         <Image src={previewThumbnail} w="280px" h="310px" />

@@ -46,6 +46,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
+  useToast,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -68,10 +69,19 @@ import PaymentMiddleware from "../../middlewares/payment";
 
 import { useHistory, useParams } from "react-router-dom";
 
+import useFetch from "../../hooks/useFetch";
+
 export default function Cashier() {
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState("0");
+
+  const { data, error } = useFetch(`/findOrdersCashier/${page}`);
+
   const cancelRef = useRef();
   const { push } = useHistory();
   const { cash } = useParams();
+  const toast = useToast();
+
   const [modalRevenue, setModalRevenue] = useState(false);
   const [modalExpense, setModalExpense] = useState(false);
   const [modalPrint, setModalPrint] = useState(false);
@@ -81,6 +91,24 @@ export default function Cashier() {
   const [modalMoviment, setModalMoviment] = useState(false);
   const [modalCloseCashier, setModalCloseCashier] = useState(false);
   const [modalClose, setModalClose] = useState(false);
+
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      setOrders(data.orders);
+      handlePagination(data.count.count);
+    }
+  }, [data]);
+
+  function handlePagination(num) {
+    const divisor = parseFloat(num) / 10;
+    if (divisor > parseInt(divisor) && divisor < parseInt(divisor) + 1) {
+      setPages(parseInt(divisor) + 1);
+    } else {
+      setPages(parseInt(divisor));
+    }
+  }
 
   function handlePayment() {
     setModalPayments(false);
@@ -94,6 +122,36 @@ export default function Cashier() {
 
   function routing(rt) {
     push(rt);
+  }
+
+  function showToast(message, status, title) {
+    toast({
+      title: title,
+      description: message,
+      status: status,
+      position: "bottom",
+      duration: 8000,
+      isClosable: true,
+    });
+  }
+
+  if (error) {
+    if (error.message === "Network Error") {
+      alert(
+        "Sem conexão com o servidor, verifique sua conexão com a internet."
+      );
+    } else {
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
   }
 
   return (
