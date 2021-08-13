@@ -47,6 +47,13 @@ import {
   AlertDialogOverlay,
   AlertDialogCloseButton,
   useToast,
+  Stack,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  Tag,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -61,6 +68,8 @@ import {
   FaClipboardList,
   FaTrash,
   FaPlus,
+  FaArrowRight,
+  FaArrowLeft,
 } from "react-icons/fa";
 import { AiOutlineFall, AiOutlineRise } from "react-icons/ai";
 
@@ -70,8 +79,16 @@ import PaymentMiddleware from "../../middlewares/payment";
 import { useHistory, useParams } from "react-router-dom";
 
 import useFetch from "../../hooks/useFetch";
+import emptyAnimation from "../../animations/empty.json";
+import Lottie from "../../components/lottie";
+import { format } from "date-fns";
+import pt_br from "date-fns/locale/pt-BR";
+import sendAnimation from "../../animations/search.json";
+import api from "../../configs/axios";
+import { useEmployee } from "../../context/Employee";
 
 export default function Cashier() {
+  const { employee } = useEmployee();
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState("0");
 
@@ -91,13 +108,18 @@ export default function Cashier() {
   const [modalMoviment, setModalMoviment] = useState(false);
   const [modalCloseCashier, setModalCloseCashier] = useState(false);
   const [modalClose, setModalClose] = useState(false);
+  const [loadingModal, setLoadingModal] = useState(false);
+  const [loadingDel, setLoadingDel] = useState(false);
 
   const [orders, setOrders] = useState([]);
+  const [order, setOrder] = useState({});
+  const [payments, setPayments] = useState([]);
 
   useEffect(() => {
     if (data) {
       setOrders(data.orders);
       handlePagination(data.count.count);
+      console.log(data);
     }
   }, [data]);
 
@@ -154,176 +176,107 @@ export default function Cashier() {
     }
   }
 
+  async function findPaymentsByOrder(id) {
+    const result = await orders.find((obj) => obj.id === id);
+    setOrder(result);
+    setLoadingModal(true);
+    try {
+      const response = await api.get(`/findPaymentsByOrder/${id}`);
+      setPayments(response.data);
+      setLoadingModal(false);
+      setModalPayments(true);
+    } catch (error) {
+      setLoadingModal(false);
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  const handleClose = () => {
+    setModalPayments(false);
+    setModalPayment(false);
+  };
+
+  async function delPaymentsByOrder() {
+    let idOrder;
+    if (JSON.stringify(order) !== "{}") {
+      idOrder = order.id;
+    } else {
+      showToast("Nenhum pedido selecionado", "info", "Informação");
+      return false;
+    }
+    setLoadingDel(true);
+    try {
+      const response = await api.delete(`/delPaymentsByOrder/${idOrder}`, {
+        headers: { "x-access-token": employee.token },
+      });
+      showToast(response.data.message, "success", "Sucesso");
+      setModalPayments(false);
+      setLoadingDel(false);
+      setModalPayment(true);
+    } catch (error) {
+      setLoadingDel(false);
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function convertOrderToBudget(id) {
+    setLoadingModal(true);
+
+    try {
+      const response = await api.put(
+        `/convertToBudget/${id}`,
+        {},
+        { headers: { "x-access-token": employee.token } }
+      );
+      const updated = await orders.filter((obj) => obj.id !== id);
+      setOrders(updated);
+      showToast(response.data.message, "success", "Sucesso");
+
+      setLoadingModal(false);
+    } catch (error) {
+      setLoadingModal(false);
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
   return (
     <>
       <HeaderApp title="Caixa Diário" icon={FaCashRegister} />
-      <Grid
-        templateRows="66.65vh 68px"
-        gap="15px"
-        mt="25px"
-        h="76.65vh"
-        maxH="76.65vh"
-      >
-        <Box
-          borderWidth="1px"
-          shadow="md"
-          rounded="md"
-          p={3}
-          h="100%"
-          minH="100%"
-          maxH="100%"
-          overflow="auto"
-        >
-          <Table size="sm">
-            <Thead fontWeight="700">
-              <Tr>
-                <Td w="6%" textAlign="center">
-                  Nº
-                </Td>
-                <Td>Cliente</Td>
-                <Td w="7%" textAlign="center">
-                  Data
-                </Td>
-                <Td isNumeric w="9%">
-                  Valor Total
-                </Td>
-                <Td isNumeric w="5%">
-                  Desconto
-                </Td>
-                <Td isNumeric w="9%">
-                  Total a Pagar
-                </Td>
+      <Grid templateColumns="220px 1fr" gap="20px" mt="25px">
+        <Box>
+          <Center rounded="md" p={2} bg="rgba(160, 174, 192, 0.1)" mb={5}>
+            <Heading fontSize="sm">Opções</Heading>
+          </Center>
 
-                <Td w="8%"></Td>
-              </Tr>
-            </Thead>
-            <Tbody>
-              <Tr>
-                <Td w="6%" textAlign="center">
-                  1001
-                </Td>
-                <Td>Natanael dos Santos Bezerra</Td>
-                <Td w="7%" textAlign="center">
-                  10/10/1010
-                </Td>
-                <Td isNumeric w="9%">
-                  R$ 300,00
-                </Td>
-                <Td isNumeric w="5%">
-                  0%
-                </Td>
-                <Td isNumeric w="9%">
-                  R$ 300,00
-                </Td>
-                <Td w="12%" textAlign="center">
-                  <HStack spacing={2}>
-                    <Tooltip label="Imprimir Pedido" hasArrow>
-                      <IconButton
-                        icon={<FaPrint />}
-                        rounded="full"
-                        size="sm"
-                        onClick={() => setModalPrint(true)}
-                        colorScheme={config.buttons}
-                        variant="ghost"
-                      />
-                    </Tooltip>
-                    <Tooltip label="Visualizar Pagamentos" hasArrow>
-                      <IconButton
-                        icon={<FaBarcode />}
-                        rounded="full"
-                        size="sm"
-                        onClick={() => setModalPayments(true)}
-                        colorScheme={config.buttons}
-                        variant="ghost"
-                      />
-                    </Tooltip>
-
-                    <Popover placement="bottom-end">
-                      <PopoverTrigger>
-                        <IconButton
-                          icon={<FaClipboardList />}
-                          size="sm"
-                          rounded="full"
-                          colorScheme={config.buttons}
-                          variant="ghost"
-                        />
-                      </PopoverTrigger>
-                      <PopoverContent _focus={{ outline: "none" }}>
-                        <PopoverArrow />
-                        <PopoverCloseButton />
-                        <PopoverHeader>Confirmação!</PopoverHeader>
-                        <PopoverBody>
-                          Deseja converter este pedido em orçamento?
-                        </PopoverBody>
-                        <PopoverFooter d="flex" justifyContent="flex-end">
-                          <ButtonGroup size="sm">
-                            <Button
-                              variant="outline"
-                              colorScheme={config.buttons}
-                            >
-                              Não
-                            </Button>
-                            <Button colorScheme={config.buttons}>Sim</Button>
-                          </ButtonGroup>
-                        </PopoverFooter>
-                      </PopoverContent>
-                    </Popover>
-
-                    <Popover placement="bottom-end">
-                      <PopoverTrigger>
-                        <IconButton
-                          colorScheme="red"
-                          icon={<FaTrash />}
-                          size="sm"
-                          rounded="full"
-                          variant="ghost"
-                        />
-                      </PopoverTrigger>
-                      <PopoverContent _focus={{ outline: "none" }}>
-                        <PopoverArrow />
-                        <PopoverCloseButton />
-                        <PopoverHeader>Confirmação!</PopoverHeader>
-                        <PopoverBody>Deseja cancelar este pedido?</PopoverBody>
-                        <PopoverFooter d="flex" justifyContent="flex-end">
-                          <ButtonGroup size="sm">
-                            <Button
-                              variant="outline"
-                              colorScheme={config.buttons}
-                            >
-                              Não
-                            </Button>
-                            <Button colorScheme={config.buttons}>Sim</Button>
-                          </ButtonGroup>
-                        </PopoverFooter>
-                      </PopoverContent>
-                    </Popover>
-
-                    <Button
-                      leftIcon={<FaCheck />}
-                      colorScheme={config.buttons}
-                      size="sm"
-                      onClick={() => setModalFinish(true)}
-                    >
-                      Faturar
-                    </Button>
-                  </HStack>
-                </Td>
-              </Tr>
-            </Tbody>
-          </Table>
-        </Box>
-        <Flex
-          h="68px"
-          borderWidth="1px"
-          shadow="md"
-          rounded="md"
-          align="center"
-          pl={3}
-          pr={3}
-        >
-          <Grid templateColumns="repeat(4, 1fr)" gap="15px" w="100%">
+          <Stack spacing={3}>
             <Button
-              size="lg"
               colorScheme="green"
               leftIcon={<AiOutlineRise />}
               onClick={() => setModalRevenue(true)}
@@ -331,31 +284,252 @@ export default function Cashier() {
               Efetuar Depósito
             </Button>
             <Button
-              size="lg"
               colorScheme="red"
               leftIcon={<AiOutlineFall />}
               onClick={() => setModalExpense(true)}
             >
               Efetuar Retirada
             </Button>
+          </Stack>
+
+          <Divider mt={3} mb={3} />
+
+          <Stack spacing={3}>
             <Button
-              size="lg"
               colorScheme="gray"
               leftIcon={<FaChartLine />}
               onClick={() => setModalMoviment(true)}
             >
               Movimentação do Caixa
             </Button>
+          </Stack>
+
+          <Divider mt={3} mb={3} />
+
+          <Stack spacing={3}>
             <Button
-              size="lg"
               colorScheme="blue"
               leftIcon={<FaLock />}
               onClick={() => setModalClose(true)}
             >
               Fechar o Caixa
             </Button>
-          </Grid>
-        </Flex>
+          </Stack>
+        </Box>
+
+        <Box
+          borderWidth="1px"
+          shadow="md"
+          rounded="md"
+          p={3}
+          h="100%"
+          maxH="min-content"
+          overflow="auto"
+        >
+          {orders.length === 0 ? (
+            <Flex justify="center" align="center" direction="column">
+              <Lottie animation={emptyAnimation} height={200} width={200} />
+              <Text>Nenhum pedido para mostrar</Text>
+            </Flex>
+          ) : (
+            <>
+              <Table size="sm">
+                <Thead fontWeight="700">
+                  <Tr>
+                    <Td w="6%" textAlign="center">
+                      Nº
+                    </Td>
+                    <Td>Cliente</Td>
+                    <Td w="7%" textAlign="center">
+                      Data
+                    </Td>
+                    <Td isNumeric w="9%">
+                      Valor Total
+                    </Td>
+                    <Td isNumeric w="5%">
+                      Desconto
+                    </Td>
+                    <Td isNumeric w="9%">
+                      Total a Pagar
+                    </Td>
+
+                    <Td w="8%"></Td>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {orders.map((ord) => (
+                    <Tr key={ord.id}>
+                      <Td w="6%" textAlign="center">
+                        {ord.id}
+                      </Td>
+                      <Td>{ord.client_name}</Td>
+                      <Td w="7%" textAlign="center">
+                        {format(new Date(ord.order_date), "dd/MM/yyyy", {
+                          locale: pt_br,
+                        })}
+                      </Td>
+                      <Td isNumeric w="12%">
+                        {parseFloat(ord.grand_total).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </Td>
+                      <Td isNumeric w="5%">
+                        {parseFloat(ord.discount)}%
+                      </Td>
+                      <Td isNumeric w="12%">
+                        {parseFloat(ord.total_to_pay).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </Td>
+                      <Td w="12%">
+                        <HStack spacing={2} justify="flex-end">
+                          <Tooltip label="Imprimir Pedido" hasArrow>
+                            <IconButton
+                              icon={<FaPrint />}
+                              rounded="full"
+                              size="xs"
+                              onClick={() => setModalPrint(true)}
+                              colorScheme={config.buttons}
+                              variant="ghost"
+                            />
+                          </Tooltip>
+                          <Tooltip label="Visualizar Pagamentos" hasArrow>
+                            <IconButton
+                              icon={<FaBarcode />}
+                              rounded="full"
+                              size="xs"
+                              onClick={() => findPaymentsByOrder(ord.id)}
+                              colorScheme={config.buttons}
+                              variant="ghost"
+                            />
+                          </Tooltip>
+
+                          <Popover placement="bottom-end">
+                            <PopoverTrigger>
+                              <IconButton
+                                icon={<FaClipboardList />}
+                                size="xs"
+                                rounded="full"
+                                colorScheme={config.buttons}
+                                variant="ghost"
+                              />
+                            </PopoverTrigger>
+                            <PopoverContent _focus={{ outline: "none" }}>
+                              <PopoverArrow />
+                              <PopoverCloseButton />
+                              <PopoverHeader>Confirmação!</PopoverHeader>
+                              <PopoverBody>
+                                Deseja converter este pedido em orçamento?
+                              </PopoverBody>
+                              <PopoverFooter d="flex" justifyContent="flex-end">
+                                <ButtonGroup size="xs">
+                                  <Button
+                                    colorScheme={config.buttons}
+                                    onClick={() => convertOrderToBudget(ord.id)}
+                                  >
+                                    Sim
+                                  </Button>
+                                </ButtonGroup>
+                              </PopoverFooter>
+                            </PopoverContent>
+                          </Popover>
+
+                          <Popover placement="bottom-end">
+                            <PopoverTrigger>
+                              <IconButton
+                                colorScheme="red"
+                                icon={<FaTrash />}
+                                size="xs"
+                                rounded="full"
+                                variant="ghost"
+                              />
+                            </PopoverTrigger>
+                            <PopoverContent _focus={{ outline: "none" }}>
+                              <PopoverArrow />
+                              <PopoverCloseButton />
+                              <PopoverHeader>Confirmação!</PopoverHeader>
+                              <PopoverBody>
+                                Deseja cancelar este pedido?
+                              </PopoverBody>
+                              <PopoverFooter d="flex" justifyContent="flex-end">
+                                <ButtonGroup size="xs">
+                                  <Button colorScheme={config.buttons}>
+                                    Sim
+                                  </Button>
+                                </ButtonGroup>
+                              </PopoverFooter>
+                            </PopoverContent>
+                          </Popover>
+
+                          <Button
+                            leftIcon={<FaCheck />}
+                            colorScheme={config.buttons}
+                            size="xs"
+                            isFullWidth
+                            onClick={() => setModalFinish(true)}
+                          >
+                            Finalizar
+                          </Button>
+                        </HStack>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </>
+          )}
+          <Flex justify="flex-end" align="center" mt={5}>
+            <Button
+              size="sm"
+              colorScheme={config.buttons}
+              mr={2}
+              leftIcon={<FaArrowLeft />}
+              onClick={() => setPage(page - 1)}
+              isDisabled={page <= 1 ? true : false}
+            >
+              Anterior
+            </Button>
+            <NumberInput
+              precision={0}
+              step={1}
+              focusBorderColor={config.inputs}
+              value={page}
+              onChange={(e) => setPage(e)}
+              size="sm"
+              w="70px"
+            >
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+
+            <Text ml={2} mr={2}>
+              de
+            </Text>
+            <Input
+              size="sm"
+              w="70px"
+              focusBorderColor={config.inputs}
+              value={pages}
+              isReadOnly
+              type="number"
+              mr={2}
+            />
+            <Button
+              size="sm"
+              colorScheme={config.buttons}
+              rightIcon={<FaArrowRight />}
+              onClick={() => setPage(page + 1)}
+              isDisabled={parseInt(page) >= parseInt(pages) ? true : false}
+            >
+              Próxima
+            </Button>
+          </Flex>
+        </Box>
       </Grid>
 
       <Modal
@@ -765,101 +939,83 @@ export default function Cashier() {
         onClose={() => setModalPayments(false)}
         isCentered
         scrollBehavior="inside"
-        size="lg"
+        size="6xl"
       >
         <ModalOverlay />
-        <ModalContent maxW="50rem">
+        <ModalContent>
           <ModalHeader>Pagamentos</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Table size="sm">
-              <Thead fontWeight="700">
-                <Tr>
-                  <Td>Descrição</Td>
-                  <Td w="12%" textAlign="center">
-                    Vencimento
-                  </Td>
-                  <Td w="12%" textAlign="center">
-                    Status
-                  </Td>
-                  <Td w="16%" isNumeric>
-                    Valor
-                  </Td>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td>Dinheiro</Td>
-                  <Td w="12%" textAlign="center">
-                    10/10/1010
-                  </Td>
-                  <Td w="12%" textAlign="center">
-                    <Button variant="link" size="sm" colorScheme="green">
-                      Confirmado
-                    </Button>
-                  </Td>
-                  <Td w="16%" isNumeric>
-                    R$ 400,00
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Dinheiro</Td>
-                  <Td w="12%" textAlign="center">
-                    10/10/1010
-                  </Td>
-                  <Td w="12%" textAlign="center">
-                    <Button variant="link" size="sm" colorScheme="green">
-                      Confirmado
-                    </Button>
-                  </Td>
-                  <Td w="16%" isNumeric>
-                    R$ 400,00
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Dinheiro</Td>
-                  <Td w="12%" textAlign="center">
-                    10/10/1010
-                  </Td>
-                  <Td w="12%" textAlign="center">
-                    <Button variant="link" size="sm" colorScheme="green">
-                      Confirmado
-                    </Button>
-                  </Td>
-                  <Td w="20%" isNumeric>
-                    R$ 400,00
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Dinheiro</Td>
-                  <Td w="12%" textAlign="center">
-                    10/10/1010
-                  </Td>
-                  <Td w="12%" textAlign="center">
-                    <Button variant="link" size="sm" colorScheme="green">
-                      Confirmado
-                    </Button>
-                  </Td>
-                  <Td w="16%" isNumeric>
-                    R$ 400,00
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Dinheiro</Td>
-                  <Td w="12%" textAlign="center">
-                    10/10/1010
-                  </Td>
-                  <Td w="12%" textAlign="center">
-                    <Button variant="link" size="sm" colorScheme="green">
-                      Confirmado
-                    </Button>
-                  </Td>
-                  <Td w="20%" isNumeric>
-                    R$ 400,00
-                  </Td>
-                </Tr>
-              </Tbody>
-            </Table>
+            {payments.length === 0 ? (
+              <Flex justify="center" align="center" direction="column">
+                <Lottie animation={emptyAnimation} height={200} width={200} />
+                <Text>Nenhum pagamento para mostrar</Text>
+              </Flex>
+            ) : (
+              <Table size="sm">
+                <Thead fontWeight="700">
+                  <Tr>
+                    <Td>Descrição</Td>
+                    <Td w="12%" textAlign="center">
+                      Vencimento
+                    </Td>
+                    <Td w="12%" textAlign="center">
+                      Status
+                    </Td>
+                    <Td w="16%" isNumeric>
+                      Valor
+                    </Td>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {payments.map((pay) => (
+                    <Tr key={pay.id}>
+                      <Td>{pay.identify}</Td>
+                      <Td w="12%" textAlign="center">
+                        {format(new Date(pay.due_date), "dd/MM/yyyy", {
+                          locale: pt_br,
+                        })}
+                      </Td>
+                      <Td w="12%" textAlign="center">
+                        {pay.status === "waiting" && (
+                          <Tag
+                            w="100%"
+                            justifyContent="center"
+                            colorScheme="yellow"
+                          >
+                            Não Pago
+                          </Tag>
+                        )}
+                        {pay.status === "canceled" && (
+                          <Tag
+                            w="100%"
+                            justifyContent="center"
+                            colorScheme="red"
+                          >
+                            Cancelado
+                          </Tag>
+                        )}
+                        {pay.status === "paid_out" && (
+                          <Tag
+                            w="100%"
+                            justifyContent="center"
+                            colorScheme="green"
+                          >
+                            Pago
+                          </Tag>
+                        )}
+                      </Td>
+                      <Td w="16%" isNumeric>
+                        {parseFloat(pay.value).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            )}
           </ModalBody>
           <ModalFooter>
             <Popover placement="left">
@@ -868,7 +1024,7 @@ export default function Cashier() {
                   Nova Forma de Pagamento
                 </Button>
               </PopoverTrigger>
-              <PopoverContent>
+              <PopoverContent _focus={{ outline: "none" }}>
                 <PopoverArrow />
                 <PopoverCloseButton />
                 <PopoverHeader>Confirmação!</PopoverHeader>
@@ -878,12 +1034,10 @@ export default function Cashier() {
                 </PopoverBody>
                 <PopoverFooter d="flex" justifyContent="flex-end">
                   <ButtonGroup size="sm">
-                    <Button variant="outline" colorScheme={config.buttons}>
-                      Não
-                    </Button>
                     <Button
                       colorScheme={config.buttons}
-                      onClick={() => handlePayment()}
+                      onClick={() => delPaymentsByOrder()}
+                      isLoading={loadingDel}
                     >
                       Sim
                     </Button>
@@ -897,16 +1051,19 @@ export default function Cashier() {
 
       <Modal
         isOpen={modalPayment}
-        onClose={() => setModalPayment(false)}
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
         isCentered
         scrollBehavior="inside"
       >
         <ModalOverlay />
         <ModalContent maxW="60rem" pb={4}>
           <ModalHeader>Adicionar Forma de Pagamento</ModalHeader>
-          <ModalCloseButton />
+
           <ModalBody>
-            {modalPayment === true && <PaymentMiddleware />}
+            {modalPayment === true && (
+              <PaymentMiddleware order={order} handleClose={handleClose} />
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -1113,6 +1270,25 @@ export default function Cashier() {
               Concluir
             </Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={loadingModal}
+        isCentered
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+      >
+        <ModalOverlay />
+        <ModalContent maxW="60rem" pb={4} bg="transparent" boxShadow="none">
+          <ModalBody bg="transparent" boxShadow="none">
+            <Flex justify="center" align="center" direction="column">
+              <Lottie animation={sendAnimation} height={250} width={250} />
+              <Text fontSize="2xl" color="gray.100">
+                Aguarde...
+              </Text>
+            </Flex>
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>
