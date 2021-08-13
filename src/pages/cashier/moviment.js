@@ -347,7 +347,7 @@ export default function MovimentCashier() {
                       <Button
                         leftIcon={<FaCashRegister />}
                         colorScheme={config.buttons}
-                        size="sm"
+                        size="xs"
                         onClick={() => routing(`/cashier/${cash.id}`)}
                       >
                         Ir para o Caixa

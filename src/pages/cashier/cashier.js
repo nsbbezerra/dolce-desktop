@@ -70,8 +70,9 @@ import {
   FaPlus,
   FaArrowRight,
   FaArrowLeft,
+  FaTimes,
 } from "react-icons/fa";
-import { AiOutlineFall, AiOutlineRise } from "react-icons/ai";
+import { AiOutlineBlock, AiOutlineFall, AiOutlineRise } from "react-icons/ai";
 
 import PrintMiddleware from "../../middlewares/print";
 import PaymentMiddleware from "../../middlewares/payment";
@@ -115,11 +116,15 @@ export default function Cashier() {
   const [order, setOrder] = useState({});
   const [payments, setPayments] = useState([]);
 
+  const [value, setValue] = useState(0);
+  const [description, setDescription] = useState("");
+  const [type, setType] = useState("");
+
   useEffect(() => {
     if (data) {
       setOrders(data.orders);
       handlePagination(data.count.count);
-      console.log(data);
+      console.log(data.orders);
     }
   }, [data]);
 
@@ -130,11 +135,6 @@ export default function Cashier() {
     } else {
       setPages(parseInt(divisor));
     }
-  }
-
-  function handlePayment() {
-    setModalPayments(false);
-    setModalPayment(true);
   }
 
   function handleCloseCashier() {
@@ -237,6 +237,28 @@ export default function Cashier() {
     }
   }
 
+  const handleCloseDeposit = () => {
+    setValue(0);
+    setDescription("");
+    setModalRevenue(false);
+  };
+
+  const openDeposit = () => {
+    setType("deposit");
+    setModalRevenue(true);
+  };
+
+  const openWithDraw = () => {
+    setType("withdraw");
+    setModalExpense(true);
+  };
+
+  const handleCloseWithDraw = () => {
+    setValue(0);
+    setDescription("");
+    setModalExpense(false);
+  };
+
   async function convertOrderToBudget(id) {
     setLoadingModal(true);
 
@@ -266,6 +288,84 @@ export default function Cashier() {
     }
   }
 
+  async function storeHandling() {
+    setLoadingDel(true);
+
+    try {
+      const response = await api.post(
+        "/cashHandling",
+        {
+          description,
+          value,
+          cashier_id: parseInt(cash),
+          type,
+        },
+        { headers: { "x-access-token": employee.token } }
+      );
+      showToast(response.data.message, "success", "Sucesso");
+      setModalExpense(false);
+      setModalRevenue(false);
+      setType("");
+      setDescription("");
+      setValue(0);
+      setLoadingDel(false);
+    } catch (error) {
+      setLoadingDel(false);
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  async function handleFinish(id) {
+    const result = await orders.find((obj) => obj.id === id);
+    await setOrder(result);
+    setTimeout(() => {
+      setModalFinish(true);
+    }, 100);
+  }
+
+  async function finalizeOrder() {
+    if (JSON.stringify(order) === "{}") {
+      showToast("Nenhuma informação do pedido", "error", "Erro");
+      return false;
+    }
+    setLoadingDel(true);
+
+    try {
+      const response = await api.put(
+        `/finalizeOrder/${order.id}`,
+        { cash: parseInt(cash) },
+        { headers: { "x-access-token": employee.token } }
+      );
+      showToast(response.data.message, "success", "Sucesso");
+      const updated = await orders.filter((obj) => obj.id !== order.id);
+      setOrders(updated);
+      setModalFinish(false);
+      setLoadingDel(false);
+      setOrder({});
+    } catch (error) {
+      setLoadingDel(false);
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
   return (
     <>
       <HeaderApp title="Caixa Diário" icon={FaCashRegister} />
@@ -279,14 +379,14 @@ export default function Cashier() {
             <Button
               colorScheme="green"
               leftIcon={<AiOutlineRise />}
-              onClick={() => setModalRevenue(true)}
+              onClick={() => openDeposit()}
             >
               Efetuar Depósito
             </Button>
             <Button
               colorScheme="red"
               leftIcon={<AiOutlineFall />}
-              onClick={() => setModalExpense(true)}
+              onClick={() => openWithDraw()}
             >
               Efetuar Retirada
             </Button>
@@ -468,7 +568,7 @@ export default function Cashier() {
                             colorScheme={config.buttons}
                             size="xs"
                             isFullWidth
-                            onClick={() => setModalFinish(true)}
+                            onClick={() => handleFinish(ord.id)}
                           >
                             Finalizar
                           </Button>
@@ -534,7 +634,7 @@ export default function Cashier() {
 
       <Modal
         isOpen={modalRevenue}
-        onClose={() => setModalRevenue(false)}
+        onClose={() => handleCloseDeposit()}
         isCentered
         scrollBehavior="inside"
         size="lg"
@@ -547,17 +647,32 @@ export default function Cashier() {
             <FormControl isRequired>
               <FormLabel>Valor do Depósito</FormLabel>
               <InputGroup size="lg">
-                <Input focusBorderColor={config.inputs} />
+                <Input
+                  focusBorderColor={config.inputs}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  type="number"
+                />
                 <InputRightAddon>R$</InputRightAddon>
               </InputGroup>
             </FormControl>
             <FormControl mt={3}>
               <FormLabel>Descrição</FormLabel>
-              <Textarea focusBorderColor={config.inputs} />
+              <Textarea
+                placeholder="Descrição"
+                focusBorderColor={config.inputs}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaSave />} colorScheme={config.buttons}>
+            <Button
+              leftIcon={<FaSave />}
+              colorScheme={config.buttons}
+              isLoading={loadingDel}
+              onClick={() => storeHandling()}
+            >
               Salvar
             </Button>
           </ModalFooter>
@@ -566,7 +681,7 @@ export default function Cashier() {
 
       <Modal
         isOpen={modalExpense}
-        onClose={() => setModalExpense(false)}
+        onClose={() => handleCloseWithDraw()}
         isCentered
         scrollBehavior="inside"
         size="lg"
@@ -579,17 +694,32 @@ export default function Cashier() {
             <FormControl isRequired>
               <FormLabel>Valor da Retirada</FormLabel>
               <InputGroup size="lg">
-                <Input focusBorderColor={config.inputs} />
+                <Input
+                  focusBorderColor={config.inputs}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  type="number"
+                />
                 <InputRightAddon>R$</InputRightAddon>
               </InputGroup>
             </FormControl>
             <FormControl mt={3}>
               <FormLabel>Descrição</FormLabel>
-              <Textarea focusBorderColor={config.inputs} />
+              <Textarea
+                placeholder="Descrição"
+                focusBorderColor={config.inputs}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaSave />} colorScheme={config.buttons}>
+            <Button
+              leftIcon={<FaSave />}
+              colorScheme={config.buttons}
+              isLoading={loadingDel}
+              onClick={() => storeHandling()}
+            >
               Salvar
             </Button>
           </ModalFooter>
@@ -604,208 +734,196 @@ export default function Cashier() {
       >
         <ModalOverlay />
         <ModalContent maxW="70rem">
-          <ModalHeader>Faturar Pedido</ModalHeader>
+          <ModalHeader>Finalizar Pedido</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Center rounded="md" p={2} bg="rgba(160, 174, 192, 0.1)" mb={3}>
-              <Heading fontSize="sm">Informações do Pedido</Heading>
-            </Center>
-            <HStack spacing={3}>
-              <Input
-                type="text"
-                placeholder="Nome do cliente"
-                focusBorderColor={config.inputs}
-                isReadOnly
-              />
-            </HStack>
-            <HStack spacing={3} mt={3}>
-              <Input
-                size="sm"
-                placeholder="Endereço do cliente"
-                focusBorderColor={config.inputs}
-                w="70%"
-              />
-              <Input
-                size="sm"
-                placeholder="Contato"
-                focusBorderColor={config.inputs}
-                w="30%"
-              />
-            </HStack>
-
-            <Divider mt={3} mb={3} />
-
-            <Table size="sm" maxW="100%">
-              <Thead fontWeight="700">
-                <Tr>
-                  <Td w="2%" textAlign="center">
-                    Qtd
-                  </Td>
-                  <Td isTruncated w="62%" maxW="62%">
-                    Produto
-                  </Td>
-                  <Td w="7%" textAlign="center">
-                    SKU
-                  </Td>
-                  <Td w="14%" isNumeric>
-                    V. Uni
-                  </Td>
-                  <Td w="14%" isNumeric>
-                    V. Tot
-                  </Td>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td w="2%" textAlign="center">
-                    10
-                  </Td>
-                  <Td isTruncated w="62%" maxW="62%">
-                    <Text>
-                      Camiseta Masculina Masculina Topper adasdasdasda
-                    </Text>
-                  </Td>
-                  <Td w="7%" textAlign="center">
-                    SJKD889
-                  </Td>
-                  <Td w="14%" isNumeric>
-                    400,00
-                  </Td>
-                  <Td w="14%" isNumeric>
-                    400,00
-                  </Td>
-                </Tr>
-              </Tbody>
-            </Table>
-
-            <Grid templateColumns="1fr 1fr" gap="15px" mt={5}>
-              <Box>
+            {JSON.stringify(order) === "{}" ? (
+              <Flex justify="center" align="center" direction="column">
+                <Lottie animation={emptyAnimation} height={200} width={200} />
+                <Text>Nenhum informação para mostrar</Text>
+              </Flex>
+            ) : (
+              <>
                 <Center rounded="md" p={2} bg="rgba(160, 174, 192, 0.1)" mb={3}>
-                  <Heading fontSize="sm">Resumo</Heading>
+                  <Heading fontSize="sm">Informações do Pedido</Heading>
                 </Center>
-                <Box borderWidth="1px" rounded="md" h="123px">
-                  <Flex p={3} align="center" justify="space-between" h={10}>
-                    <Text>Valor Total</Text>
-                    <Text fontWeight="700">R$ 400,00</Text>
-                  </Flex>
-                  <Divider />
-                  <Flex p={3} align="center" justify="space-between" h={10}>
-                    <Text>Desconto</Text>
-                    <Text fontWeight="700">0%</Text>
-                  </Flex>
-                  <Divider />
-                  <Flex p={3} align="center" justify="space-between" h={10}>
-                    <Text>Total a Pagar</Text>
-                    <Text fontWeight="700">R$ 400,00</Text>
-                  </Flex>
-                </Box>
-              </Box>
-              <Box>
-                <Center rounded="md" p={2} bg="rgba(160, 174, 192, 0.1)" mb={3}>
-                  <Heading fontSize="sm">Pagamento</Heading>
-                </Center>
-                <Box
-                  borderWidth="1px"
-                  rounded="md"
-                  h="123px"
-                  maxH="123px"
-                  overflow="auto"
-                >
-                  <Table size="sm">
-                    <Thead fontWeight="700">
-                      <Tr>
-                        <Td>Descrição</Td>
-                        <Td w="12%" textAlign="center">
-                          Vencimento
+
+                <FormControl>
+                  <FormLabel>Cliente</FormLabel>
+                  <Input
+                    type="text"
+                    placeholder="Nome do cliente"
+                    focusBorderColor={config.inputs}
+                    isReadOnly
+                    value={order.client_name}
+                  />
+                </FormControl>
+
+                <Divider mt={3} mb={3} />
+
+                <Table size="sm" maxW="100%">
+                  <Thead fontWeight="700">
+                    <Tr>
+                      <Td w="2%" textAlign="center">
+                        Qtd
+                      </Td>
+                      <Td isTruncated w="62%" maxW="62%">
+                        Produto
+                      </Td>
+                      <Td w="7%" textAlign="center">
+                        Promocional?
+                      </Td>
+                      <Td w="14%" isNumeric>
+                        V. Unitário
+                      </Td>
+                      <Td w="14%" isNumeric>
+                        V. Total
+                      </Td>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {order.products.map((pro) => (
+                      <Tr key={pro.id}>
+                        <Td w="2%" textAlign="center">
+                          {pro.quantity}
                         </Td>
-                        <Td w="12%" textAlign="center">
-                          Status
+                        <Td isTruncated w="62%" maxW="62%">
+                          <Text>{pro.name}</Text>
                         </Td>
-                        <Td w="16%" isNumeric>
-                          Valor
+                        <Td w="7%" textAlign="center">
+                          {pro.promotional === false ? (
+                            <Icon as={FaTimes} color="red.500" fontSize="sm" />
+                          ) : (
+                            <Icon
+                              as={FaCheck}
+                              color="green.500"
+                              fontSize="sm"
+                            />
+                          )}
                         </Td>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      <Tr>
-                        <Td>Dinheiro</Td>
-                        <Td w="12%" textAlign="center">
-                          10/10/1010
+                        <Td w="14%" isNumeric>
+                          {parseFloat(pro.value).toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
                         </Td>
-                        <Td w="12%" textAlign="center">
-                          <Button variant="link" size="sm" colorScheme="green">
-                            Confirmado
-                          </Button>
-                        </Td>
-                        <Td w="16%" isNumeric>
-                          R$ 400,00
-                        </Td>
-                      </Tr>
-                      <Tr>
-                        <Td>Dinheiro</Td>
-                        <Td w="12%" textAlign="center">
-                          10/10/1010
-                        </Td>
-                        <Td w="12%" textAlign="center">
-                          <Button variant="link" size="sm" colorScheme="green">
-                            Confirmado
-                          </Button>
-                        </Td>
-                        <Td w="16%" isNumeric>
-                          R$ 400,00
+                        <Td w="14%" isNumeric>
+                          {parseFloat(pro.total_value).toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
                         </Td>
                       </Tr>
-                      <Tr>
-                        <Td>Dinheiro</Td>
-                        <Td w="12%" textAlign="center">
-                          10/10/1010
-                        </Td>
-                        <Td w="12%" textAlign="center">
-                          <Button variant="link" size="sm" colorScheme="green">
-                            Confirmado
-                          </Button>
-                        </Td>
-                        <Td w="20%" isNumeric>
-                          R$ 400,00
-                        </Td>
-                      </Tr>
-                      <Tr>
-                        <Td>Dinheiro</Td>
-                        <Td w="12%" textAlign="center">
-                          10/10/1010
-                        </Td>
-                        <Td w="12%" textAlign="center">
-                          <Button variant="link" size="sm" colorScheme="green">
-                            Confirmado
-                          </Button>
-                        </Td>
-                        <Td w="16%" isNumeric>
-                          R$ 400,00
-                        </Td>
-                      </Tr>
-                      <Tr>
-                        <Td>Dinheiro</Td>
-                        <Td w="12%" textAlign="center">
-                          10/10/1010
-                        </Td>
-                        <Td w="12%" textAlign="center">
-                          <Button variant="link" size="sm" colorScheme="green">
-                            Confirmado
-                          </Button>
-                        </Td>
-                        <Td w="20%" isNumeric>
-                          R$ 400,00
-                        </Td>
-                      </Tr>
-                    </Tbody>
-                  </Table>
-                </Box>
-              </Box>
-            </Grid>
+                    ))}
+                  </Tbody>
+                </Table>
+
+                <Grid templateColumns="1fr 1fr" gap="15px" mt={5}>
+                  <Box>
+                    <Center
+                      rounded="md"
+                      p={2}
+                      bg="rgba(160, 174, 192, 0.1)"
+                      mb={3}
+                    >
+                      <Heading fontSize="sm">Resumo</Heading>
+                    </Center>
+                    <Box borderWidth="1px" rounded="md" h="123px">
+                      <Flex p={3} align="center" justify="space-between" h={10}>
+                        <Text>Valor Total</Text>
+                        <Text fontWeight="700">
+                          {parseFloat(order.grand_total).toLocaleString(
+                            "pt-BR",
+                            {
+                              style: "currency",
+                              currency: "BRL",
+                            }
+                          )}
+                        </Text>
+                      </Flex>
+                      <Divider />
+                      <Flex p={3} align="center" justify="space-between" h={10}>
+                        <Text>Desconto</Text>
+                        <Text fontWeight="700">
+                          {parseFloat(order.discount)}%
+                        </Text>
+                      </Flex>
+                      <Divider />
+                      <Flex p={3} align="center" justify="space-between" h={10}>
+                        <Text>Total a Pagar</Text>
+                        <Text fontWeight="700">
+                          {parseFloat(order.total_to_pay).toLocaleString(
+                            "pt-BR",
+                            {
+                              style: "currency",
+                              currency: "BRL",
+                            }
+                          )}
+                        </Text>
+                      </Flex>
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Center
+                      rounded="md"
+                      p={2}
+                      bg="rgba(160, 174, 192, 0.1)"
+                      mb={3}
+                    >
+                      <Heading fontSize="sm">Pagamento</Heading>
+                    </Center>
+                    <Box
+                      borderWidth="1px"
+                      rounded="md"
+                      h="123px"
+                      maxH="123px"
+                      overflow="auto"
+                    >
+                      {!order.payment_info ||
+                      order.payment_info.length === 0 ? (
+                        ""
+                      ) : (
+                        <Table size="sm">
+                          <Thead fontWeight="700">
+                            <Tr>
+                              <Td>Descrição do Pagamento</Td>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            {order.payment_info.map((pay) => (
+                              <Tr key={pay.id}>
+                                <Td>{`${pay.pay_form_name} - ${parseFloat(
+                                  pay.installment_total
+                                ).toLocaleString("pt-BR", {
+                                  style: "currency",
+                                  currency: "BRL",
+                                })} em ${
+                                  pay.installment_amount
+                                }x de ${parseFloat(
+                                  pay.installment_value
+                                ).toLocaleString("pt-BR", {
+                                  style: "currency",
+                                  currency: "BRL",
+                                })}`}</Td>
+                              </Tr>
+                            ))}
+                          </Tbody>
+                        </Table>
+                      )}
+                    </Box>
+                  </Box>
+                </Grid>
+              </>
+            )}
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaCheck />} colorScheme={config.buttons}>
-              Faturar
+            <Button
+              leftIcon={<FaCheck />}
+              colorScheme={config.buttons}
+              isLoading={loadingDel}
+              onClick={() => finalizeOrder()}
+            >
+              Finalizar Pedido
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -551,7 +551,6 @@ export default function Pdv() {
       setOrder(response.data[0]);
       setModalPayment(true);
     } catch (error) {
-      console.log(error);
       setLoading(false);
       if (error.message === "Network Error") {
         alert(
@@ -674,7 +673,6 @@ export default function Pdv() {
       setLoadingModal(false);
       setModalBudget(true);
     } catch (error) {
-      console.log(error);
       setLoadingModal(false);
       if (error.message === "Network Error") {
         alert(
