@@ -375,22 +375,21 @@ export default function Cashier() {
             <Heading fontSize="sm">Opções</Heading>
           </Center>
 
-          <Stack spacing={3}>
-            <Button
-              colorScheme="green"
-              leftIcon={<AiOutlineRise />}
-              onClick={() => openDeposit()}
-            >
-              Efetuar Depósito
+          <Grid gap={3} templateColumns="1fr 1fr">
+            <Button colorScheme="green" onClick={() => openDeposit()} h="80px">
+              <Flex direction="column" justify="center" align="center" h="80px">
+                <Icon as={AiOutlineRise} fontSize="4xl" />
+                <Text fontSize="sm">Depósito</Text>
+              </Flex>
             </Button>
-            <Button
-              colorScheme="red"
-              leftIcon={<AiOutlineFall />}
-              onClick={() => openWithDraw()}
-            >
-              Efetuar Retirada
+
+            <Button colorScheme="red" onClick={() => openWithDraw()} h="80px">
+              <Flex direction="column" justify="center" align="center" h="80px">
+                <Icon as={AiOutlineFall} fontSize="4xl" />
+                <Text fontSize="sm">Retirada</Text>
+              </Flex>
             </Button>
-          </Stack>
+          </Grid>
 
           <Divider mt={3} mb={3} />
 
@@ -759,9 +758,7 @@ export default function Cashier() {
                   />
                 </FormControl>
 
-                <Divider mt={3} mb={3} />
-
-                <Table size="sm" maxW="100%">
+                <Table size="sm" maxW="100%" mt={5}>
                   <Thead fontWeight="700">
                     <Tr>
                       <Td w="2%" textAlign="center">
