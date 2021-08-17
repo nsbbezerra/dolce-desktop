@@ -72,7 +72,12 @@ import {
   FaArrowLeft,
   FaTimes,
 } from "react-icons/fa";
-import { AiOutlineBlock, AiOutlineFall, AiOutlineRise } from "react-icons/ai";
+import {
+  AiOutlineBarcode,
+  AiOutlineDollar,
+  AiOutlineFall,
+  AiOutlineRise,
+} from "react-icons/ai";
 
 import PrintMiddleware from "../../middlewares/print";
 import PaymentMiddleware from "../../middlewares/payment";
@@ -120,11 +125,17 @@ export default function Cashier() {
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
 
+  const [ordersReport, setOrdersReport] = useState([]);
+  const [cashierInfo, setCashierInfo] = useState({});
+  const [payFormsReport, setPayFormsReport] = useState([]);
+  const [paymentsReport, setPaymentsReport] = useState([]);
+  const [revenuesReport, setRevenuesReport] = useState([]);
+  const [expensesReport, setExpensesReport] = useState([]);
+
   useEffect(() => {
     if (data) {
       setOrders(data.orders);
       handlePagination(data.count.count);
-      console.log(data.orders);
     }
   }, [data]);
 
@@ -366,6 +377,45 @@ export default function Cashier() {
     }
   }
 
+  async function cashierReport() {
+    setLoadingModal(true);
+    try {
+      const response = await api.get(`/cashierMoviment/${cash}`);
+      console.log(response);
+      setCashierInfo(response.data.cashier);
+      setExpensesReport(response.data.expenses);
+      setOrdersReport(response.data.orders);
+      setPayFormsReport(response.data.payFormsReport);
+      setPaymentsReport(response.data.payments);
+      setRevenuesReport(response.data.revenues);
+      setModalMoviment(true);
+      setLoadingModal(false);
+    } catch (error) {
+      setLoadingModal(false);
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
+
+  function calculatePrice(list) {
+    let valor = list.reduce(
+      (total, numeros) => total + parseFloat(numeros.value),
+      0
+    );
+    return parseFloat(valor).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
+
   return (
     <>
       <HeaderApp title="Caixa Diário" icon={FaCashRegister} />
@@ -397,9 +447,9 @@ export default function Cashier() {
             <Button
               colorScheme="gray"
               leftIcon={<FaChartLine />}
-              onClick={() => setModalMoviment(true)}
+              onClick={() => cashierReport()}
             >
-              Movimentação do Caixa
+              Relatório do Caixa
             </Button>
           </Stack>
 
@@ -934,10 +984,176 @@ export default function Cashier() {
       >
         <ModalOverlay />
         <ModalContent maxW="70rem">
-          <ModalHeader>Movimentações do Caixa</ModalHeader>
+          <ModalHeader>Relatório do Caixa</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Grid templateColumns="repeat(1, 1fr)" gap="15px">
+            <Center rounded="md" p={2} bg="blackAlpha.200" mb={3}>
+              <Heading fontSize="sm">Informações do Caixa</Heading>
+            </Center>
+            <Box p={2} rounded="md" borderWidth="1px">
+              <Grid templateColumns="1fr 1fr 1fr" gap="20px">
+                <Text>
+                  <strong>Funcionário:</strong>{" "}
+                  {JSON.stringify(cashierInfo) === "{}"
+                    ? "-"
+                    : cashierInfo.employee_name}
+                </Text>
+                <Text>
+                  <strong>Data de Abertura:</strong>{" "}
+                  {JSON.stringify(cashierInfo) === "{}"
+                    ? "-"
+                    : format(new Date(cashierInfo.open_date), "dd/MM/yyyy", {
+                        locale: pt_br,
+                      })}
+                </Text>
+                <Text>
+                  <strong>Status:</strong>{" "}
+                  {JSON.stringify(cashierInfo) === "{}" ? (
+                    "-"
+                  ) : (
+                    <>
+                      {cashierInfo.status === "open" && (
+                        <Tag
+                          size="xs"
+                          colorScheme="green"
+                          w="150px"
+                          rounded="md"
+                          justifyContent="center"
+                        >
+                          Aberto
+                        </Tag>
+                      )}
+                      {cashierInfo.status === "close" && (
+                        <Tag
+                          size="xs"
+                          colorScheme="red"
+                          w="150px"
+                          rounded="md"
+                          justifyContent="center"
+                        >
+                          Fechado
+                        </Tag>
+                      )}
+                    </>
+                  )}
+                </Text>
+              </Grid>
+              <Grid templateColumns="1fr 1fr 1fr" gap="20px" mt={2}>
+                <Text>
+                  <strong>Valor de Abertura:</strong>{" "}
+                  {JSON.stringify(cashierInfo) === "{}"
+                    ? "-"
+                    : parseFloat(cashierInfo.open_value).toLocaleString(
+                        "pt-BR",
+                        {
+                          style: "currency",
+                          currency: "BRL",
+                        }
+                      )}
+                </Text>
+                <Text>
+                  <strong>Data de Fechamento:</strong>{" "}
+                  {JSON.stringify(cashierInfo) === "{}" ? (
+                    "-"
+                  ) : (
+                    <>
+                      {!cashierInfo.close_date
+                        ? "-"
+                        : format(
+                            new Date(cashierInfo.close_date),
+                            "dd/MM/yyyy",
+                            {
+                              locale: pt_br,
+                            }
+                          )}
+                    </>
+                  )}
+                </Text>
+                <Text>
+                  <strong>Valor de Fechamento:</strong>{" "}
+                  {JSON.stringify(cashierInfo) === "{}" ? (
+                    "-"
+                  ) : (
+                    <>
+                      {!cashierInfo.close_value
+                        ? "-"
+                        : parseFloat(cashierInfo.close_value).toLocaleString(
+                            "pt-BR",
+                            {
+                              style: "currency",
+                              currency: "BRL",
+                            }
+                          )}
+                    </>
+                  )}
+                </Text>
+              </Grid>
+            </Box>
+
+            <Center rounded="md" p={2} bg="blackAlpha.200" mb={3} mt={5}>
+              <Heading fontSize="sm">Pedidos</Heading>
+            </Center>
+
+            <Box p={2} rounded="md" borderWidth="1px">
+              <Table size="sm">
+                <Thead fontWeight="700">
+                  <Tr>
+                    <Td w="6%" textAlign="center">
+                      Nº
+                    </Td>
+                    <Td>Cliente</Td>
+                    <Td isNumeric w="12%">
+                      V. Total
+                    </Td>
+                    <Td isNumeric w="9%">
+                      Desconto
+                    </Td>
+                    <Td isNumeric w="12%">
+                      T. a Pagar
+                    </Td>
+                    <Td textAlign="center" w="12%">
+                      Data
+                    </Td>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {ordersReport.map((ord) => (
+                    <Tr key={ord.id}>
+                      <Td w="6%" textAlign="center">
+                        {ord.id}
+                      </Td>
+                      <Td>{ord.client_name}</Td>
+                      <Td isNumeric w="12%">
+                        {parseFloat(ord.grand_total).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </Td>
+                      <Td isNumeric w="9%">
+                        {parseFloat(ord.discount)}%
+                      </Td>
+                      <Td isNumeric w="12%">
+                        {parseFloat(ord.total_to_pay).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </Td>
+                      <Td textAlign="center" w="12%">
+                        {format(new Date(ord.order_date), "dd/MM/yyyy", {
+                          locale: pt_br,
+                        })}
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </Box>
+
+            <Center rounded="md" p={2} bg="blackAlpha.200" mb={3} mt={5}>
+              <Heading fontSize="sm">Movimentações do Caixa</Heading>
+            </Center>
+
+            <Grid templateColumns="repeat(2, 1fr)" gap="15px">
               <Box borderWidth="1px" rounded="md" h="min-content">
                 <Flex p={2} align="center">
                   <Icon as={AiOutlineRise} mr={3} />
@@ -947,17 +1163,28 @@ export default function Cashier() {
                 <Table size="sm">
                   <Thead fontWeight="700">
                     <Tr>
-                      <Td w="80%">Descrição</Td>
+                      <Td w="60%">Descrição</Td>
                       <Td textAlign="center">Data</Td>
                       <Td isNumeric>Valor</Td>
                     </Tr>
                   </Thead>
                   <Tbody>
-                    <Tr>
-                      <Td w="80%">Descrição</Td>
-                      <Td textAlign="center">Data</Td>
-                      <Td isNumeric>Valor</Td>
-                    </Tr>
+                    {revenuesReport.map((rev) => (
+                      <Tr key={rev.id}>
+                        <Td w="60%">{rev.description}</Td>
+                        <Td textAlign="center">
+                          {format(new Date(rev.created_at), "dd/MM/yyyy", {
+                            locale: pt_br,
+                          })}
+                        </Td>
+                        <Td isNumeric>
+                          {parseFloat(rev.value).toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
+                        </Td>
+                      </Tr>
+                    ))}
                   </Tbody>
                 </Table>
               </Box>
@@ -971,58 +1198,167 @@ export default function Cashier() {
                 <Table size="sm">
                   <Thead fontWeight="700">
                     <Tr>
-                      <Td w="80%">Descrição</Td>
+                      <Td w="60%">Descrição</Td>
                       <Td textAlign="center">Data</Td>
                       <Td isNumeric>Valor</Td>
                     </Tr>
                   </Thead>
                   <Tbody>
-                    <Tr>
-                      <Td w="80%">Descrição</Td>
-                      <Td textAlign="center">10/10/1000</Td>
-                      <Td isNumeric>R$ 3000,00</Td>
-                    </Tr>
+                    {expensesReport.map((exp) => (
+                      <Tr key={exp.id}>
+                        <Td w="60%">{exp.description}</Td>
+                        <Td textAlign="center">
+                          {format(new Date(exp.created_at), "dd/MM/yyyy", {
+                            locale: pt_br,
+                          })}
+                        </Td>
+                        <Td isNumeric>
+                          {parseFloat(exp.value).toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
+                        </Td>
+                      </Tr>
+                    ))}
                   </Tbody>
                 </Table>
               </Box>
             </Grid>
 
-            <Divider mt={5} mb={5} />
+            <Center rounded="md" p={2} bg="blackAlpha.200" mb={3} mt={5}>
+              <Heading fontSize="sm">Movimentação Financeira</Heading>
+            </Center>
 
-            <Box borderWidth="1px" rounded="md">
-              <Table size="sm">
-                <Tbody>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Valor de Abertura
-                    </Td>
-                    <Td isNumeric>R$ 4000,00</Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Total das Entradas
-                    </Td>
-                    <Td isNumeric color="green.400">
-                      R$ 4000,00
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Total das Saídas
-                    </Td>
-                    <Td isNumeric color="red.400">
-                      R$ 4000,00
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Valor de Fechamento
-                    </Td>
-                    <Td isNumeric>R$ 4000,00</Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-            </Box>
+            <Grid templateColumns="1fr 2fr" gap="20px">
+              <Box>
+                <Box borderWidth="1px" rounded="md" h="min-content">
+                  <Flex p={2} align="center">
+                    <Icon as={AiOutlineDollar} mr={3} />
+                    <Text fontWeight="700">Resumo dos Pagamentos</Text>
+                  </Flex>
+                  <Divider />
+                  <Table size="sm">
+                    <Thead fontWeight="700">
+                      <Tr>
+                        <Td>Forma de Pagamento</Td>
+                        <Td w="13%" isNumeric>
+                          Total
+                        </Td>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {payFormsReport.map((pfr) => (
+                        <Tr key={pfr.id}>
+                          <Td>{pfr.pay_form}</Td>
+                          <Td w="13%" isNumeric>
+                            {parseFloat(pfr.value).toLocaleString("pt-BR", {
+                              style: "currency",
+                              currency: "BRL",
+                            })}
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </Box>
+
+                <Box borderWidth="1px" rounded="md" h="min-content" mt={5}>
+                  <Flex p={2} align="center">
+                    <Icon as={AiOutlineRise} mr={3} />
+                    <Text fontWeight="700">Total dos Depósitos</Text>
+                  </Flex>
+                  <Divider />
+                  <Text fontSize="lg" p={3}>
+                    {calculatePrice(revenuesReport)}
+                  </Text>
+                </Box>
+
+                <Box borderWidth="1px" rounded="md" h="min-content" mt={5}>
+                  <Flex p={2} align="center">
+                    <Icon as={AiOutlineFall} mr={3} />
+                    <Text fontWeight="700">Total das Retiradas</Text>
+                  </Flex>
+                  <Divider />
+                  <Text fontSize="lg" p={3}>
+                    {calculatePrice(expensesReport)}
+                  </Text>
+                </Box>
+              </Box>
+              <Box borderWidth="1px" rounded="md" h="min-content">
+                <Flex p={2} align="center">
+                  <Icon as={AiOutlineBarcode} mr={3} />
+                  <Text fontWeight="700">Pagamentos</Text>
+                </Flex>
+                <Divider />
+                <Table size="sm">
+                  <Thead fontWeight="700">
+                    <Tr>
+                      <Td>Descrição</Td>
+                      <Td w="15%">Status</Td>
+                      <Td w="10%" textAlign="center">
+                        Vencimento
+                      </Td>
+                      <Td w="12%" isNumeric>
+                        Valor
+                      </Td>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {paymentsReport.map((pay) => (
+                      <Tr key={pay.id}>
+                        <Td>{pay.identify}</Td>
+                        <Td w="15%">
+                          {pay.status === "paid_out" && (
+                            <Tag
+                              w="100%"
+                              justifyContent="center"
+                              size="xs"
+                              colorScheme="green"
+                              rounded="md"
+                            >
+                              Pago
+                            </Tag>
+                          )}
+                          {pay.status === "waiting" && (
+                            <Tag
+                              w="100%"
+                              justifyContent="center"
+                              size="xs"
+                              colorScheme="yellow"
+                              rounded="md"
+                            >
+                              Não Pago
+                            </Tag>
+                          )}
+                          {pay.status === "canceled" && (
+                            <Tag
+                              w="100%"
+                              justifyContent="center"
+                              size="xs"
+                              colorScheme="red"
+                              rounded="md"
+                            >
+                              Cancelado
+                            </Tag>
+                          )}
+                        </Td>
+                        <Td w="10%" textAlign="center">
+                          {format(new Date(pay.due_date), "dd/MM/yyyy", {
+                            locale: pt_br,
+                          })}
+                        </Td>
+                        <Td w="12%" isNumeric>
+                          {parseFloat(pay.value).toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Box>
+            </Grid>
           </ModalBody>
           <ModalFooter>
             <Button leftIcon={<FaPrint />} colorScheme={config.buttons}>

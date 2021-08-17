@@ -114,7 +114,6 @@ export default function Sider() {
           <MenuItem
             icon={<FaShoppingBag />}
             onClick={() => routing("/listorders")}
-            isDisabled
           >
             Pedidos
           </MenuItem>
@@ -199,7 +198,6 @@ export default function Sider() {
           <MenuItem
             icon={<FaFileImport />}
             onClick={() => routing("/registerProducts")}
-            isDisabled
           >
             Importar XML
           </MenuItem>

@@ -38,7 +38,6 @@ import HeaderApp from "../../components/headerApp";
 import {
   FaCalculator,
   FaCashRegister,
-  FaBookOpen,
   FaLockOpen,
   FaCalendarAlt,
 } from "react-icons/fa";
@@ -75,14 +74,21 @@ export default function MovimentCashier() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log(data);
     if (data) {
       setCashier(data);
     }
   }, [data]);
 
-  function routing(rt) {
-    push(rt);
+  function routing(rt, dt) {
+    if (dateFns.isPast(new Date(dt))) {
+      push(rt);
+    } else {
+      showToast(
+        "Caixa sem validade, por favor abra um novo.",
+        "warning",
+        "Atenção"
+      );
+    }
   }
 
   function showToast(message, status, title) {
@@ -348,7 +354,9 @@ export default function MovimentCashier() {
                         leftIcon={<FaCashRegister />}
                         colorScheme={config.buttons}
                         size="xs"
-                        onClick={() => routing(`/cashier/${cash.id}`)}
+                        onClick={() =>
+                          routing(`/cashier/${cash.id}`, cash.open_date)
+                        }
                       >
                         Ir para o Caixa
                       </Button>
