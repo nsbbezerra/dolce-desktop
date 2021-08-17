@@ -1393,7 +1393,11 @@ export default function Cashier() {
             </Grid>
           </ModalBody>
           <ModalFooter>
-            <Button leftIcon={<FaPrint />} colorScheme={config.buttons}>
+            <Button
+              leftIcon={<FaPrint />}
+              colorScheme={config.buttons}
+              onClick={() => setModalPrint(true)}
+            >
               Imprimir
             </Button>
           </ModalFooter>
@@ -1405,14 +1409,22 @@ export default function Cashier() {
         onClose={() => setModalPrint(false)}
         isCentered
         scrollBehavior="inside"
-        size="lg"
       >
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Imprimir</ModalHeader>
+        <ModalContent maxW="95vw" minH="95vh" pb={4} p={0} overflow="hidden">
+          <ModalHeader pt={2} pb={2} pl={5}>
+            Imprimir
+          </ModalHeader>
           <ModalCloseButton />
-          <ModalBody pb={4}>
-            {modalPrint === true && <PrintMiddleware />}
+          <ModalBody p={0} overflow="hidden">
+            <Box h="89vh">
+              <embed
+                src={`${config.url}/cashierReport/${cash}`}
+                width="100%"
+                height="100%"
+                type="application/pdf"
+              />
+            </Box>
           </ModalBody>
         </ModalContent>
       </Modal>
