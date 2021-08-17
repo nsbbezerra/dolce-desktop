@@ -79,16 +79,8 @@ export default function MovimentCashier() {
     }
   }, [data]);
 
-  function routing(rt, dt) {
-    if (dateFns.isPast(new Date(dt))) {
-      push(rt);
-    } else {
-      showToast(
-        "Caixa sem validade, por favor abra um novo.",
-        "warning",
-        "Atenção"
-      );
-    }
+  function routing(rt) {
+    push(rt);
   }
 
   function showToast(message, status, title) {
@@ -354,9 +346,8 @@ export default function MovimentCashier() {
                         leftIcon={<FaCashRegister />}
                         colorScheme={config.buttons}
                         size="xs"
-                        onClick={() =>
-                          routing(`/cashier/${cash.id}`, cash.open_date)
-                        }
+                        onClick={() => routing(`/cashier/${cash.id}`)}
+                        isDisabled={cash.status === "close" ? true : false}
                       >
                         Ir para o Caixa
                       </Button>

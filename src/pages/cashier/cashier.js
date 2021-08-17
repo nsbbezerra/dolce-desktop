@@ -132,6 +132,9 @@ export default function Cashier() {
   const [revenuesReport, setRevenuesReport] = useState([]);
   const [expensesReport, setExpensesReport] = useState([]);
 
+  const [reportLoading, setReportLoading] = useState(false);
+  const [closeLoading, setCloseLoading] = useState(false);
+
   useEffect(() => {
     if (data) {
       setOrders(data.orders);
@@ -378,10 +381,9 @@ export default function Cashier() {
   }
 
   async function cashierReport() {
-    setLoadingModal(true);
+    setReportLoading(true);
     try {
       const response = await api.get(`/cashierMoviment/${cash}`);
-      console.log(response);
       setCashierInfo(response.data.cashier);
       setExpensesReport(response.data.expenses);
       setOrdersReport(response.data.orders);
@@ -389,9 +391,9 @@ export default function Cashier() {
       setPaymentsReport(response.data.payments);
       setRevenuesReport(response.data.revenues);
       setModalMoviment(true);
-      setLoadingModal(false);
+      setReportLoading(false);
     } catch (error) {
-      setLoadingModal(false);
+      setReportLoading(false);
       const statusCode = error.response.status || 400;
       const typeError =
         error.response.data.message || "Ocorreu um erro ao buscar";
@@ -414,6 +416,35 @@ export default function Cashier() {
       style: "currency",
       currency: "BRL",
     });
+  }
+
+  async function closeCashier() {
+    setCloseLoading(true);
+
+    try {
+      const response = await api.put(
+        `/closeCashier/${cash}`,
+        {},
+        {
+          headers: { "x-access-token": employee.token },
+        }
+      );
+      showToast(response.data.message, "success", "Sucesso");
+      setCloseLoading(true);
+      routing("/cashiermoviment");
+    } catch (error) {
+      setCloseLoading(false);
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
   }
 
   return (
@@ -448,6 +479,7 @@ export default function Cashier() {
               colorScheme="gray"
               leftIcon={<FaChartLine />}
               onClick={() => cashierReport()}
+              isLoading={reportLoading}
             >
               Relatório do Caixa
             </Button>
@@ -1547,182 +1579,14 @@ export default function Cashier() {
               colorScheme={config.buttons}
               ml={3}
               ref={cancelRef}
-              onClick={() => handleCloseCashier()}
+              onClick={() => closeCashier()}
+              isLoading={closeLoading}
             >
               Sim
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <Modal
-        isOpen={modalCloseCashier}
-        onClose={() => setModalCloseCashier(false)}
-        isCentered
-        scrollBehavior="inside"
-      >
-        <ModalOverlay />
-        <ModalContent maxW="50rem">
-          <ModalHeader>Fechamento de Caixa</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Grid templateColumns="repeat(1, 1fr)" gap="15px">
-              <Box borderWidth="1px" rounded="md" h="min-content">
-                <Flex p={2} align="center">
-                  <Icon as={AiOutlineRise} mr={3} />
-                  <Text fontWeight="700">Depósitos</Text>
-                </Flex>
-                <Divider />
-                <Table size="sm">
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td w="80%">Descrição</Td>
-                      <Td textAlign="center">Data</Td>
-                      <Td isNumeric>Valor</Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    <Tr>
-                      <Td w="80%">Descrição</Td>
-                      <Td textAlign="center">Data</Td>
-                      <Td isNumeric>Valor</Td>
-                    </Tr>
-                  </Tbody>
-                </Table>
-              </Box>
-
-              <Box borderWidth="1px" rounded="md" h="min-content">
-                <Flex p={2} align="center">
-                  <Icon as={AiOutlineFall} mr={3} />
-                  <Text fontWeight="700">Retiradas</Text>
-                </Flex>
-                <Divider />
-                <Table size="sm">
-                  <Thead fontWeight="700">
-                    <Tr>
-                      <Td w="80%">Descrição</Td>
-                      <Td textAlign="center">Data</Td>
-                      <Td isNumeric>Valor</Td>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    <Tr>
-                      <Td w="80%">Descrição</Td>
-                      <Td textAlign="center">10/10/1000</Td>
-                      <Td isNumeric>R$ 3000,00</Td>
-                    </Tr>
-                  </Tbody>
-                </Table>
-              </Box>
-            </Grid>
-
-            <Box borderWidth="1px" rounded="md" h="min-content" mt="15px">
-              <Flex p={2} align="center">
-                <Icon as={AiOutlineFall} mr={3} />
-                <Text fontWeight="700">Resumo das Movimentações de Caixa</Text>
-              </Flex>
-              <Divider />
-              <Table size="sm">
-                <Tbody>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Valor de Abertura
-                    </Td>
-                    <Td isNumeric>R$ 4000,00</Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Total das Entradas
-                    </Td>
-                    <Td isNumeric color="green.400">
-                      R$ 4000,00
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Total das Saídas
-                    </Td>
-                    <Td isNumeric color="red.400">
-                      R$ 4000,00
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Valor de Fechamento
-                    </Td>
-                    <Td isNumeric>R$ 4000,00</Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-            </Box>
-
-            <Box borderWidth="1px" rounded="md" h="min-content" mt="15px">
-              <Flex p={2} align="center">
-                <Icon as={AiOutlineFall} mr={3} />
-                <Text fontWeight="700">Resumo dos Pagamentos</Text>
-              </Flex>
-              <Divider />
-              <Table size="sm">
-                <Tbody>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Total em Dinheiro
-                    </Td>
-                    <Td isNumeric>R$ 4000,00</Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Total em Cartão de Crédito
-                    </Td>
-                    <Td isNumeric>R$ 4000,00</Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Total em Cartão de Débito
-                    </Td>
-                    <Td isNumeric>R$ 4000,00</Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Total em Cheque
-                    </Td>
-                    <Td isNumeric>R$ 4000,00</Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Total em Duplicata
-                    </Td>
-                    <Td isNumeric>R$ 4000,00</Td>
-                  </Tr>
-                  <Tr>
-                    <Td fontWeight="700" w="70%">
-                      Total em Transferências
-                    </Td>
-                    <Td isNumeric>R$ 4000,00</Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-            </Box>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              leftIcon={<FaPrint />}
-              mr={3}
-              colorScheme={config.buttons}
-              variant="outline"
-            >
-              Imprimir Relatório
-            </Button>
-            <Button
-              leftIcon={<FaCheck />}
-              colorScheme={config.buttons}
-              onClick={() => routing("/cashiermoviment")}
-            >
-              Concluir
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
 
       <Modal
         isOpen={loadingModal}
