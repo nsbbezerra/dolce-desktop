@@ -54,7 +54,6 @@ import config from "../configs";
 import { GiShop } from "react-icons/gi";
 
 import Icone from "../assets/logo.svg";
-import Logo from "../assets/name-slug.png";
 
 import { useHistory } from "react-router-dom";
 import { useEmployee } from "../context/Employee";

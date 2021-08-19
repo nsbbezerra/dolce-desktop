@@ -33,6 +33,7 @@ import {
   Tooltip,
   ModalCloseButton,
   ModalHeader,
+  useToast,
 } from "@chakra-ui/react";
 import Sider from "../components/sider";
 import Header from "../components/header";
@@ -55,10 +56,11 @@ import { useEmployee } from "../context/Employee";
 import api from "../configs/axios";
 
 const remote = window.require("electron").remote;
+const version = window.require("electron").remote.app.getVersion();
 
 export default function Layout() {
   const initialRef = useRef();
-
+  const toast = useToast();
   const { setEmployee } = useEmployee();
 
   const [modalRoute, setModalRoute] = useState(false);
@@ -82,6 +84,17 @@ export default function Layout() {
   const [showCloseButton, setShowCloseButton] = useState(false);
   const [typeRoute, setTypeRoute] = useState("https");
 
+  function showToast(message, status, title) {
+    toast({
+      title: title,
+      description: message,
+      status: status,
+      position: "bottom",
+      duration: 8000,
+      isClosable: true,
+    });
+  }
+
   useEffect(() => {
     setWrongUser(false);
   }, [user]);
@@ -94,7 +107,6 @@ export default function Layout() {
     const tp = await localStorage.getItem("typert");
     const rt = await localStorage.getItem("route");
     const pt = await localStorage.getItem("port");
-    console.log("PORTA", pt);
     if (!rt && !pt && !tp) {
       setModalRoute(true);
     } else {
@@ -160,12 +172,17 @@ export default function Layout() {
       const response = await api.post("/employeeautenticate", {
         user: user,
         password: pass,
+        vers: version,
       });
       setEmployee(response.data);
       setLoadingAuth(false);
       setModalAuth(false);
     } catch (error) {
       setLoadingAuth(false);
+      if (error.response.data.warning) {
+        showToast(error.response.data.message, "error", "Erro");
+        return false;
+      }
       if (error.message === "Network Error") {
         alert(
           "Sem conexão com o servidor, verifique sua conexão com a internet."
@@ -364,6 +381,9 @@ export default function Layout() {
               </FormControl>
             </ModalBody>
             <ModalFooter>
+              <Text fontSize="xs" color="gray.600" mr={10}>
+                Versão: {version}
+              </Text>
               <Tooltip label="Configuração de rota do servidor" hasArrow>
                 <IconButton
                   icon={<FaServer />}
