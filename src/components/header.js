@@ -87,20 +87,7 @@ export default function HeaderApp() {
 
   const handleMaximize = useCallback(() => {
     const window = remote.getCurrentWindow();
-
-    const { width: currentWidth, height: currentHeight } = window.getBounds();
-
-    const { width: maxWidth, height: maxHeight } =
-      remote.screen.getPrimaryDisplay().workAreaSize;
-
-    const isMaximized =
-      currentWidth === maxWidth && currentHeight === maxHeight;
-
-    if (!isMaximized) {
-      window.maximize();
-    } else {
-      window.unmaximize();
-    }
+    window.setFullScreen(!window.isFullScreen());
   }, []);
 
   function RadioCard(props) {
@@ -277,7 +264,13 @@ export default function HeaderApp() {
 
   return (
     <>
-      <Grid h="60px" bg={config.header.bg} templateColumns="1fr 2fr 1fr" pl={3}>
+      <Grid
+        h="60px"
+        bg={config.header.bg}
+        templateColumns="1fr 2fr 1fr"
+        pl={3}
+        className="draggable"
+      >
         <Flex h="60px" justify="flex-start" align="center">
           <Image
             userSelect="none"
@@ -317,6 +310,7 @@ export default function HeaderApp() {
                 rounded="xl"
                 ml={3}
                 onClick={() => setModalTheme(true)}
+                className="no-draggable"
               />
             </Tooltip>
 
@@ -327,6 +321,7 @@ export default function HeaderApp() {
                 rounded="xl"
                 ml={3}
                 onClick={() => push("/configapp")}
+                className="no-draggable"
               />
             </Tooltip>
 
@@ -337,6 +332,7 @@ export default function HeaderApp() {
                 rounded="xl"
                 ml={3}
                 onClick={() => toogleDevTools()}
+                className="no-draggable"
               />
             </Tooltip>
 
@@ -347,25 +343,13 @@ export default function HeaderApp() {
                 rounded="xl"
                 ml={3}
                 onClick={() => setAlertLogout(true)}
+                className="no-draggable"
               />
             </Tooltip>
           </Flex>
         </Flex>
 
         <Flex h="60px" justify="flex-end" align="startadm">
-          <Tooltip label="Clique para arrastar" hasArrow>
-            <IconButton
-              aria-label="Search database"
-              icon={<AiOutlineDrag />}
-              size="sm"
-              rounded="none"
-              w="40px"
-              fontSize="sm"
-              variant="ghost"
-              className="draggable"
-            />
-          </Tooltip>
-
           <Tooltip label="Minimizar" hasArrow>
             <IconButton
               aria-label="Search database"
@@ -377,6 +361,7 @@ export default function HeaderApp() {
               fontSize="sm"
               borderBottomLeftRadius="5px"
               onClick={() => handleMinimize()}
+              className="no-draggable"
             />
           </Tooltip>
           <Tooltip label={"Maximizar"} hasArrow>
@@ -389,6 +374,7 @@ export default function HeaderApp() {
               w="40px"
               fontSize="sm"
               onClick={() => handleMaximize()}
+              className="no-draggable"
             />
           </Tooltip>
           <Tooltip label="Fechar" hasArrow>
@@ -402,6 +388,7 @@ export default function HeaderApp() {
               fontSize="md"
               colorScheme="red"
               onClick={() => handleCloseWindow()}
+              className="no-draggable"
             />
           </Tooltip>
         </Flex>

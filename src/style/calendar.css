@@ -28,6 +28,10 @@
   -webkit-app-region: drag;
 }
 
+.no-draggable {
+  -webkit-app-region: no-drag;
+}
+
 .customDatePickerWidth,
 .customDatePickerWidth > div.react-datepicker-wrapper,
 .customDatePickerWidth
