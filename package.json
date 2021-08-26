@@ -1,7 +1,7 @@
 {
   "name": "nkgest",
   "productName": "NKGEST - Gerenciador de Ecomerce",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "homepage": "./",
   "main": "public/electron.js",

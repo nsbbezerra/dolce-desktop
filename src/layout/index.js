@@ -221,7 +221,13 @@ export default function Layout() {
           return true;
         }}
       >
-        <Box w={"100%"} h="100%" overflow="hidden">
+        <Box
+          w={"100%"}
+          h="100%"
+          overflow="hidden"
+          borderWidth="1px"
+          borderColor={config.inputs}
+        >
           <Header />
           <Grid templateColumns="60px 1fr" w="100%" h="92vh" overflow="hidden">
             <Box>

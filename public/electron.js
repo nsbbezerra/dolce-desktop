@@ -3,9 +3,12 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const path = require("path");
 const isDev = require("electron-is-dev");
+const ipcMain = require("electron").ipcMain;
+const { EventEmitter } = require("events");
 let mainWindow;
 let slpash;
 const Menu = electron.Menu;
+const emitter = new EventEmitter();
 
 Menu.setApplicationMenu(false);
 
@@ -14,12 +17,10 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1300,
     height: 700,
-    center: true,
     frame: false,
     show: false,
     hasShadow: false,
-    resizable: false,
-    transparent: true,
+    transparent: false,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
@@ -51,7 +52,29 @@ function createWindow() {
     mainWindow.show();
   });
   mainWindow.on("closed", () => (mainWindow = null));
+  mainWindow.on("maximize", () => {
+    mainWindow.webContents.send("maximized");
+  });
+  mainWindow.on("unmaximize", () => {
+    mainWindow.webContents.send("unmaximize");
+  });
 }
+
+ipcMain.handle("minimize-event", () => {
+  mainWindow.minimize();
+});
+ipcMain.handle("maximize-event", () => {
+  emitter.setMaxListeners(0);
+  mainWindow.maximize();
+});
+ipcMain.handle("unmaximize-event", () => {
+  emitter.setMaxListeners(0);
+  mainWindow.restore();
+});
+ipcMain.handle("close-event", () => {
+  app.quit();
+});
+
 app.setName("NKGEST - Gerenciador de Ecomerce");
 app.allowRendererProcessReuse = true;
 app.on("ready", createWindow);

@@ -40,16 +40,17 @@ import {
   FaTimes,
   FaSun,
   FaMoon,
+  FaWindowRestore,
+  FaWindowMaximize,
+  FaWindowMinimize,
 } from "react-icons/fa";
 
 import {
   AiOutlineCheck,
-  AiOutlineDrag,
   AiOutlineLogout,
   AiOutlineReload,
   AiOutlineStop,
 } from "react-icons/ai";
-import { FiMinus, FiMaximize, FiX } from "react-icons/fi";
 import config from "../configs";
 import { GiShop } from "react-icons/gi";
 
@@ -58,7 +59,9 @@ import Icone from "../assets/logo.svg";
 import { useHistory } from "react-router-dom";
 import { useEmployee } from "../context/Employee";
 
+const ipcRenderer = window.require("electron").ipcRenderer;
 const remote = window.require("electron").remote;
+ipcRenderer.setMaxListeners(30);
 
 export default function HeaderApp() {
   const { push } = useHistory();
@@ -71,22 +74,36 @@ export default function HeaderApp() {
   const [alert, setAlert] = useState(false);
   const [destak, setDestak] = useState("");
   const [alertLogout, setAlertLogout] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+
+  ipcRenderer.on("maximized", () => {
+    setIsMaximized(true);
+  });
+  ipcRenderer.on("unmaximize", () => {
+    setIsMaximized(false);
+  });
+
+  useEffect(() => {
+    let max = remote.getCurrentWindow().isMaximized();
+    setIsMaximized(max);
+  }, []);
 
   const handleCloseWindow = useCallback(() => {
-    const window = remote.getCurrentWindow();
-
-    window.close();
+    ipcRenderer.invoke("close-event");
   }, []);
 
   const handleMinimize = useCallback(() => {
-    const window = remote.getCurrentWindow();
-
-    window.minimize();
+    ipcRenderer.invoke("minimize-event");
   }, []);
 
   const handleMaximize = useCallback(() => {
-    const window = remote.getCurrentWindow();
-    window.setFullScreen(!window.isFullScreen());
+    if (remote.getCurrentWindow().isMaximized()) {
+      ipcRenderer.invoke("unmaximize-event");
+      setIsMaximized(false);
+    } else {
+      ipcRenderer.invoke("maximize-event");
+      setIsMaximized(true);
+    }
   }, []);
 
   function RadioCard(props) {
@@ -285,15 +302,21 @@ export default function HeaderApp() {
             <InputGroup>
               <InputLeftElement
                 pointerEvents="none"
-                children={<Icon as={FaUserCircle} />}
+                children={<Icon as={FaUserCircle} color="white" />}
               />
               <Input
                 _focus={{
                   bg:
                     useColorMode().colorMode === "light"
-                      ? "gray.100"
+                      ? "whiteAlpha.500"
                       : "whiteAlpha.100",
                 }}
+                bg={
+                  useColorMode().colorMode === "light"
+                    ? "whiteAlpha.500"
+                    : "whiteAlpha.100"
+                }
+                color="white"
                 type="text"
                 variant="filled"
                 rounded="xl"
@@ -310,6 +333,8 @@ export default function HeaderApp() {
                 ml={3}
                 onClick={() => setModalTheme(true)}
                 className="no-draggable"
+                colorScheme="whiteAlpha"
+                color="white"
               />
             </Tooltip>
 
@@ -321,6 +346,8 @@ export default function HeaderApp() {
                 ml={3}
                 onClick={() => push("/configapp")}
                 className="no-draggable"
+                colorScheme="whiteAlpha"
+                color="white"
               />
             </Tooltip>
 
@@ -332,6 +359,8 @@ export default function HeaderApp() {
                 ml={3}
                 onClick={() => toogleDevTools()}
                 className="no-draggable"
+                colorScheme="whiteAlpha"
+                color="white"
               />
             </Tooltip>
 
@@ -343,6 +372,8 @@ export default function HeaderApp() {
                 ml={3}
                 onClick={() => setAlertLogout(true)}
                 className="no-draggable"
+                colorScheme="whiteAlpha"
+                color="white"
               />
             </Tooltip>
           </Flex>
@@ -352,24 +383,37 @@ export default function HeaderApp() {
           <Tooltip label="Minimizar" hasArrow>
             <IconButton
               aria-label="Search database"
-              icon={<FiMinus />}
+              icon={<FaWindowMinimize />}
               size="sm"
               rounded="none"
+              color="white"
               w="40px"
-              variant="ghost"
+              colorScheme="whiteAlpha"
+              variant="solid"
               fontSize="sm"
               borderBottomLeftRadius="5px"
               onClick={() => handleMinimize()}
               className="no-draggable"
             />
           </Tooltip>
-          <Tooltip label={"Maximizar"} hasArrow>
+          <Tooltip
+            label={isMaximized === false ? "Maximizar" : "Restaurar"}
+            hasArrow
+          >
             <IconButton
               aria-label="Search database"
-              icon={<FiMaximize />}
+              icon={
+                isMaximized === false ? (
+                  <FaWindowMaximize />
+                ) : (
+                  <FaWindowRestore />
+                )
+              }
               size="sm"
               rounded="none"
-              variant="ghost"
+              colorScheme="whiteAlpha"
+              variant="solid"
+              color="white"
               w="40px"
               fontSize="sm"
               onClick={() => handleMaximize()}
@@ -379,13 +423,14 @@ export default function HeaderApp() {
           <Tooltip label="Fechar" hasArrow>
             <IconButton
               aria-label="Search database"
-              icon={<FiX />}
+              icon={<FaTimes />}
               size="sm"
               rounded="none"
-              variant="ghost"
+              colorScheme="whiteAlpha"
+              variant="solid"
               w="40px"
               fontSize="md"
-              colorScheme="red"
+              color="white"
               onClick={() => handleCloseWindow()}
               className="no-draggable"
             />
