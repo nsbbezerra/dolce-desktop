@@ -53,6 +53,7 @@ export default function RegisterProvider() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fantasia, setFantasia] = useState("");
 
   function clear() {
     setName("");
@@ -69,6 +70,7 @@ export default function RegisterProvider() {
     setState("");
     setThumbnail(null);
     removeThumbnail();
+    setFantasia("");
   }
 
   function showToast(message, status, title) {
@@ -221,6 +223,7 @@ export default function RegisterProvider() {
       data.append("cep", cep);
       data.append("city", city);
       data.append("state", state);
+      data.append("fantasia", fantasia);
       console.log(thumbnail);
       const response = await api.post("/providers", data, {
         headers: { "x-access-token": employee.token },
@@ -317,7 +320,7 @@ export default function RegisterProvider() {
             </Box>
 
             <Box>
-              <Grid templateColumns="1fr" gap="15px">
+              <Grid templateColumns="1fr 1fr" gap="15px">
                 <FormControl
                   isRequired
                   isInvalid={
@@ -326,7 +329,7 @@ export default function RegisterProvider() {
                 >
                   <FormLabel>Razão Social</FormLabel>
                   <Input
-                    placeholder="Nome"
+                    placeholder="Razão Social"
                     id="name"
                     focusBorderColor={config.inputs}
                     value={name}
@@ -339,6 +342,19 @@ export default function RegisterProvider() {
                       ? validators.find((obj) => obj.path === "name").message
                       : ""}
                   </FormErrorMessage>
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel>Nome Fantasia</FormLabel>
+                  <Input
+                    placeholder="Nome Fantasia"
+                    id="fantasia"
+                    focusBorderColor={config.inputs}
+                    value={fantasia}
+                    onChange={(e) =>
+                      setFantasia(capitalizeFirstLetter(e.target.value))
+                    }
+                  />
                 </FormControl>
               </Grid>
 

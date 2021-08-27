@@ -61,7 +61,7 @@ import { useEmployee } from "../context/Employee";
 
 const ipcRenderer = window.require("electron").ipcRenderer;
 const remote = window.require("electron").remote;
-ipcRenderer.setMaxListeners(30);
+ipcRenderer.setMaxListeners(32);
 
 export default function HeaderApp() {
   const { push } = useHistory();

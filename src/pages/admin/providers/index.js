@@ -86,6 +86,7 @@ export default function ListProviders() {
   const [loadingImage, setLoadingImage] = useState(false);
   const [findProvider, setFindProvider] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
+  const [fantasia, setFantasia] = useState("");
 
   async function findBaseUrl() {
     const base = await localStorage.getItem("baseUrl");
@@ -177,8 +178,9 @@ export default function ListProviders() {
       title: title,
       description: message,
       status: status,
-      position: "bottom-right",
+      position: "bottom",
       duration: 8000,
+      isClosable: true,
     });
   }
 
@@ -212,6 +214,7 @@ export default function ListProviders() {
     } else {
       setTypeContact("1");
     }
+    result.fantasia && setFantasia(result.fantasia);
     setEmail(result.email);
     setStreet(result.street);
     setNumber(result.number);
@@ -240,6 +243,7 @@ export default function ListProviders() {
           cep,
           city,
           state,
+          fantasia,
         },
         { headers: { "x-access-token": employee.token } }
       );
@@ -259,6 +263,7 @@ export default function ListProviders() {
             cep,
             city,
             state,
+            fantasia,
           };
         }
         return prov;
@@ -278,7 +283,10 @@ export default function ListProviders() {
         cep,
         city,
         state,
+        fantasia,
       });
+      setModalInfo(false);
+      setFantasia("");
       showToast(response.data.message, "success", "Sucesso");
       setLoading(false);
     } catch (error) {
@@ -385,6 +393,7 @@ export default function ListProviders() {
       setLoadingImage(false);
       setModalImage(false);
     } catch (error) {
+      setLoadingImage(false);
       if (error.message === "Network Error") {
         alert(
           "Sem conexão com o servidor, verifique sua conexão com a internet."
@@ -459,8 +468,8 @@ export default function ListProviders() {
                         Ativo?
                       </Td>
                       <Td w="20%">Fornecedor</Td>
+                      <Td>Nome Fantasia</Td>
                       <Td w="13%">CNPJ</Td>
-                      <Td>Email</Td>
                       <Td w="13%">Contato</Td>
                       <Td w="13%">Cidade</Td>
                       <Td w="5%">UF</Td>
@@ -490,8 +499,8 @@ export default function ListProviders() {
                           />
                         </Td>
                         <Td w="20%">{prov.name}</Td>
+                        <Td>{!prov.fantasia ? "" : prov.fantasia}</Td>
                         <Td w="13%">{prov.cnpj}</Td>
-                        <Td>{prov.email}</Td>
                         <Td w="13%">{prov.contact}</Td>
                         <Td w="13%">{prov.city}</Td>
                         <Td w="5%">{prov.state}</Td>
@@ -501,7 +510,7 @@ export default function ListProviders() {
                               isFullWidth
                               as={Button}
                               rightIcon={<MdKeyboardArrowDown />}
-                              size="sm"
+                              size="xs"
                               colorScheme={config.buttons}
                             >
                               Opções
@@ -541,7 +550,7 @@ export default function ListProviders() {
               <ModalHeader>Editar Informações</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
-                <Grid templateColumns="1fr" gap="15px">
+                <Grid templateColumns="1fr 1fr" gap="15px">
                   <FormControl
                     isRequired
                     isInvalid={
@@ -552,7 +561,7 @@ export default function ListProviders() {
                   >
                     <FormLabel>Razão Social</FormLabel>
                     <Input
-                      placeholder="Nome"
+                      placeholder="Razão Social"
                       id="name"
                       focusBorderColor={config.inputs}
                       value={name}
@@ -565,6 +574,19 @@ export default function ListProviders() {
                         ? validators.find((obj) => obj.path === "name").message
                         : ""}
                     </FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>Nome Fantasia</FormLabel>
+                    <Input
+                      placeholder="Nome Fantasia"
+                      id="fantasia"
+                      focusBorderColor={config.inputs}
+                      value={fantasia}
+                      onChange={(e) =>
+                        setFantasia(capitalizeFirstLetter(e.target.value))
+                      }
+                    />
                   </FormControl>
                 </Grid>
 

@@ -21,6 +21,7 @@ import RegisterImages from "../pages/cadastro/produtos/imagens";
 import RegisterProvider from "../pages/cadastro/provider";
 import MakePromotional from "../pages/cadastro/promotional";
 import SubCategories from "../pages/cadastro/subCategories";
+import XmlImporter from "../pages/cadastro/xmlimporter";
 
 /** ESTOQUE */
 import ListDepartment from "../pages/products/department";
@@ -154,6 +155,9 @@ export default function Routers() {
       </Route>
       <Route path="/listSubCategories">
         <ListSubCat />
+      </Route>
+      <Route path="/xmlimporter">
+        <XmlImporter />
       </Route>
     </Switch>
   );

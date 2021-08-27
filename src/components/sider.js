@@ -197,7 +197,7 @@ export default function Sider() {
           </MenuItem>
           <MenuItem
             icon={<FaFileImport />}
-            onClick={() => routing("/registerProducts")}
+            onClick={() => routing("/xmlimporter")}
           >
             Importar XML
           </MenuItem>
