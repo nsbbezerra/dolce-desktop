@@ -752,68 +752,142 @@ export default function Pdv() {
               <Stack spacing={3}>
                 <Button
                   isFullWidth
-                  colorScheme={config.buttons}
-                  leftIcon={<FaTags />}
-                  variant="outline"
+                  colorScheme="green"
+                  h="70px"
                   onClick={() => setModalProducts(true)}
-                  size="sm"
                 >
-                  Produtos <Kbd ml={1}>F11</Kbd>
+                  <Flex
+                    direction="column"
+                    justify="center"
+                    align="center"
+                    h="70px"
+                  >
+                    <Icon as={FaTags} fontSize="3xl" mb={2} />
+                    <Text fontSize="sm">
+                      Produtos{" "}
+                      <Kbd ml={1} color="ButtonText">
+                        F11
+                      </Kbd>
+                    </Text>
+                  </Flex>
                 </Button>
               </Stack>
               <Divider mt={3} mb={3} />
-              <Stack spacing={3}>
+              <Grid templateColumns="1fr 1fr" gap={3} mb={3}>
                 <Button
                   isFullWidth
                   colorScheme={config.buttons}
-                  leftIcon={<FaEdit />}
                   variant="outline"
                   onClick={() => setModalObs(true)}
-                  size="sm"
+                  h="70px"
                 >
-                  Adicionar Observação <Kbd ml={1}>Ctrl+O</Kbd>
+                  <Flex
+                    direction="column"
+                    justify="center"
+                    align="center"
+                    h="70px"
+                  >
+                    <Icon as={FaEdit} fontSize="3xl" mb={2} />
+                    <Text fontSize="xs">
+                      Observação{" "}
+                      <Kbd ml={1} color="ButtonText">
+                        Ctrl+O
+                      </Kbd>
+                    </Text>
+                  </Flex>
                 </Button>
+
                 <Button
                   isFullWidth
                   colorScheme={config.buttons}
-                  leftIcon={<FaSave />}
                   variant="outline"
-                  size="sm"
+                  h="70px"
+                >
+                  <Flex
+                    direction="column"
+                    justify="center"
+                    align="center"
+                    h="70px"
+                  >
+                    <Icon as={FaPrint} fontSize="3xl" mb={2} />
+                    <Text fontSize="xs">
+                      Imprimir{" "}
+                      <Kbd ml={1} color="ButtonText">
+                        Ctrl+P
+                      </Kbd>
+                    </Text>
+                  </Flex>
+                </Button>
+              </Grid>
+
+              <Grid templateColumns="1fr 1fr" gap={3}>
+                <Button
+                  isFullWidth
+                  colorScheme={config.buttons}
+                  variant="outline"
                   onClick={() => setAlertSave(true)}
+                  h="70px"
                 >
-                  Salvar como Orçamento <Kbd ml={1}>F4</Kbd>
+                  <Flex
+                    direction="column"
+                    justify="center"
+                    align="center"
+                    h="70px"
+                  >
+                    <Icon as={FaSave} fontSize="3xl" mb={2} />
+                    <Text fontSize="xs">
+                      Salvar{" "}
+                      <Kbd ml={1} color="ButtonText">
+                        F4
+                      </Kbd>
+                    </Text>
+                  </Flex>
                 </Button>
                 <Button
                   isFullWidth
                   colorScheme={config.buttons}
-                  leftIcon={<FaPrint />}
                   variant="outline"
-                  size="sm"
+                  h="70px"
+                  onClick={() => findBudgets()}
                 >
-                  Imprimir Pedido <Kbd ml={1}>Ctrl+P</Kbd>
+                  <Flex
+                    direction="column"
+                    justify="center"
+                    align="center"
+                    h="70px"
+                  >
+                    <Icon as={FaSearchPlus} fontSize="3xl" mb={2} />
+                    <Text fontSize="xs">
+                      Orçamentos{" "}
+                      <Kbd ml={1} color="ButtonText">
+                        F1
+                      </Kbd>
+                    </Text>
+                  </Flex>
                 </Button>
-                <Button
-                  isFullWidth
-                  colorScheme={config.buttons}
-                  leftIcon={<FaTrash />}
-                  variant="outline"
-                  onClick={() => clear()}
-                  size="sm"
-                >
-                  Cancelar Pedido <Kbd ml={1}>F5</Kbd>
-                </Button>
-              </Stack>
+              </Grid>
               <Divider mt={3} mb={3} />
               <Stack spacing={3}>
                 <Button
                   isFullWidth
-                  colorScheme={config.buttons}
-                  leftIcon={<FaSearchPlus />}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => findBudgets()}
+                  colorScheme="red"
+                  h="70px"
+                  onClick={() => clear()}
                 >
-                  Buscar Orçamento <Kbd ml={1}>F1</Kbd>
+                  <Flex
+                    direction="column"
+                    justify="center"
+                    align="center"
+                    h="70px"
+                  >
+                    <Icon as={FaTrash} fontSize="3xl" mb={2} />
+                    <Text fontSize="sm">
+                      Cancelar Pedido{" "}
+                      <Kbd ml={1} color="ButtonText">
+                        F5
+                      </Kbd>
+                    </Text>
+                  </Flex>
                 </Button>
               </Stack>
             </Box>
