@@ -34,7 +34,7 @@ import {
   Center,
   Heading,
 } from "@chakra-ui/react";
-import HeaderApp from "../../../components/headerApp";
+import HeaderApp from "./headerApp";
 import {
   FaTag,
   FaSave,
@@ -45,18 +45,18 @@ import {
   FaShippingFast,
 } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
-import { File, InputFile } from "../../../style/uploader";
-import config from "../../../configs";
-import dataTrib from "../../../data/data";
-import { useEmployee } from "../../../context/Employee";
-import useFetch from "../../../hooks/useFetch";
+import { File, InputFile } from "../style/uploader";
+import config from "../configs/index";
+import dataTrib from "../data/data";
+import { useEmployee } from "../context/Employee";
+import useFetch from "../hooks/useFetch";
 import Hotkeys from "react-hot-keys";
-import api from "../../../configs/axios";
-import marge from "../../../data/marge";
+import api from "../configs/axios";
+import marge from "../data/marge";
 import MaskedInput from "react-text-mask";
 import { MdCheckCircle } from "react-icons/md";
 
-export default function Produtos() {
+export default function HandleProducts({ item, onClosed, emitter }) {
   const { colorMode } = useColorMode();
   const { employee } = useEmployee();
   const { data, error } = useFetch("/findDependents");
@@ -66,7 +66,7 @@ export default function Produtos() {
   const [validators, setValidators] = useState([]);
   const [loading, setLoading] = useState(false);
   const [providers, setProviders] = useState([]);
-  const [providerId, setProviderId] = useState(null);
+  const [providerId, setProviderId] = useState(emitter.id || null);
 
   useEffect(() => {
     if (data) {
@@ -76,37 +76,37 @@ export default function Produtos() {
   }, [data]);
 
   /** STATES PRIMEIRA TAB */
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [barcode, setBarcode] = useState("");
-  const [sku, setSku] = useState("");
+  const [name, setName] = useState(item.name || "");
+  const [description, setDescription] = useState(item.description || "");
+  const [barcode, setBarcode] = useState(item.barcode || "");
+  const [sku, setSku] = useState(item.sku || "");
   const [thumbnail, setThumbnail] = useState(null);
 
   /** STATES SEGUNDA TAB */
-  const [icmsRate, setIcmsRate] = useState(0);
-  const [icmsCst, setIcmsCst] = useState("");
-  const [pisRate, setPisRate] = useState(0);
-  const [pisCst, setPisCst] = useState("");
-  const [cofinsRate, setCofinsRate] = useState(0);
-  const [cofinsCst, setCofinsCst] = useState("");
-  const [icmsOrigin, setIcmsOrigin] = useState("");
-  const [icmsStRate, setIcmsStRate] = useState(0);
-  const [icmsMVA, setIcmsMVA] = useState(0);
-  const [icmsStModBc, setIcmsStModBc] = useState("");
-  const [fcpRate, setFcpRate] = useState(0);
-  const [fcpStRate, setFcpStRate] = useState(0);
-  const [fcpRetRate, setFcpRetRate] = useState(0);
-  const [ipiRate, setIpiRate] = useState(0);
-  const [ipiCode, setIpiCode] = useState("");
-  const [ipiCst, setIpiCst] = useState("");
-  const [cfop, setCfop] = useState("");
-  const [ncm, setNcm] = useState("");
-  const [cest, setCest] = useState("");
+  const [icmsRate, setIcmsRate] = useState(item.icms_rate || 0);
+  const [icmsCst, setIcmsCst] = useState(item.icms_csosn || "");
+  const [pisRate, setPisRate] = useState(item.pis_rate || 0);
+  const [pisCst, setPisCst] = useState(item.pis_cst || "");
+  const [cofinsRate, setCofinsRate] = useState(item.cofins_rate || 0);
+  const [cofinsCst, setCofinsCst] = useState(item.cofins_cst || "");
+  const [icmsOrigin, setIcmsOrigin] = useState(item.icms_origin || "");
+  const [icmsStRate, setIcmsStRate] = useState(item.icms_st_rate || 0);
+  const [icmsMVA, setIcmsMVA] = useState(item.icms_marg_val_agregate || 0);
+  const [icmsStModBc, setIcmsStModBc] = useState(item.icms_st_mod_bc || "");
+  const [fcpRate, setFcpRate] = useState(item.fcp_rate || 0);
+  const [fcpStRate, setFcpStRate] = useState(item.fcp_st_rate || 0);
+  const [fcpRetRate, setFcpRetRate] = useState(item.fcp_ret_rate || 0);
+  const [ipiRate, setIpiRate] = useState(item.ipi_rate || 0);
+  const [ipiCode, setIpiCode] = useState(item.ipi_code || "");
+  const [ipiCst, setIpiCst] = useState(item.ipi_cst || "");
+  const [cfop, setCfop] = useState(item.cfop || "");
+  const [ncm, setNcm] = useState(item.ncm || "");
+  const [cest, setCest] = useState(item.cest || "");
 
   /** STATES TERCEIRA TAB */
   const [margeLucro, setMargeLucro] = useState(1.15);
-  const [costValue, setCostValue] = useState(0);
-  const [otherCost, setOtherCost] = useState(0);
+  const [costValue, setCostValue] = useState(item.cost_value || 0);
+  const [otherCost, setOtherCost] = useState(item.other_cost || 0);
   const [saleValue, setSaleValue] = useState(0);
   const [productHeight, setProductHeight] = useState(0);
   const [productWidth, setProductWidht] = useState(0);
@@ -123,6 +123,10 @@ export default function Produtos() {
   const [information, setInformation] = useState("");
   const [list, setList] = useState([]);
   const [listText, setListText] = useState("");
+
+  useEffect(() => {
+    console.log(sub_cat_id);
+  }, [sub_cat_id]);
 
   function clear() {
     setFcpRetRate(0);
@@ -448,8 +452,8 @@ export default function Produtos() {
       data.append("provider", providerId);
       data.append("information", information);
       data.append("list", JSON.stringify(list));
-      data.append("handle", "off");
-      data.append("id_to_del", 0);
+      data.append("handle", "on");
+      data.append("id_to_del", item.id);
 
       const response = await api.post("/products", data, {
         headers: { "x-access-token": employee.token },
@@ -457,6 +461,7 @@ export default function Produtos() {
       clear();
       showToast(response.data.message, "success", "Sucesso");
       setLoading(false);
+      onClosed();
     } catch (error) {
       setLoading(false);
       if (error.message === "Network Error") {
@@ -514,9 +519,7 @@ export default function Produtos() {
           return true;
         }}
       >
-        <HeaderApp title="Cadastro de Produtos" icon={FaTag} />
-
-        <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
+        <Box>
           <Grid
             templateColumns="repeat(4, 1fr)"
             gap="15px"
@@ -535,7 +538,8 @@ export default function Produtos() {
                 focusBorderColor={config.inputs}
                 placeholder="Selecione um Fornecedor"
                 value={providerId}
-                onChange={(e) => setProviderId(e.target.value)}
+                isReadOnly
+                isDisabled
               >
                 {providers.map((pro) => (
                   <option value={pro.id} key={pro.id}>

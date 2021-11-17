@@ -192,14 +192,15 @@ export default function Sider() {
             Galeria de Imagens
           </MenuItem>
           <MenuDivider />
-          <MenuItem icon={<FaTags />} onClick={() => routing("/promotional")}>
-            Criar Promoções
-          </MenuItem>
           <MenuItem
             icon={<FaFileImport />}
             onClick={() => routing("/xmlimporter")}
           >
             Importar XML
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem icon={<FaTags />} onClick={() => routing("/promotional")}>
+            Criar Promoções
           </MenuItem>
         </MenuList>
       </Menu>

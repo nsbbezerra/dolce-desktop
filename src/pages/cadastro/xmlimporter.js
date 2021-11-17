@@ -27,13 +27,21 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import api from "../../configs/axios";
 import { useEmployee } from "../../context/Employee";
 import HeaderApp from "../../components/headerApp";
-import { FaFileImport, FaPercentage, FaSave, FaTrash } from "react-icons/fa";
+import { FaFileImport, FaSave, FaTrash } from "react-icons/fa";
 import { File, InputFile } from "../../style/uploader";
 import config from "../../configs";
+import HandleProducts from "../../components/products";
 
 export default function XmlImporter() {
   const toast = useToast();
@@ -46,6 +54,14 @@ export default function XmlImporter() {
   const [produtos, setProdutos] = useState([]);
   const [total, setTotal] = useState({});
   const [imported, setImported] = useState(false);
+  const [modalHandle, setModalHandle] = useState(false);
+  const [productHandle, setProductHandle] = useState({});
+
+  async function handleCloseModal() {
+    const updated = await produtos.filter((obj) => obj.id !== productHandle.id);
+    setProdutos(updated);
+    setModalHandle(false);
+  }
 
   function showToast(message, status, title) {
     toast({
@@ -99,6 +115,11 @@ export default function XmlImporter() {
       findData();
     }
   }, [xml]);
+
+  function handleSaveProduct(info) {
+    setProductHandle(info);
+    setModalHandle(true);
+  }
 
   return (
     <>
@@ -324,6 +345,7 @@ export default function XmlImporter() {
                         colorScheme={config.buttons}
                         size="xs"
                         leftIcon={<FaSave />}
+                        onClick={() => handleSaveProduct(prod)}
                       >
                         Visualizar e Salvar
                       </Button>
@@ -425,6 +447,29 @@ export default function XmlImporter() {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+
+      <Modal
+        isOpen={modalHandle}
+        onClose={() => setModalHandle(false)}
+        size="7xl"
+        isCentered
+        scrollBehavior="inside"
+      >
+        <ModalOverlay />
+        <ModalContent h="95vh" maxW="95vw">
+          <ModalHeader>Visualizar e Salvar</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={5}>
+            {modalHandle && (
+              <HandleProducts
+                item={productHandle}
+                onClosed={handleCloseModal}
+                emitter={emitente}
+              />
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 }
