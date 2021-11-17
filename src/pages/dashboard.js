@@ -24,6 +24,7 @@ import {
 } from "react-icons/ai";
 import { FaBarcode, FaGlobe } from "react-icons/fa";
 import config from "../configs/index";
+import { useHistory } from "react-router-dom";
 
 const LineChart = Recharts.LineChart;
 const Line = Recharts.Line;
@@ -35,6 +36,7 @@ const Legend = Recharts.Legend;
 const Responsive = Recharts.ResponsiveContainer;
 
 function Dashboard() {
+  const { push } = useHistory();
   const data = [
     {
       name: "Janeiro 2021",
@@ -142,6 +144,10 @@ function Dashboard() {
     },
   ];
 
+  function routing(rt) {
+    push(rt);
+  }
+
   return (
     <>
       <Grid templateColumns="repeat(3, 1fr)" gap={"25px"}>
@@ -243,6 +249,7 @@ function Dashboard() {
               size="sm"
               colorScheme={config.buttons}
               leftIcon={<AiOutlineZoomIn />}
+              onClick={() => routing("/expenses")}
             >
               Veja Mais
             </Button>
@@ -311,6 +318,7 @@ function Dashboard() {
               size="sm"
               colorScheme={config.buttons}
               leftIcon={<AiOutlineZoomIn />}
+              onClick={() => routing("/revenues")}
             >
               Veja Mais
             </Button>

@@ -6,6 +6,7 @@ import {
   Tbody,
   Tr,
   Td,
+  Th,
   Menu,
   MenuButton,
   MenuList,
@@ -371,14 +372,14 @@ export default function DepartmentList() {
               ) : (
                 <>
                   <Table size="sm">
-                    <Thead fontWeight="700">
+                    <Thead>
                       <Tr>
-                        <Td w="5%" textAlign="center">
+                        <Th w="5%" textAlign="center">
                           Ativo?
-                        </Td>
-                        <Td w="35%">Nome</Td>
-                        <Td w="50%">Descrição</Td>
-                        <Td w="10%"></Td>
+                        </Th>
+                        <Th w="35%">Nome</Th>
+                        <Th w="50%">Descrição</Th>
+                        <Th w="10%"></Th>
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -406,7 +407,7 @@ export default function DepartmentList() {
                                 isFullWidth
                                 as={Button}
                                 rightIcon={<MdKeyboardArrowDown />}
-                                size="sm"
+                                size="xs"
                                 colorScheme={config.buttons}
                               >
                                 Opções

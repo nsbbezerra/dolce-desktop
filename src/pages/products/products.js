@@ -13,6 +13,7 @@ import {
   Button,
   Text,
   Grid,
+  Th,
   Select,
   Input,
   Switch,
@@ -922,29 +923,29 @@ export default function ProductList() {
                 </Flex>
               ) : (
                 <Table size="sm" mt="25px">
-                  <Thead fontWeight="700">
+                  <Thead>
                     <Tr>
-                      <Td w="5%" textAlign="center">
+                      <Th w="5%" textAlign="center">
                         Ativo?
-                      </Td>
-                      <Td w="5%" textAlign="center">
+                      </Th>
+                      <Th w="5%" textAlign="center">
                         Promoção?
-                      </Td>
-                      <Td w="25%">Nome</Td>
-                      <Td w="15%">Código</Td>
-                      <Td w="15%" isNumeric>
+                      </Th>
+                      <Th w="25%">Nome</Th>
+                      <Th w="15%">Código</Th>
+                      <Th w="15%" isNumeric>
                         Valor de Custo
-                      </Td>
-                      <Td w="15%" isNumeric>
+                      </Th>
+                      <Th w="15%" isNumeric>
                         Valor de Venda
-                      </Td>
-                      <Td w="15%" isNumeric>
+                      </Th>
+                      <Th w="15%" isNumeric>
                         Valor Promocional
-                      </Td>
-                      <Td w="10%" isNumeric>
+                      </Th>
+                      <Th w="10%" isNumeric>
                         Desconto
-                      </Td>
-                      <Td w="10%"></Td>
+                      </Th>
+                      <Th w="10%"></Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -1015,7 +1016,7 @@ export default function ProductList() {
                               isFullWidth
                               as={Button}
                               rightIcon={<MdKeyboardArrowDown />}
-                              size="sm"
+                              size="xs"
                               colorScheme={config.buttons}
                             >
                               Opções
@@ -2003,11 +2004,11 @@ export default function ProductList() {
                   </Flex>
                 ) : (
                   <Table size="sm">
-                    <Thead fontWeight="700">
+                    <Thead>
                       <Tr>
-                        <Td>Tamanho</Td>
-                        <Td isNumeric>Estoque</Td>
-                        <Td w="15%" isNumeric></Td>
+                        <Th>Tamanho</Th>
+                        <Th isNumeric>Estoque</Th>
+                        <Th w="15%" isNumeric></Th>
                       </Tr>
                     </Thead>
                     <Tbody>

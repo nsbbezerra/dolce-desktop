@@ -182,6 +182,7 @@ export default function Sider() {
           >
             Produtos
           </MenuItem>
+          <MenuDivider />
           <MenuItem
             icon={<FaRulerCombined />}
             onClick={() => routing("/sizes")}

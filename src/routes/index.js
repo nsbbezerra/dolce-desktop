@@ -21,7 +21,7 @@ import RegisterImages from "../pages/cadastro/produtos/imagens";
 import RegisterProvider from "../pages/cadastro/provider";
 import MakePromotional from "../pages/cadastro/promotional";
 import SubCategories from "../pages/cadastro/subCategories";
-import XmlImporter from "../pages/cadastro/xmlimporter";
+import XmlImporter from "../pages/cadastro/xmlIndex";
 
 /** ESTOQUE */
 import ListDepartment from "../pages/products/department";

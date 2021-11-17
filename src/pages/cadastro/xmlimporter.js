@@ -31,13 +31,11 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
 import api from "../../configs/axios";
 import { useEmployee } from "../../context/Employee";
-import HeaderApp from "../../components/headerApp";
 import { FaFileImport, FaSave, FaTrash } from "react-icons/fa";
 import { File, InputFile } from "../../style/uploader";
 import config from "../../configs";
@@ -123,9 +121,7 @@ export default function XmlImporter() {
 
   return (
     <>
-      <HeaderApp title="Importar XML de NFE" icon={FaFileImport} />
-
-      <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
+      <Box>
         <Grid templateColumns="1fr" gap="20px">
           <FormControl>
             <FormLabel>Importar do Arquivo XML</FormLabel>
@@ -323,7 +319,7 @@ export default function XmlImporter() {
                   <Th>SKU</Th>
                   <Th>Cód. Barras</Th>
                   <Th isNumeric w="12%">
-                    Custo
+                    Custo (R$)
                   </Th>
                   <Th w="10%"></Th>
                 </Tr>

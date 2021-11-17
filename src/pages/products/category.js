@@ -19,6 +19,7 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
+  Th,
   ModalFooter,
   ModalBody,
   ModalCloseButton,
@@ -367,15 +368,15 @@ export default function CategoryList() {
               ) : (
                 <>
                   <Table size="sm" mt="25px">
-                    <Thead fontWeight="700">
+                    <Thead>
                       <Tr>
-                        <Td w="5%" textAlign="center">
+                        <Th w="5%" textAlign="center">
                           Ativo?
-                        </Td>
-                        <Td w="25%">Nome</Td>
-                        <Td w="25%">Departamento</Td>
-                        <Td w="45%">Descrição</Td>
-                        <Td w="10%"></Td>
+                        </Th>
+                        <Th w="25%">Nome</Th>
+                        <Th w="25%">Departamento</Th>
+                        <Th w="45%">Descrição</Th>
+                        <Th w="10%"></Th>
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -404,7 +405,7 @@ export default function CategoryList() {
                                 isFullWidth
                                 as={Button}
                                 rightIcon={<MdKeyboardArrowDown />}
-                                size="sm"
+                                size="xs"
                                 colorScheme={config.buttons}
                               >
                                 Opções

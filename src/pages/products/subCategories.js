@@ -11,6 +11,7 @@ import {
   Table,
   Tbody,
   Td,
+  Th,
   Text,
   Thead,
   Tr,
@@ -265,12 +266,12 @@ export default function ListSubCat() {
           ) : (
             <>
               <Table size="sm">
-                <Thead fontWeight="700">
+                <Thead>
                   <Tr>
-                    <Td w="5%">Ativo?</Td>
-                    <Td w="42%">Nome</Td>
-                    <Td w="42%">Categoria</Td>
-                    <Td w="10%"></Td>
+                    <Th w="5%">Ativo?</Th>
+                    <Th w="42%">Nome</Th>
+                    <Th w="42%">Categoria</Th>
+                    <Th w="10%"></Th>
                   </Tr>
                 </Thead>
 
@@ -295,7 +296,7 @@ export default function ListSubCat() {
                             as={Button}
                             rightIcon={<MdKeyboardArrowDown />}
                             colorScheme={config.buttons}
-                            size="sm"
+                            size="xs"
                             isFullWidth
                           >
                             Opções

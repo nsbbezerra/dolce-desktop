@@ -33,6 +33,20 @@ import {
   ListIcon,
   Center,
   Heading,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Stack,
+  CheckboxGroup,
+  Checkbox,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
 } from "@chakra-ui/react";
 import HeaderApp from "../../../components/headerApp";
 import {
@@ -67,6 +81,57 @@ export default function Produtos() {
   const [loading, setLoading] = useState(false);
   const [providers, setProviders] = useState([]);
   const [providerId, setProviderId] = useState(null);
+  const [modalTravel, setModalTravel] = useState(false);
+  const [cep, setCep] = useState("");
+  const [travels, setTravels] = useState([]);
+  const [services] = useState(["04510", "04014"]);
+  const [loadingTravel, setLoadingTravel] = useState();
+  const [formato, setFormato] = useState("");
+
+  function handleCloseModalTravel() {
+    setTravels([]);
+    setModalTravel(false);
+  }
+
+  async function CalcTravel() {
+    if (formato === "") {
+      showToast("Selecione um formato de encomenda", "warning", "Atenção");
+      return false;
+    }
+    try {
+      setLoadingTravel(true);
+
+      let cepReplaced = cep.replace(".", "");
+      let cepFinal = cepReplaced.replace("-", "");
+
+      const response = await api.post("/travel", {
+        cepOrigem: "77710000",
+        cepDestino: cepFinal,
+        peso: productWeight,
+        formato: formato,
+        comprimento: productLength,
+        altura: productHeight,
+        largura: productWidth,
+        servicos: services,
+        diametro: productDiameter,
+      });
+
+      setTravels(response.data);
+      setLoadingTravel(false);
+    } catch (error) {
+      setLoadingTravel(false);
+      const statusCode = error.response.status || 400;
+      const typeError =
+        error.response.data.message || "Ocorreu um erro ao buscar";
+      const errorMesg = error.response.data.errorMessage || statusCode;
+      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+      showToast(
+        errorMessageFinal,
+        "error",
+        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+      );
+    }
+  }
 
   useEffect(() => {
     if (data) {
@@ -539,7 +604,7 @@ export default function Produtos() {
               >
                 {providers.map((pro) => (
                   <option value={pro.id} key={pro.id}>
-                    {pro.name}
+                    {pro.fantasia || pro.name}
                   </option>
                 ))}
               </Select>
@@ -1503,10 +1568,12 @@ export default function Produtos() {
                   id="format"
                   focusBorderColor={config.inputs}
                   placeholder="Formato da Encomenda"
+                  value={formato}
+                  onChange={(e) => setFormato(e.target.value)}
                 >
-                  <option value={1}>Formato Caixa/Pacote</option>
-                  <option value={2}>Formato Rolo/Prisma</option>
-                  <option value={3}>Envelope</option>
+                  <option value={"1"}>Formato Caixa/Pacote</option>
+                  <option value={"2"}>Formato Rolo/Prisma</option>
+                  <option value={"3"}>Envelope</option>
                 </Select>
                 <FormErrorMessage>
                   {validators.find((obj) => obj.path === "format")
@@ -1521,6 +1588,7 @@ export default function Produtos() {
               leftIcon={<FaShippingFast />}
               mt={3}
               variant="outline"
+              onClick={() => setModalTravel(true)}
             >
               Simular Frete
             </Button>
@@ -1602,6 +1670,108 @@ export default function Produtos() {
             </Button>
           </Box>
         </Box>
+
+        <Modal
+          isOpen={modalTravel}
+          onClose={() => handleCloseModalTravel()}
+          size="3xl"
+          isCentered
+          scrollBehavior="inside"
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Simular Frete</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Grid templateColumns="1fr 2fr" gap={5}>
+                <Box borderRightWidth="1px" pr={5}>
+                  <FormControl>
+                    <FormLabel>CEP de Destino</FormLabel>
+                    <MaskedInput
+                      mask={[
+                        /[0-9]/,
+                        /\d/,
+                        ".",
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        "-",
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                      ]}
+                      value={cep}
+                      onChange={(e) => setCep(e.target.value)}
+                      placeholder="CEP"
+                      id="cep"
+                      render={(ref, props) => (
+                        <Input
+                          ref={ref}
+                          {...props}
+                          focusBorderColor={config.inputs}
+                        />
+                      )}
+                    />
+                  </FormControl>
+                  <FormControl mt={4}>
+                    <FormLabel>Serviços</FormLabel>
+                    <CheckboxGroup
+                      colorScheme={config.switchs}
+                      defaultValue={["04510", "04014"]}
+                    >
+                      <Stack>
+                        <Checkbox value="04510" size="lg" isReadOnly>
+                          PAC
+                        </Checkbox>
+                        <Checkbox value="04014" size="lg" isReadOnly>
+                          SEDEX
+                        </Checkbox>
+                      </Stack>
+                    </CheckboxGroup>
+                  </FormControl>
+                </Box>
+                <Box w="100%">
+                  <Grid templateColumns="1fr 1fr" gap={5}>
+                    {travels.map((trav) => (
+                      <Box
+                        rounded="md"
+                        borderWidth="1px"
+                        p={3}
+                        key={trav.Codigo}
+                      >
+                        <Stat>
+                          <StatLabel>
+                            {trav.Codigo === "04510" ? "PAC" : "SEDEX"}
+                          </StatLabel>
+                          <StatNumber>
+                            {parseFloat(trav.Valor).toLocaleString("pt-BR", {
+                              style: "currency",
+                              currency: "BRL",
+                            })}
+                          </StatNumber>
+                          <StatHelpText>
+                            Entrega em até: {trav.PrazoEntrega} dias
+                          </StatHelpText>
+                        </Stat>
+                      </Box>
+                    ))}
+                  </Grid>
+                </Box>
+              </Grid>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                colorScheme={config.buttons}
+                leftIcon={<FaCalculator />}
+                isLoading={loadingTravel}
+                onClick={() => CalcTravel()}
+              >
+                Calcular
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Hotkeys>
     </>
   );
