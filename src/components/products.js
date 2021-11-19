@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, {useState, useEffect, useMemo} from 'react';
 import {
   Box,
   Tabs,
@@ -33,28 +33,26 @@ import {
   ListIcon,
   Center,
   Heading,
-} from "@chakra-ui/react";
-import HeaderApp from "./headerApp";
+} from '@chakra-ui/react';
 import {
-  FaTag,
   FaSave,
   FaCalculator,
   FaImage,
   FaPlus,
   FaTrash,
   FaShippingFast,
-} from "react-icons/fa";
-import { AiOutlineClose } from "react-icons/ai";
-import { File, InputFile } from "../style/uploader";
-import config from "../configs/index";
-import dataTrib from "../data/data";
-import { useEmployee } from "../context/Employee";
-import useFetch from "../hooks/useFetch";
-import Hotkeys from "react-hot-keys";
-import api from "../configs/axios";
-import marge from "../data/marge";
-import MaskedInput from "react-text-mask";
-import { MdCheckCircle } from "react-icons/md";
+} from 'react-icons/fa';
+import {AiOutlineClose} from 'react-icons/ai';
+import {File, InputFile} from '../style/uploader';
+import config from '../configs/index';
+import dataTrib from '../data/data';
+import {useEmployee} from '../context/Employee';
+import useFetch from '../hooks/useFetch';
+import Hotkeys from 'react-hot-keys';
+import api from '../configs/axios';
+import marge from '../data/marge';
+import MaskedInput from 'react-text-mask';
+import {MdCheckCircle} from 'react-icons/md';
 import {
   Stack,
   CheckboxGroup,
@@ -70,12 +68,12 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
-export default function HandleProducts({ item, onClosed, emitter }) {
-  const { colorMode } = useColorMode();
-  const { employee } = useEmployee();
-  const { data, error } = useFetch("/findDependents");
+export default function HandleProducts({item, onClosed, emitter}) {
+  const {colorMode} = useColorMode();
+  const {employee} = useEmployee();
+  const {data, error} = useFetch('/findDependents');
   const toast = useToast();
 
   const [tabIndex, setTabIndex] = useState(0);
@@ -83,15 +81,15 @@ export default function HandleProducts({ item, onClosed, emitter }) {
   const [loading, setLoading] = useState(false);
   const [providers, setProviders] = useState([]);
   const [providerId, setProviderId] = useState(
-    emitter === null ? item.provider_id : emitter.id
+    emitter === null ? item.provider_id : emitter.id,
   );
 
   const [modalTravel, setModalTravel] = useState(false);
-  const [cep, setCep] = useState("");
+  const [cep, setCep] = useState('');
   const [travels, setTravels] = useState([]);
-  const [services] = useState(["04510", "04014"]);
+  const [services] = useState(['04510', '04014']);
   const [loadingTravel, setLoadingTravel] = useState();
-  const [formato, setFormato] = useState("");
+  const [formato, setFormato] = useState('');
 
   function handleCloseModalTravel() {
     setTravels([]);
@@ -99,18 +97,18 @@ export default function HandleProducts({ item, onClosed, emitter }) {
   }
 
   async function CalcTravel() {
-    if (formato === "") {
-      showToast("Selecione um formato de encomenda", "warning", "Atenção");
+    if (formato === '') {
+      showToast('Selecione um formato de encomenda', 'warning', 'Atenção');
       return false;
     }
     try {
       setLoadingTravel(true);
 
-      let cepReplaced = cep.replace(".", "");
-      let cepFinal = cepReplaced.replace("-", "");
+      let cepReplaced = cep.replace('.', '');
+      let cepFinal = cepReplaced.replace('-', '');
 
-      const response = await api.post("/travel", {
-        cepOrigem: "77710000",
+      const response = await api.post('/travel', {
+        cepOrigem: '77710000',
         cepDestino: cepFinal,
         peso: productWeight,
         formato: formato,
@@ -127,13 +125,13 @@ export default function HandleProducts({ item, onClosed, emitter }) {
       setLoadingTravel(false);
       const statusCode = error.response.status || 400;
       const typeError =
-        error.response.data.message || "Ocorreu um erro ao buscar";
+        error.response.data.message || 'Ocorreu um erro ao buscar';
       const errorMesg = error.response.data.errorMessage || statusCode;
       const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
       showToast(
         errorMessageFinal,
-        "error",
-        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+        'error',
+        statusCode === 401 ? 'Erro Autorização' : 'Erro no Cadastro',
       );
     }
   }
@@ -146,32 +144,45 @@ export default function HandleProducts({ item, onClosed, emitter }) {
   }, [data]);
 
   /** STATES PRIMEIRA TAB */
-  const [name, setName] = useState(item.name || "");
-  const [description, setDescription] = useState(item.description || "");
-  const [barcode, setBarcode] = useState(item.barcode || "");
-  const [sku, setSku] = useState(item.sku || "");
+  const [name, setName] = useState(item.name || '');
+  const [description, setDescription] = useState(item.description || '');
+  const [barcode, setBarcode] = useState(item.barcode || '');
+  const [sku, setSku] = useState(item.sku || '');
   const [thumbnail, setThumbnail] = useState(null);
 
   /** STATES SEGUNDA TAB */
   const [icmsRate, setIcmsRate] = useState(item.icms_rate || 0);
-  const [icmsCst, setIcmsCst] = useState(item.icms_csosn || "");
+  const [icmsCst, setIcmsCst] = useState(item.icms_csosn || '');
   const [pisRate, setPisRate] = useState(item.pis_rate || 0);
-  const [pisCst, setPisCst] = useState(item.pis_cst || "");
+  const [pisCst, setPisCst] = useState(item.pis_cst || '');
   const [cofinsRate, setCofinsRate] = useState(item.cofins_rate || 0);
-  const [cofinsCst, setCofinsCst] = useState(item.cofins_cst || "");
-  const [icmsOrigin, setIcmsOrigin] = useState(item.icms_origin || "");
+  const [cofinsCst, setCofinsCst] = useState(item.cofins_cst || '');
+  const [icmsOrigin, setIcmsOrigin] = useState(item.icms_origin || '');
   const [icmsStRate, setIcmsStRate] = useState(item.icms_st_rate || 0);
   const [icmsMVA, setIcmsMVA] = useState(item.icms_marg_val_agregate || 0);
-  const [icmsStModBc, setIcmsStModBc] = useState(item.icms_st_mod_bc || "");
+  const [icmsStModBc, setIcmsStModBc] = useState(item.icms_st_mod_bc || '');
   const [fcpRate, setFcpRate] = useState(item.fcp_rate || 0);
   const [fcpStRate, setFcpStRate] = useState(item.fcp_st_rate || 0);
   const [fcpRetRate, setFcpRetRate] = useState(item.fcp_ret_rate || 0);
   const [ipiRate, setIpiRate] = useState(item.ipi_rate || 0);
-  const [ipiCode, setIpiCode] = useState(item.ipi_code || "");
-  const [ipiCst, setIpiCst] = useState(item.ipi_cst || "");
-  const [cfop, setCfop] = useState(item.cfop || "");
-  const [ncm, setNcm] = useState(item.ncm || "");
-  const [cest, setCest] = useState(item.cest || "");
+  const [ipiCode, setIpiCode] = useState(item.ipi_code || '');
+  const [ipiCst, setIpiCst] = useState(item.ipi_cst || '');
+  const [cfop, setCfop] = useState(item.cfop || '');
+  const [ncm, setNcm] = useState(item.ncm || '');
+  const [cest, setCest] = useState(item.cest || '');
+
+  const [icmsBaseCalc, setIcmsBaseCalc] = useState(item.icms_base_calc || 0);
+  const [icmsStBaseCalc, setIcmsStBaseCalc] = useState(
+    item.imcs_st_base_calc || 0,
+  );
+  const [fcpBaseCalc, setFcpBaseCalc] = useState(item.fcp_base_calc || 0);
+  const [fcpStBaseCalc, setFcpStBaseCalce] = useState(
+    item.fcp_st_base_calc || 0,
+  );
+  const [pisBaseCalc, setPisBaseCalc] = useState(item.pis_base_calc || 0);
+  const [cofinsBaseCalc, setCofinsBaseCalc] = useState(
+    item.cofins_base_calc || 0,
+  );
 
   /** STATES TERCEIRA TAB */
   const [margeLucro, setMargeLucro] = useState(1.15);
@@ -190,43 +201,49 @@ export default function HandleProducts({ item, onClosed, emitter }) {
   const [departments, setDepartments] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subCats, setSubCats] = useState([]);
-  const [information, setInformation] = useState("");
+  const [information, setInformation] = useState('');
   const [list, setList] = useState([]);
-  const [listText, setListText] = useState("");
+  const [listText, setListText] = useState('');
 
   useEffect(() => {
     console.log(sub_cat_id);
   }, [sub_cat_id]);
 
   function clear() {
+    setIcmsBaseCalc(0);
+    setIcmsStBaseCalc(0);
+    setFcpBaseCalc(0);
+    setFcpStBaseCalce(0);
+    setPisBaseCalc(0);
+    setCofinsBaseCalc(0);
     setFcpRetRate(0);
-    setNcm("");
-    setCest("");
-    setCfop("");
+    setNcm('');
+    setCest('');
+    setCfop('');
     setDepartmentId(null);
     setCategoryId(null);
     setSub_cat_id(null);
     setTabIndex(0);
-    setName("");
-    setDescription("");
-    setBarcode("");
-    setSku("");
+    setName('');
+    setDescription('');
+    setBarcode('');
+    setSku('');
     setThumbnail(null);
     setIcmsRate(0);
-    setIcmsCst("");
+    setIcmsCst('');
     setPisRate(0);
-    setPisCst("");
+    setPisCst('');
     setCofinsRate(0);
-    setCofinsCst("");
-    setIcmsOrigin("");
+    setCofinsCst('');
+    setIcmsOrigin('');
     setIcmsStRate(0);
     setIcmsMVA(0);
-    setIcmsStModBc("");
+    setIcmsStModBc('');
     setFcpRate(0);
     setFcpStRate(0);
     setIpiRate(0);
-    setIpiCode("");
-    setIpiCst("");
+    setIpiCode('');
+    setIpiCst('');
     setMargeLucro(1.15);
     setCostValue(0);
     setOtherCost(0);
@@ -236,7 +253,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
     setProductHeight(0);
     setProductDiameter(0);
     setProductLength(0);
-    setInformation("");
+    setInformation('');
     setList([]);
   }
 
@@ -258,20 +275,20 @@ export default function HandleProducts({ item, onClosed, emitter }) {
       const response = await api.get(`/findCatByDepartments/${id}`);
       setCategories(response.data);
     } catch (error) {
-      if (error.message === "Network Error") {
+      if (error.message === 'Network Error') {
         alert(
-          "Sem conexão com o servidor, verifique sua conexão com a internet."
+          'Sem conexão com o servidor, verifique sua conexão com a internet.',
         );
       } else {
         const statusCode = error.response.status || 400;
         const typeError =
-          error.response.data.message || "Ocorreu um erro ao buscar";
+          error.response.data.message || 'Ocorreu um erro ao buscar';
         const errorMesg = error.response.data.errorMessage || statusCode;
         const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
         showToast(
           errorMessageFinal,
-          "error",
-          statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+          'error',
+          statusCode === 401 ? 'Erro Autorização' : 'Erro no Cadastro',
         );
       }
     }
@@ -282,20 +299,20 @@ export default function HandleProducts({ item, onClosed, emitter }) {
       const response = await api.get(`/subCat/${id}`);
       setSubCats(response.data);
     } catch (error) {
-      if (error.message === "Network Error") {
+      if (error.message === 'Network Error') {
         alert(
-          "Sem conexão com o servidor, verifique sua conexão com a internet."
+          'Sem conexão com o servidor, verifique sua conexão com a internet.',
         );
       } else {
         const statusCode = error.response.status || 400;
         const typeError =
-          error.response.data.message || "Ocorreu um erro ao buscar";
+          error.response.data.message || 'Ocorreu um erro ao buscar';
         const errorMesg = error.response.data.errorMessage || statusCode;
         const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
         showToast(
           errorMessageFinal,
-          "error",
-          statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+          'error',
+          statusCode === 401 ? 'Erro Autorização' : 'Erro no Cadastro',
         );
       }
     }
@@ -306,27 +323,27 @@ export default function HandleProducts({ item, onClosed, emitter }) {
       title: title,
       description: message,
       status: status,
-      position: "bottom",
+      position: 'bottom',
       duration: 8000,
       isClosable: true,
     });
   }
 
   if (error) {
-    if (error.message === "Network Error") {
+    if (error.message === 'Network Error') {
       alert(
-        "Sem conexão com o servidor, verifique sua conexão com a internet."
+        'Sem conexão com o servidor, verifique sua conexão com a internet.',
       );
     } else {
       const statusCode = error.response.status || 400;
       const typeError =
-        error.response.data.message || "Ocorreu um erro ao buscar";
+        error.response.data.message || 'Ocorreu um erro ao buscar';
       const errorMesg = error.response.data.errorMessage || statusCode;
       const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
       showToast(
         errorMessageFinal,
-        "error",
-        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+        'error',
+        statusCode === 401 ? 'Erro Autorização' : 'Erro no Cadastro',
       );
     }
   }
@@ -342,11 +359,11 @@ export default function HandleProducts({ item, onClosed, emitter }) {
   }
 
   function capitalizeAllFirstLetter(string) {
-    let splited = string.split(" ");
-    let toJoin = splited.map((e) => {
+    let splited = string.split(' ');
+    let toJoin = splited.map(e => {
       return e.charAt(0).toUpperCase() + e.slice(1);
     });
-    let joined = toJoin.join(" ");
+    let joined = toJoin.join(' ');
     return joined;
   }
 
@@ -358,13 +375,13 @@ export default function HandleProducts({ item, onClosed, emitter }) {
     if (thumbnail) {
       let size = thumbnail.size / 1024;
       let thumbname = thumbnail.name;
-      if (thumbname.includes(" ")) {
-        handleValidator("image", "Nome da imagem não pode conter espaços");
+      if (thumbname.includes(' ')) {
+        handleValidator('image', 'Nome da imagem não pode conter espaços');
       }
       if (size > 500) {
         handleValidator(
-          "image",
-          "Imagem maior que 500kb, insira uma imagem menor"
+          'image',
+          'Imagem maior que 500kb, insira uma imagem menor',
         );
       }
     } else {
@@ -374,10 +391,10 @@ export default function HandleProducts({ item, onClosed, emitter }) {
 
   function handleValidator(path, message) {
     let val = [];
-    let info = { path: path, message: message };
+    let info = {path: path, message: message};
     val.push(info);
     setValidators(val);
-    if (path !== "image") {
+    if (path !== 'image') {
       const inpt = document.getElementById(path);
       inpt.focus();
     }
@@ -388,167 +405,174 @@ export default function HandleProducts({ item, onClosed, emitter }) {
       e.preventDefault();
     }
     if (!providerId) {
-      handleValidator("provider", "Selcione um fornecedor");
-      showToast("Selcione um fornecedor", "warning", "Atenção");
+      handleValidator('provider', 'Selcione um fornecedor');
+      showToast('Selcione um fornecedor', 'warning', 'Atenção');
       return false;
     }
     if (!departmentId) {
-      handleValidator("department", "Selcione um departamento");
-      showToast("Selcione um departamento", "warning", "Atenção");
+      handleValidator('department', 'Selcione um departamento');
+      showToast('Selcione um departamento', 'warning', 'Atenção');
       return false;
     }
     if (!categoryId) {
-      handleValidator("category", "Selcione uma categoria");
-      showToast("Selcione uma categoria", "warning", "Atenção");
+      handleValidator('category', 'Selcione uma categoria');
+      showToast('Selcione uma categoria', 'warning', 'Atenção');
       return false;
     }
     if (!sub_cat_id) {
-      handleValidator("sub_cat", "Selcione uma Sub-Categoria");
-      showToast("Selcione uma Sub-Categoria", "warning", "Atenção");
+      handleValidator('sub_cat', 'Selcione uma Sub-Categoria');
+      showToast('Selcione uma Sub-Categoria', 'warning', 'Atenção');
       return false;
     }
     if (!thumbnail) {
       setTabIndex(0);
-      handleValidator("image", "Selecione uma imagem");
-      showToast("Selecione uma imagem", "warning", "Atenção");
+      handleValidator('image', 'Selecione uma imagem');
+      showToast('Selecione uma imagem', 'warning', 'Atenção');
       return false;
     }
-    if (thumbnail.name.includes(" ")) {
+    if (thumbnail.name.includes(' ')) {
       setTabIndex(0);
-      handleValidator("image", "Nome da imagem não pode conter espaços");
-      showToast("Nome da imagem não pode conter espaços", "warning", "Atenção");
+      handleValidator('image', 'Nome da imagem não pode conter espaços');
+      showToast('Nome da imagem não pode conter espaços', 'warning', 'Atenção');
       return false;
     }
     let size = thumbnail.size / 1024;
     if (size > 500) {
       setTabIndex(0);
       handleValidator(
-        "image",
-        "Imagem maior que 500kb, insira uma imagem menor"
+        'image',
+        'Imagem maior que 500kb, insira uma imagem menor',
       );
       showToast(
-        "Imagem maior que 500kb, insira uma imagem menor",
-        "warning",
-        "Atenção"
+        'Imagem maior que 500kb, insira uma imagem menor',
+        'warning',
+        'Atenção',
       );
       return false;
     }
-    if (!name || name === "") {
+    if (!name || name === '') {
       setTabIndex(0);
-      handleValidator("name", "O Nome é obrigatório");
-      showToast("O Nome é obrigatório", "warning", "Atenção");
+      handleValidator('name', 'O Nome é obrigatório');
+      showToast('O Nome é obrigatório', 'warning', 'Atenção');
       return false;
     }
-    if (!description || description === "") {
+    if (!description || description === '') {
       setTabIndex(0);
-      handleValidator("description", "A Descrição é obrigatória");
-      showToast("A Descrição é obrigatória", "warning", "Atenção");
+      handleValidator('description', 'A Descrição é obrigatória');
+      showToast('A Descrição é obrigatória', 'warning', 'Atenção');
       return false;
     }
     if (saleValue === 0) {
       setTabIndex(2);
-      handleValidator("valueSale", "Faça o cálculo de venda corretamente");
-      showToast("Faça o cálculo de venda corretamente", "warning", "Atenção");
+      handleValidator('valueSale', 'Faça o cálculo de venda corretamente');
+      showToast('Faça o cálculo de venda corretamente', 'warning', 'Atenção');
       return false;
     }
-    if (productHeight === "") {
+    if (productHeight === '') {
       setTabIndex(2);
-      handleValidator("height", "Adicione uma altura para o produto");
-      showToast("Adicione uma altura para o produto", "warning", "Atenção");
+      handleValidator('height', 'Adicione uma altura para o produto');
+      showToast('Adicione uma altura para o produto', 'warning', 'Atenção');
       return false;
     }
-    if (productWidth === "") {
+    if (productWidth === '') {
       setTabIndex(2);
-      handleValidator("width", "Adicione uma largura para o produto");
-      showToast("Adicione uma largura para o produto", "warning", "Atenção");
+      handleValidator('width', 'Adicione uma largura para o produto');
+      showToast('Adicione uma largura para o produto', 'warning', 'Atenção');
       return false;
     }
-    if (productLength === "") {
+    if (productLength === '') {
       setTabIndex(2);
-      handleValidator("lenght", "Adicione um comprimento para o produto");
-      showToast("Adicione um comprimento para o produto", "warning", "Atenção");
+      handleValidator('lenght', 'Adicione um comprimento para o produto');
+      showToast('Adicione um comprimento para o produto', 'warning', 'Atenção');
       return false;
     }
-    if (productDiameter === "") {
+    if (productDiameter === '') {
       setTabIndex(2);
-      handleValidator("diameter", "Adicione um diâmetro para o produto");
-      showToast("Adicione um diâmetro para o produto", "warning", "Atenção");
+      handleValidator('diameter', 'Adicione um diâmetro para o produto');
+      showToast('Adicione um diâmetro para o produto', 'warning', 'Atenção');
       return false;
     }
-    if (productWeight === "") {
+    if (productWeight === '') {
       setTabIndex(2);
-      handleValidator("weight", "Adicione um peso para o produto");
-      showToast("Adicione um peso para o produto", "warning", "Atenção");
+      handleValidator('weight', 'Adicione um peso para o produto');
+      showToast('Adicione um peso para o produto', 'warning', 'Atenção');
       return false;
     }
     try {
       setLoading(true);
       let data = new FormData();
-      data.append("thumbnail", thumbnail);
-      data.append("name", name);
-      data.append("description", description);
-      data.append("sku", sku);
-      data.append("barcode", barcode);
-      data.append("cfop", cfop);
-      data.append("ncm", ncm);
-      data.append("icms_rate", parseFloat(icmsRate));
-      data.append("icms_origin", icmsOrigin);
-      data.append("icms_csosn", icmsCst);
-      data.append("icms_st_rate", parseFloat(icmsStRate));
-      data.append("icms_marg_val_agregate", parseFloat(icmsMVA));
-      data.append("icms_st_mod_bc", icmsStModBc);
-      data.append("fcp_rate", parseFloat(fcpRate));
-      data.append("fcp_st_rate", parseFloat(fcpStRate));
-      data.append("fcp_ret_rate", parseFloat(fcpRetRate));
-      data.append("ipi_cst", ipiCst);
-      data.append("ipi_rate", parseFloat(ipiRate));
-      data.append("ipi_code", ipiCode);
-      data.append("pis_cst", pisCst);
-      data.append("pis_rate", parseFloat(pisRate));
-      data.append("cofins_cst", cofinsCst);
-      data.append("cofins_rate", parseFloat(cofinsRate));
-      data.append("cest", cest);
-      data.append("cost_value", parseFloat(costValue));
-      data.append("other_cost", parseFloat(otherCost));
-      data.append("sale_value", parseFloat(saleValue));
-      data.append("freight_weight", parseFloat(productWeight));
-      data.append("freight_width", parseFloat(productWidth));
-      data.append("freight_height", parseFloat(productHeight));
-      data.append("freight_diameter", parseFloat(productDiameter));
-      data.append("freight_length", parseFloat(productLength));
-      data.append("departments_id", departmentId);
-      data.append("categories_id", categoryId);
-      data.append("sub_cat_id", sub_cat_id);
-      data.append("provider", providerId);
-      data.append("information", information);
-      data.append("list", JSON.stringify(list));
-      data.append("handle", "on");
-      data.append("id_to_del", item.id);
+      data.append('thumbnail', thumbnail);
+      data.append('name', name);
+      data.append('description', description);
+      data.append('sku', sku);
+      data.append('barcode', barcode);
+      data.append('cfop', cfop);
+      data.append('ncm', ncm);
+      data.append('icms_rate', parseFloat(icmsRate));
+      data.append('icms_origin', icmsOrigin);
+      data.append('icms_csosn', icmsCst);
+      data.append('icms_st_rate', parseFloat(icmsStRate));
+      data.append('icms_marg_val_agregate', parseFloat(icmsMVA));
+      data.append('icms_st_mod_bc', icmsStModBc);
+      data.append('fcp_rate', parseFloat(fcpRate));
+      data.append('fcp_st_rate', parseFloat(fcpStRate));
+      data.append('fcp_ret_rate', parseFloat(fcpRetRate));
+      data.append('ipi_cst', ipiCst);
+      data.append('ipi_rate', parseFloat(ipiRate));
+      data.append('ipi_code', ipiCode);
+      data.append('pis_cst', pisCst);
+      data.append('pis_rate', parseFloat(pisRate));
+      data.append('cofins_cst', cofinsCst);
+      data.append('cofins_rate', parseFloat(cofinsRate));
+      data.append('cest', cest);
+      data.append('cost_value', parseFloat(costValue));
+      data.append('other_cost', parseFloat(otherCost));
+      data.append('sale_value', parseFloat(saleValue));
+      data.append('freight_weight', parseFloat(productWeight));
+      data.append('freight_width', parseFloat(productWidth));
+      data.append('freight_height', parseFloat(productHeight));
+      data.append('freight_diameter', parseFloat(productDiameter));
+      data.append('freight_length', parseFloat(productLength));
+      data.append('freight_format', formato);
+      data.append('departments_id', departmentId);
+      data.append('categories_id', categoryId);
+      data.append('sub_cat_id', sub_cat_id);
+      data.append('provider', providerId);
+      data.append('information', information);
+      data.append('list', JSON.stringify(list));
+      data.append('handle', 'on');
+      data.append('id_to_del', item.id);
+      data.append('icms_base_calc', icmsBaseCalc);
+      data.append('imcs_st_base_calc', icmsStBaseCalc);
+      data.append('fcp_base_calc', fcpBaseCalc);
+      data.append('fcp_st_base_calc', fcpStBaseCalc);
+      data.append('pis_base_calc', pisBaseCalc);
+      data.append('cofins_base_calc', cofinsBaseCalc);
 
-      const response = await api.post("/products", data, {
-        headers: { "x-access-token": employee.token },
+      const response = await api.post('/products', data, {
+        headers: {'x-access-token': employee.token},
       });
       clear();
-      showToast(response.data.message, "success", "Sucesso");
+      showToast(response.data.message, 'success', 'Sucesso');
       setLoading(false);
       onClosed();
     } catch (error) {
       setLoading(false);
-      if (error.message === "Network Error") {
+      if (error.message === 'Network Error') {
         alert(
-          "Sem conexão com o servidor, verifique sua conexão com a internet."
+          'Sem conexão com o servidor, verifique sua conexão com a internet.',
         );
         return false;
       }
       const statusCode = error.response.status || 400;
       const typeError =
-        error.response.data.message || "Ocorreu um erro ao salvar";
+        error.response.data.message || 'Ocorreu um erro ao salvar';
       const errorMesg = error.response.data.errorMessage || statusCode;
       const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
       showToast(
         errorMessageFinal,
-        "error",
-        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+        'error',
+        statusCode === 401 ? 'Erro Autorização' : 'Erro no Cadastro',
       );
     }
   }
@@ -559,23 +583,23 @@ export default function HandleProducts({ item, onClosed, emitter }) {
   }
 
   function onKeyDown(keyName, e, handle) {
-    if (keyName === "f12") {
+    if (keyName === 'f12') {
       register(e);
     }
   }
 
   function handleList() {
-    const result = list.find((obj) => obj.text === listText);
+    const result = list.find(obj => obj.text === listText);
     if (result) {
-      showToast("Esta informação já existe", "warning", "Atenção");
+      showToast('Esta informação já existe', 'warning', 'Atenção');
       return false;
     }
-    setList([...list, { text: listText }]);
-    setListText("");
+    setList([...list, {text: listText}]);
+    setListText('');
   }
 
   function removeList(text) {
-    const result = list.filter((obj) => obj.text !== text);
+    const result = list.filter(obj => obj.text !== text);
     setList(result);
   }
 
@@ -585,23 +609,20 @@ export default function HandleProducts({ item, onClosed, emitter }) {
         keyName="f3, f2, f12, f5"
         onKeyDown={onKeyDown}
         allowRepeat
-        filter={(event) => {
+        filter={event => {
           return true;
-        }}
-      >
+        }}>
         <Box>
           <Grid
             templateColumns="repeat(4, 1fr)"
             gap="15px"
-            alignContent="center"
-          >
+            alignContent="center">
             <FormControl
               isRequired
               mr={3}
               isInvalid={
-                validators.find((obj) => obj.path === "provider") ? true : false
-              }
-            >
+                validators.find(obj => obj.path === 'provider') ? true : false
+              }>
               <FormLabel>Fornecedor</FormLabel>
               <Select
                 id="provider"
@@ -609,9 +630,8 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 placeholder="Selecione um Fornecedor"
                 value={providerId}
                 isReadOnly
-                isDisabled
-              >
-                {providers.map((pro) => (
+                isDisabled>
+                {providers.map(pro => (
                   <option value={pro.id} key={pro.id}>
                     {pro.fantasia || pro.name}
                   </option>
@@ -619,9 +639,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               </Select>
 
               <FormErrorMessage>
-                {validators.find((obj) => obj.path === "provider")
-                  ? validators.find((obj) => obj.path === "provider").message
-                  : ""}
+                {validators.find(obj => obj.path === 'provider')
+                  ? validators.find(obj => obj.path === 'provider').message
+                  : ''}
               </FormErrorMessage>
             </FormControl>
 
@@ -629,20 +649,16 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               isRequired
               mr={3}
               isInvalid={
-                validators.find((obj) => obj.path === "department")
-                  ? true
-                  : false
-              }
-            >
+                validators.find(obj => obj.path === 'department') ? true : false
+              }>
               <FormLabel>Departamento</FormLabel>
               <Select
                 id="department"
                 focusBorderColor={config.inputs}
                 placeholder="Selecione um Departamento"
                 value={departmentId}
-                onChange={(e) => handleDepartment(e.target.value)}
-              >
-                {departments.map((dep) => (
+                onChange={e => handleDepartment(e.target.value)}>
+                {departments.map(dep => (
                   <option value={dep.id} key={dep.id}>
                     {dep.name}
                   </option>
@@ -650,9 +666,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               </Select>
 
               <FormErrorMessage>
-                {validators.find((obj) => obj.path === "department")
-                  ? validators.find((obj) => obj.path === "department").message
-                  : ""}
+                {validators.find(obj => obj.path === 'department')
+                  ? validators.find(obj => obj.path === 'department').message
+                  : ''}
               </FormErrorMessage>
             </FormControl>
 
@@ -660,18 +676,16 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               isRequired
               mr={3}
               isInvalid={
-                validators.find((obj) => obj.path === "category") ? true : false
-              }
-            >
+                validators.find(obj => obj.path === 'category') ? true : false
+              }>
               <FormLabel>Categoria</FormLabel>
               <Select
                 id="category"
                 focusBorderColor={config.inputs}
                 placeholder="Selecione uma Categoria"
                 value={categoryId}
-                onChange={(e) => handleCategories(e.target.value)}
-              >
-                {categories.map((cat) => (
+                onChange={e => handleCategories(e.target.value)}>
+                {categories.map(cat => (
                   <option value={cat.id} key={cat.id}>
                     {cat.name}
                   </option>
@@ -679,9 +693,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               </Select>
 
               <FormErrorMessage>
-                {validators.find((obj) => obj.path === "category")
-                  ? validators.find((obj) => obj.path === "category").message
-                  : ""}
+                {validators.find(obj => obj.path === 'category')
+                  ? validators.find(obj => obj.path === 'category').message
+                  : ''}
               </FormErrorMessage>
             </FormControl>
 
@@ -689,18 +703,16 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               isRequired
               mr={3}
               isInvalid={
-                validators.find((obj) => obj.path === "sub_cat") ? true : false
-              }
-            >
+                validators.find(obj => obj.path === 'sub_cat') ? true : false
+              }>
               <FormLabel>Sub-Categoria</FormLabel>
               <Select
                 id="sub_cat"
                 focusBorderColor={config.inputs}
                 placeholder="Selecione uma Sub-Categoria"
                 value={sub_cat_id}
-                onChange={(e) => setSub_cat_id(e.target.value)}
-              >
-                {subCats.map((cat) => (
+                onChange={e => setSub_cat_id(e.target.value)}>
+                {subCats.map(cat => (
                   <option value={cat.id} key={cat.id}>
                     {cat.name}
                   </option>
@@ -708,9 +720,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               </Select>
 
               <FormErrorMessage>
-                {validators.find((obj) => obj.path === "sub_cat")
-                  ? validators.find((obj) => obj.path === "sub_cat").message
-                  : ""}
+                {validators.find(obj => obj.path === 'sub_cat')
+                  ? validators.find(obj => obj.path === 'sub_cat').message
+                  : ''}
               </FormErrorMessage>
             </FormControl>
           </Grid>
@@ -718,7 +730,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
           <Divider mt={5} mb={5} />
 
           <Box>
-            <Center rounded="md" p={2} bg={"blackAlpha.200"} mb={5}>
+            <Center rounded="md" p={2} bg={'blackAlpha.200'} mb={5}>
               <Heading fontSize="sm">Informações do Produto</Heading>
             </Center>
 
@@ -726,9 +738,8 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               <FormControl
                 isRequired
                 isInvalid={
-                  validators.find((obj) => obj.path === "image") ? true : false
-                }
-              >
+                  validators.find(obj => obj.path === 'image') ? true : false
+                }>
                 <FormLabel>Imagem</FormLabel>
                 <Box w="300px" h="300px">
                   {thumbnail ? (
@@ -751,11 +762,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                     <InputFile alt={300} lar={300} cor={colorMode}>
                       <File
                         type="file"
-                        onChange={(event) =>
-                          setThumbnail(event.target.files[0])
-                        }
+                        onChange={event => setThumbnail(event.target.files[0])}
                       />
-                      <FaImage style={{ fontSize: 50, marginBottom: 20 }} />
+                      <FaImage style={{fontSize: 50, marginBottom: 20}} />
                       <Text>
                         Insira uma imagem 300x300 pixels, de até 500kb
                       </Text>
@@ -763,9 +772,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   )}
                 </Box>
                 <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "image")
-                    ? validators.find((obj) => obj.path === "image").message
-                    : ""}
+                  {validators.find(obj => obj.path === 'image')
+                    ? validators.find(obj => obj.path === 'image').message
+                    : ''}
                 </FormErrorMessage>
               </FormControl>
               <Box>
@@ -774,25 +783,22 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                     isRequired
                     mr={3}
                     isInvalid={
-                      validators.find((obj) => obj.path === "name")
-                        ? true
-                        : false
-                    }
-                  >
+                      validators.find(obj => obj.path === 'name') ? true : false
+                    }>
                     <FormLabel>Nome do Produto</FormLabel>
                     <Input
                       id="name"
                       placeholder="Nome"
                       focusBorderColor={config.inputs}
                       value={name}
-                      onChange={(e) =>
+                      onChange={e =>
                         setName(capitalizeAllFirstLetter(e.target.value))
                       }
                     />
                     <FormErrorMessage>
-                      {validators.find((obj) => obj.path === "name")
-                        ? validators.find((obj) => obj.path === "name").message
-                        : ""}
+                      {validators.find(obj => obj.path === 'name')
+                        ? validators.find(obj => obj.path === 'name').message
+                        : ''}
                     </FormErrorMessage>
                   </FormControl>
 
@@ -802,7 +808,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                       placeholder="Código de Barras"
                       focusBorderColor={config.inputs}
                       value={barcode}
-                      onChange={(e) => setBarcode(e.target.value.toUpperCase())}
+                      onChange={e => setBarcode(e.target.value.toUpperCase())}
                     />
                   </FormControl>
 
@@ -812,7 +818,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                       placeholder="Código SKU"
                       focusBorderColor={config.inputs}
                       value={sku}
-                      onChange={(e) => setSku(e.target.value.toUpperCase())}
+                      onChange={e => setSku(e.target.value.toUpperCase())}
                     />
                   </FormControl>
                 </Grid>
@@ -822,11 +828,10 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                     mr={3}
                     isRequired
                     isInvalid={
-                      validators.find((obj) => obj.path === "description")
+                      validators.find(obj => obj.path === 'description')
                         ? true
                         : false
-                    }
-                  >
+                    }>
                     <FormLabel>Descrição</FormLabel>
                     <Textarea
                       id="description"
@@ -834,22 +839,22 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                       resize="none"
                       focusBorderColor={config.inputs}
                       value={description}
-                      onChange={(e) =>
+                      onChange={e =>
                         setDescription(capitalizeFirstLetter(e.target.value))
                       }
                     />
                     <FormErrorMessage>
-                      {validators.find((obj) => obj.path === "description")
-                        ? validators.find((obj) => obj.path === "description")
+                      {validators.find(obj => obj.path === 'description')
+                        ? validators.find(obj => obj.path === 'description')
                             .message
-                        : ""}
+                        : ''}
                     </FormErrorMessage>
                   </FormControl>
                 </Grid>
               </Box>
             </Grid>
 
-            <Center rounded="md" p={2} bg={"blackAlpha.200"} mb={5} mt={5}>
+            <Center rounded="md" p={2} bg={'blackAlpha.200'} mb={5} mt={5}>
               <Heading fontSize="sm">Tributação</Heading>
             </Center>
 
@@ -859,7 +864,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 <MaskedInput
                   mask={[/[0-9]/, /\d/, /\d/, /\d/]}
                   value={cfop}
-                  onChange={(e) => setCfop(e.target.value)}
+                  onChange={e => setCfop(e.target.value)}
                   placeholder="CFOP"
                   render={(ref, props) => (
                     <Input
@@ -878,15 +883,15 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                     /\d/,
                     /\d/,
                     /\d/,
-                    ".",
+                    '.',
                     /\d/,
                     /\d/,
-                    ".",
+                    '.',
                     /\d/,
                     /\d/,
                   ]}
                   value={ncm}
-                  onChange={(e) => setNcm(e.target.value)}
+                  onChange={e => setNcm(e.target.value)}
                   placeholder="NCM"
                   render={(ref, props) => (
                     <Input
@@ -900,9 +905,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               <FormControl>
                 <FormLabel>CEST</FormLabel>
                 <MaskedInput
-                  mask={[/[0-9]/, /\d/, ".", /\d/, /\d/, /\d/, ".", /\d/, /\d/]}
+                  mask={[/[0-9]/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/]}
                   value={cest}
-                  onChange={(e) => setCest(e.target.value)}
+                  onChange={e => setCest(e.target.value)}
                   placeholder="CEST"
                   render={(ref, props) => (
                     <Input
@@ -916,7 +921,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
             </Grid>
 
             <Box mt={5}>
-              <Tabs variant="soft-rounded" colorScheme={config.buttons}>
+              <Tabs variant="enclosed" colorScheme={config.buttons}>
                 <TabList>
                   <Tab>ICMS</Tab>
                   <Tab>PIS</Tab>
@@ -925,7 +930,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 </TabList>
                 <TabPanels>
                   <TabPanel>
-                    <Grid templateColumns="1fr 1fr" gap="10px" mb={3}>
+                    <Grid templateColumns="repeat(4, 1fr)" gap="10px" mb={3}>
                       <FormControl mr={3}>
                         <FormLabel>Alíquota</FormLabel>
                         <NumberInput
@@ -933,8 +938,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                           step={0.01}
                           focusBorderColor={config.inputs}
                           value={icmsRate}
-                          onChange={(e) => setIcmsRate(e)}
-                        >
+                          onChange={e => setIcmsRate(e)}>
                           <NumberInputField />
                           <NumberInputStepper>
                             <NumberIncrementStepper />
@@ -943,49 +947,108 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                         </NumberInput>
                       </FormControl>
                       <FormControl mr={3}>
-                        <FormLabel>CSOSN</FormLabel>
+                        <FormLabel>CST / CSOSN</FormLabel>
                         <Select
                           focusBorderColor={config.inputs}
                           value={icmsCst}
-                          onChange={(e) => setIcmsCst(e.target.value)}
-                        >
-                          <option value={"101"}>
-                            101 - Tributada pelo Simples Nacional com permissão
-                            de crédito
-                          </option>
-                          <option value={"102"}>
-                            102 - Tributada pelo Simples Nacional sem permissão
-                            de crédito
-                          </option>
-                          <option value={"103"}>
-                            103 - Isenção do ICMS no Simples Nacional para faixa
-                            de receita bruta
-                          </option>
-                          <option value={"201"}>
-                            201 - Tributada pelo Simples Nacional com permissão
-                            de crédito e com cobrança do ICMS por substituição
-                            tributária
-                          </option>
-                          <option value={"202"}>
-                            202 - Tributada pelo Simples Nacional sem permissão
-                            de crédito e com cobrança do ICMS por substituição
-                            tributária
-                          </option>
-                          <option value={"203"}>
-                            203 - Isenção do ICMS no Simples Nacional para faixa
-                            de receita bruta e com cobrança do ICMS por
-                            substituição tributária
-                          </option>
-                          <option value={"300"}>300 - Imune</option>
-                          <option value={"400"}>
-                            400 - Não tributada pelo Simples Nacional
-                          </option>
-                          <option value={"500"}>
-                            500 - ICMS cobrado anteriormente por substituição
-                            tributária (substituído) ou por antecipação
-                          </option>
-                          <option value={"900"}>900 - Outros</option>
+                          onChange={e => setIcmsCst(e.target.value)}>
+                          <optgroup label="CST">
+                            <option value={'00'}>
+                              00 - Tributada Integralmente
+                            </option>
+                            <option value={'10'}>
+                              10 - Tributada e com cobrança do ICMS por
+                              Substituição Tributária
+                            </option>
+                            <option value={'20'}>20 - Com redução da BC</option>
+                            <option value={'30'}>
+                              30 - Isenta / não tributada e com cobrança do ICMS
+                              por Substituição Tributária
+                            </option>
+                            <option value={'40'}>40 - Isenta</option>
+                            <option value={'41'}>41 - Não Tributada</option>
+                            <option value={'50'}>50 - Com Suspensão</option>
+                            <option value={'51'}>51 - Com Diferimento</option>
+                            <option value={'60'}>
+                              60 - ICMS cobrado anteriormente por Substituição
+                              Tributária
+                            </option>
+                            <option value={'70'}>
+                              70 - Com redução da BC e cobrança do ICMS por
+                              Substituição Tributária
+                            </option>
+                            <option value={'90'}>90 - Outras</option>
+                          </optgroup>
+                          <optgroup label="CSOSN">
+                            <option value={'101'}>
+                              101 - Tributada pelo Simples Nacional com
+                              permissão de crédito
+                            </option>
+                            <option value={'102'}>
+                              102 - Tributada pelo Simples Nacional sem
+                              permissão de crédito
+                            </option>
+                            <option value={'103'}>
+                              103 - Isenção do ICMS no Simples Nacional para
+                              faixa de receita bruta
+                            </option>
+                            <option value={'201'}>
+                              201 - Tributada pelo Simples Nacional com
+                              permissão de crédito e com cobrança do ICMS por
+                              substituição tributária
+                            </option>
+                            <option value={'202'}>
+                              202 - Tributada pelo Simples Nacional sem
+                              permissão de crédito e com cobrança do ICMS por
+                              substituição tributária
+                            </option>
+                            <option value={'203'}>
+                              203 - Isenção do ICMS no Simples Nacional para
+                              faixa de receita bruta e com cobrança do ICMS por
+                              substituição tributária
+                            </option>
+                            <option value={'300'}>300 - Imune</option>
+                            <option value={'400'}>
+                              400 - Não tributada pelo Simples Nacional
+                            </option>
+                            <option value={'500'}>
+                              500 - ICMS cobrado anteriormente por substituição
+                              tributária (substituído) ou por antecipação
+                            </option>
+                            <option value={'900'}>900 - Outros</option>
+                          </optgroup>
                         </Select>
+                      </FormControl>
+
+                      <FormControl>
+                        <FormLabel>ICMS Base de Cálculo</FormLabel>
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={icmsBaseCalc}
+                          onChange={e => setIcmsBaseCalc(e)}>
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
+                      <FormControl>
+                        <FormLabel>ICMS ST Base de Cálculo</FormLabel>
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={icmsStBaseCalc}
+                          onChange={e => setIcmsStBaseCalc(e)}>
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
                       </FormControl>
                     </Grid>
 
@@ -995,53 +1058,50 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                         <Select
                           focusBorderColor={config.inputs}
                           value={icmsOrigin}
-                          onChange={(e) => setIcmsOrigin(e.target.value)}
-                        >
-                          <option value={"0"}>0 - Nacional</option>
-                          <option value={"1"}>
+                          onChange={e => setIcmsOrigin(e.target.value)}>
+                          <option value={'0'}>0 - Nacional</option>
+                          <option value={'1'}>
                             1 - Estrangeira (importação direta)
                           </option>
-                          <option value={"2"}>
+                          <option value={'2'}>
                             2 - Estrangeira (adquirida no mercado interno)
                           </option>
-                          <option value={"3"}>
+                          <option value={'3'}>
                             3 - Nacional com mais de 40% de conteúdo estrangeiro
                           </option>
-                          <option value={"4"}>
+                          <option value={'4'}>
                             4 - Nacional produzida através de processos
                             produtivos básicos
                           </option>
-                          <option value={"5"}>
+                          <option value={'5'}>
                             5 - Nacional com menos de 40% de conteúdo
                             estrangeiro
                           </option>
-                          <option value={"6"}>
+                          <option value={'6'}>
                             6 - Estrangeira (importação direta) sem produto
                             nacional similar
                           </option>
-                          <option value={"7"}>
+                          <option value={'7'}>
                             7 - Estrangeira (adquirida no mercado interno) sem
                             produto nacional similar
                           </option>
-                          <option value={"8"}>
+                          <option value={'8'}>
                             8 - Nacional, mercadoria ou bem com Conteúdo de
                             Importação superior a 70%;
                           </option>
                         </Select>
                       </FormControl>
                       <FormControl mr={3}>
-                        <FormLabel>% Subst. Trib.</FormLabel>
+                        <FormLabel>% Substituição Tributária</FormLabel>
                         <Tooltip
                           label="Alíquota de Substituição Tributária"
-                          hasArrow
-                        >
+                          hasArrow>
                           <NumberInput
                             precision={2}
                             step={0.01}
                             focusBorderColor={config.inputs}
                             value={icmsStRate}
-                            onChange={(e) => setIcmsStRate(e)}
-                          >
+                            onChange={e => setIcmsStRate(e)}>
                             <NumberInputField />
                             <NumberInputStepper>
                               <NumberIncrementStepper />
@@ -1054,15 +1114,13 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                         <FormLabel>% MVA</FormLabel>
                         <Tooltip
                           label="Alíquota ST Margem de Valor Adicionada"
-                          hasArrow
-                        >
+                          hasArrow>
                           <NumberInput
                             precision={2}
                             step={0.01}
                             focusBorderColor={config.inputs}
-                            onChange={(e) => setIcmsMVA(e)}
-                            value={icmsMVA}
-                          >
+                            onChange={e => setIcmsMVA(e)}
+                            value={icmsMVA}>
                             <NumberInputField />
                             <NumberInputStepper>
                               <NumberIncrementStepper />
@@ -1072,15 +1130,14 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                         </Tooltip>
                       </FormControl>
                       <FormControl mr={3}>
-                        <FormLabel>% FCP Ret.</FormLabel>
+                        <FormLabel>% FCP Retido</FormLabel>
                         <Tooltip label="Alíquota FCP Retido" hasArrow>
                           <NumberInput
                             precision={2}
                             step={0.01}
                             focusBorderColor={config.inputs}
-                            onChange={(e) => setFcpRetRate(e)}
-                            value={fcpRetRate}
-                          >
+                            onChange={e => setFcpRetRate(e)}
+                            value={fcpRetRate}>
                             <NumberInputField />
                             <NumberInputStepper>
                               <NumberIncrementStepper />
@@ -1090,29 +1147,27 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                         </Tooltip>
                       </FormControl>
                     </Grid>
-                    <Grid templateColumns="repeat(3, 1fr)" gap="10px">
+                    <Grid templateColumns="repeat(5, 1fr)" gap="10px">
                       <FormControl mr={3}>
-                        <FormLabel>Mod. BC ST</FormLabel>
+                        <FormLabel>Modalidade Base de Cálculo ST</FormLabel>
                         <Tooltip
                           label="Modalidade de Base de Cálculo da Substituição Tributária"
                           hasArrow
-                          placement="top"
-                        >
+                          placement="top">
                           <Select
                             focusBorderColor={config.inputs}
                             value={icmsStModBc}
-                            onChange={(e) => setIcmsStModBc(e.target.value)}
-                          >
-                            <option value={"0"}>
+                            onChange={e => setIcmsStModBc(e.target.value)}>
+                            <option value={'0'}>
                               Preço tabelado ou máximo sugerido
                             </option>
-                            <option value={"1"}>Lista Negativa (valor)</option>
-                            <option value={"2"}>Lista Positiva (valor)</option>
-                            <option value={"3"}>Lista Neutra (valor)</option>
-                            <option value={"4"}>
+                            <option value={'1'}>Lista Negativa (valor)</option>
+                            <option value={'2'}>Lista Positiva (valor)</option>
+                            <option value={'3'}>Lista Neutra (valor)</option>
+                            <option value={'4'}>
                               Margem Valor Agregado (%)
                             </option>
-                            <option value={"5"}>Pauta (valor)</option>
+                            <option value={'5'}>Pauta (valor)</option>
                           </Select>
                         </Tooltip>
                       </FormControl>
@@ -1124,8 +1179,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                             step={0.01}
                             focusBorderColor={config.inputs}
                             value={fcpRate}
-                            onChange={(e) => setFcpRate(e)}
-                          >
+                            onChange={e => setFcpRate(e)}>
                             <NumberInputField />
                             <NumberInputStepper>
                               <NumberIncrementStepper />
@@ -1135,18 +1189,16 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                         </Tooltip>
                       </FormControl>
                       <FormControl mr={3}>
-                        <FormLabel>% FCP ST</FormLabel>
+                        <FormLabel>% FCP Substituição Tributária</FormLabel>
                         <Tooltip
                           label="Alíquota FCP de Substituição Tributária"
-                          hasArrow
-                        >
+                          hasArrow>
                           <NumberInput
                             precision={2}
                             step={0.01}
                             focusBorderColor={config.inputs}
                             value={fcpStRate}
-                            onChange={(e) => setFcpStRate(e)}
-                          >
+                            onChange={e => setFcpStRate(e)}>
                             <NumberInputField />
                             <NumberInputStepper>
                               <NumberIncrementStepper />
@@ -1155,19 +1207,50 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                           </NumberInput>
                         </Tooltip>
                       </FormControl>
+
+                      <FormControl>
+                        <FormLabel>FCP Base de Cálculo</FormLabel>
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={fcpBaseCalc}
+                          onChange={e => setFcpBaseCalc(e)}>
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
+
+                      <FormControl>
+                        <FormLabel>FCP ST Base de Cálculo</FormLabel>
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={fcpStBaseCalc}
+                          onChange={e => setFcpStBaseCalce(e)}>
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
                     </Grid>
                   </TabPanel>
                   <TabPanel>
-                    <Grid templateColumns="1fr 1fr" gap="10px">
+                    <Grid templateColumns="1fr 1fr 1fr" gap="10px">
                       <FormControl mr={3}>
                         <FormLabel>Alíquota</FormLabel>
                         <NumberInput
                           precision={2}
                           step={0.01}
                           focusBorderColor={config.inputs}
-                          onChange={(e) => setPisRate(e)}
-                          value={pisRate}
-                        >
+                          onChange={e => setPisRate(e)}
+                          value={pisRate}>
                           <NumberInputField />
                           <NumberInputStepper>
                             <NumberIncrementStepper />
@@ -1180,19 +1263,34 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                         <Select
                           focusBorderColor={config.inputs}
                           value={pisCst}
-                          onChange={(e) => setPisCst(e.target.value)}
-                        >
-                          {dataTrib.map((dt) => (
+                          onChange={e => setPisCst(e.target.value)}>
+                          {dataTrib.map(dt => (
                             <option value={dt.code} key={dt.code}>
                               {dt.desc}
                             </option>
                           ))}
                         </Select>
                       </FormControl>
+
+                      <FormControl>
+                        <FormLabel>Base de Cálculo</FormLabel>
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={pisBaseCalc}
+                          onChange={e => setPisBaseCalc(e)}>
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </FormControl>
                     </Grid>
                   </TabPanel>
                   <TabPanel>
-                    <Grid templateColumns="1fr 1fr" gap="10px">
+                    <Grid templateColumns="1fr 1fr 1fr" gap="10px">
                       <FormControl mr={3}>
                         <FormLabel>Alíquota</FormLabel>
                         <NumberInput
@@ -1200,8 +1298,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                           step={0.01}
                           focusBorderColor={config.inputs}
                           value={cofinsRate}
-                          onChange={(e) => setCofinsRate(e)}
-                        >
+                          onChange={e => setCofinsRate(e)}>
                           <NumberInputField />
                           <NumberInputStepper>
                             <NumberIncrementStepper />
@@ -1214,14 +1311,29 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                         <Select
                           focusBorderColor={config.inputs}
                           value={cofinsCst}
-                          onChange={(e) => setCofinsCst(e.target.value)}
-                        >
-                          {dataTrib.map((dt) => (
+                          onChange={e => setCofinsCst(e.target.value)}>
+                          {dataTrib.map(dt => (
                             <option value={dt.code} key={dt.code}>
                               {dt.desc}
                             </option>
                           ))}
                         </Select>
+                      </FormControl>
+
+                      <FormControl>
+                        <FormLabel>Base de Cálculo</FormLabel>
+                        <NumberInput
+                          precision={2}
+                          step={0.01}
+                          focusBorderColor={config.inputs}
+                          value={cofinsBaseCalc}
+                          onChange={e => setCofinsBaseCalc(e)}>
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
                       </FormControl>
                     </Grid>
                   </TabPanel>
@@ -1234,8 +1346,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                           step={0.01}
                           focusBorderColor={config.inputs}
                           value={ipiRate}
-                          onChange={(e) => setIpiRate(e)}
-                        >
+                          onChange={e => setIpiRate(e)}>
                           <NumberInputField />
                           <NumberInputStepper>
                             <NumberIncrementStepper />
@@ -1250,7 +1361,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                           type="text"
                           focusBorderColor={config.inputs}
                           value={ipiCode}
-                          onChange={(e) => setIpiCode(e.target.value)}
+                          onChange={e => setIpiCode(e.target.value)}
                         />
                       </FormControl>
                       <FormControl mr={3}>
@@ -1258,33 +1369,32 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                         <Select
                           focusBorderColor={config.inputs}
                           value={ipiCst}
-                          onChange={(e) => setIpiCst(e.target.value)}
-                        >
-                          <option value={""}>Nenhum</option>
-                          <option value={"00"}>
+                          onChange={e => setIpiCst(e.target.value)}>
+                          <option value={''}>Nenhum</option>
+                          <option value={'00'}>
                             00 – Entrada com Recuperação de Crédito
                           </option>
-                          <option value={"01"}>
+                          <option value={'01'}>
                             01 – Entrada Tributada com Alíquota Zero
                           </option>
-                          <option value={"02"}>02 – Entrada Isenta</option>
-                          <option value={"03"}>
+                          <option value={'02'}>02 – Entrada Isenta</option>
+                          <option value={'03'}>
                             03 – Entrada Não Tributada
                           </option>
-                          <option value={"04"}>04 – Entrada Imune</option>
-                          <option value={"05"}>
+                          <option value={'04'}>04 – Entrada Imune</option>
+                          <option value={'05'}>
                             05 – Entrada com Suspensão
                           </option>
-                          <option value={"49"}>49 – Outras Entradas</option>
-                          <option value={"50"}>50 – Saída Tributada</option>
-                          <option value={"51"}>
+                          <option value={'49'}>49 – Outras Entradas</option>
+                          <option value={'50'}>50 – Saída Tributada</option>
+                          <option value={'51'}>
                             51 – Saída Tributável com Alíquota Zero
                           </option>
-                          <option value={"52"}>52 – Saída Isenta</option>
-                          <option value={"53"}>53 – Saída Não Tributada</option>
-                          <option value={"54"}>54 – Saída Imune</option>
-                          <option value={"55"}>55 – Saída com Suspensão</option>
-                          <option value={"99"}>99 – Outras Saídas</option>
+                          <option value={'52'}>52 – Saída Isenta</option>
+                          <option value={'53'}>53 – Saída Não Tributada</option>
+                          <option value={'54'}>54 – Saída Imune</option>
+                          <option value={'55'}>55 – Saída com Suspensão</option>
+                          <option value={'99'}>99 – Outras Saídas</option>
                         </Select>
                       </FormControl>
                     </Grid>
@@ -1293,7 +1403,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               </Tabs>
             </Box>
 
-            <Center rounded="md" p={2} bg={"blackAlpha.200"} mb={5} mt={5}>
+            <Center rounded="md" p={2} bg={'blackAlpha.200'} mb={5} mt={5}>
               <Heading fontSize="sm">Preço de Venda e Frete</Heading>
             </Center>
 
@@ -1302,16 +1412,14 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 isRequired
                 mr={3}
                 isInvalid={
-                  validators.find((obj) => obj.path === "marge") ? true : false
-                }
-              >
+                  validators.find(obj => obj.path === 'marge') ? true : false
+                }>
                 <FormLabel>Margem de Lucro %</FormLabel>
                 <Select
                   value={margeLucro}
-                  onChange={(e) => setMargeLucro(parseFloat(e.target.value))}
-                  focusBorderColor={config.inputs}
-                >
-                  {marge.map((mar) => (
+                  onChange={e => setMargeLucro(parseFloat(e.target.value))}
+                  focusBorderColor={config.inputs}>
+                  {marge.map(mar => (
                     <option value={mar.value} key={mar.value}>
                       {mar.text}
                     </option>
@@ -1319,9 +1427,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 </Select>
 
                 <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "marge")
-                    ? validators.find((obj) => obj.path === "marge").message
-                    : ""}
+                  {validators.find(obj => obj.path === 'marge')
+                    ? validators.find(obj => obj.path === 'marge').message
+                    : ''}
                 </FormErrorMessage>
               </FormControl>
 
@@ -1329,11 +1437,10 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 isRequired
                 mr={3}
                 isInvalid={
-                  validators.find((obj) => obj.path === "valueCusto")
+                  validators.find(obj => obj.path === 'valueCusto')
                     ? true
                     : false
-                }
-              >
+                }>
                 <FormLabel>Valor de Custo</FormLabel>
                 <NumberInput
                   id="valueCusto"
@@ -1341,8 +1448,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   step={0.01}
                   focusBorderColor={config.inputs}
                   value={costValue}
-                  onChange={(e) => setCostValue(e)}
-                >
+                  onChange={e => setCostValue(e)}>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -1350,10 +1456,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   </NumberInputStepper>
                 </NumberInput>
                 <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "valueCusto")
-                    ? validators.find((obj) => obj.path === "valueCusto")
-                        .message
-                    : ""}
+                  {validators.find(obj => obj.path === 'valueCusto')
+                    ? validators.find(obj => obj.path === 'valueCusto').message
+                    : ''}
                 </FormErrorMessage>
               </FormControl>
 
@@ -1364,8 +1469,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   step={0.01}
                   focusBorderColor={config.inputs}
                   value={otherCost}
-                  onChange={(e) => setOtherCost(e)}
-                >
+                  onChange={e => setOtherCost(e)}>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -1377,11 +1481,10 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 isRequired
                 mr={3}
                 isInvalid={
-                  validators.find((obj) => obj.path === "valueSale")
+                  validators.find(obj => obj.path === 'valueSale')
                     ? true
                     : false
-                }
-              >
+                }>
                 <FormLabel>Valor de Venda</FormLabel>
                 <NumberInput
                   id="valueSale"
@@ -1389,8 +1492,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   step={0.01}
                   focusBorderColor={config.inputs}
                   value={saleValue}
-                  onChange={(e) => setSaleValue(e)}
-                >
+                  onChange={e => setSaleValue(e)}>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -1398,9 +1500,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   </NumberInputStepper>
                 </NumberInput>
                 <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "valueSale")
-                    ? validators.find((obj) => obj.path === "valueSale").message
-                    : ""}
+                  {validators.find(obj => obj.path === 'valueSale')
+                    ? validators.find(obj => obj.path === 'valueSale').message
+                    : ''}
                 </FormErrorMessage>
               </FormControl>
             </Grid>
@@ -1409,8 +1511,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               mt={3}
               onClick={() => calcSalePrice()}
               colorScheme={config.buttons}
-              variant="outline"
-            >
+              variant="outline">
               Calcular Preço de Venda
             </Button>
 
@@ -1425,9 +1526,8 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 isRequired
                 mr={3}
                 isInvalid={
-                  validators.find((obj) => obj.path === "height") ? true : false
-                }
-              >
+                  validators.find(obj => obj.path === 'height') ? true : false
+                }>
                 <FormLabel>Altura (cm)</FormLabel>
                 <NumberInput
                   id="height"
@@ -1435,8 +1535,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   step={0.01}
                   focusBorderColor={config.inputs}
                   value={productHeight}
-                  onChange={(e) => setProductHeight(e)}
-                >
+                  onChange={e => setProductHeight(e)}>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -1444,9 +1543,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   </NumberInputStepper>
                 </NumberInput>
                 <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "height")
-                    ? validators.find((obj) => obj.path === "height").message
-                    : ""}
+                  {validators.find(obj => obj.path === 'height')
+                    ? validators.find(obj => obj.path === 'height').message
+                    : ''}
                 </FormErrorMessage>
               </FormControl>
 
@@ -1454,9 +1553,8 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 isRequired
                 mr={3}
                 isInvalid={
-                  validators.find((obj) => obj.path === "width") ? true : false
-                }
-              >
+                  validators.find(obj => obj.path === 'width') ? true : false
+                }>
                 <FormLabel>Largura (cm)</FormLabel>
                 <NumberInput
                   id="width"
@@ -1464,8 +1562,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   step={0.01}
                   focusBorderColor={config.inputs}
                   value={productWidth}
-                  onChange={(e) => setProductWidht(e)}
-                >
+                  onChange={e => setProductWidht(e)}>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -1473,18 +1570,17 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   </NumberInputStepper>
                 </NumberInput>
                 <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "width")
-                    ? validators.find((obj) => obj.path === "width").message
-                    : ""}
+                  {validators.find(obj => obj.path === 'width')
+                    ? validators.find(obj => obj.path === 'width').message
+                    : ''}
                 </FormErrorMessage>
               </FormControl>
               <FormControl
                 isRequired
                 mr={3}
                 isInvalid={
-                  validators.find((obj) => obj.path === "lenght") ? true : false
-                }
-              >
+                  validators.find(obj => obj.path === 'lenght') ? true : false
+                }>
                 <FormLabel>Comprimento (cm)</FormLabel>
                 <NumberInput
                   id="lenght"
@@ -1492,8 +1588,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   step={0.01}
                   focusBorderColor={config.inputs}
                   value={productLength}
-                  onChange={(e) => setProductLength(e)}
-                >
+                  onChange={e => setProductLength(e)}>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -1501,20 +1596,17 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   </NumberInputStepper>
                 </NumberInput>
                 <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "lenght")
-                    ? validators.find((obj) => obj.path === "lenght").message
-                    : ""}
+                  {validators.find(obj => obj.path === 'lenght')
+                    ? validators.find(obj => obj.path === 'lenght').message
+                    : ''}
                 </FormErrorMessage>
               </FormControl>
               <FormControl
                 isRequired
                 mr={3}
                 isInvalid={
-                  validators.find((obj) => obj.path === "diameter")
-                    ? true
-                    : false
-                }
-              >
+                  validators.find(obj => obj.path === 'diameter') ? true : false
+                }>
                 <FormLabel>Diâmetro (cm)</FormLabel>
                 <NumberInput
                   id="diameter"
@@ -1522,8 +1614,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   step={0.01}
                   focusBorderColor={config.inputs}
                   value={productDiameter}
-                  onChange={(e) => setProductDiameter(e)}
-                >
+                  onChange={e => setProductDiameter(e)}>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -1531,18 +1622,17 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   </NumberInputStepper>
                 </NumberInput>
                 <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "diameter")
-                    ? validators.find((obj) => obj.path === "diameter").message
-                    : ""}
+                  {validators.find(obj => obj.path === 'diameter')
+                    ? validators.find(obj => obj.path === 'diameter').message
+                    : ''}
                 </FormErrorMessage>
               </FormControl>
               <FormControl
                 isRequired
                 mr={3}
                 isInvalid={
-                  validators.find((obj) => obj.path === "weight") ? true : false
-                }
-              >
+                  validators.find(obj => obj.path === 'weight') ? true : false
+                }>
                 <FormLabel>Peso (kg)</FormLabel>
                 <NumberInput
                   id="weight"
@@ -1550,8 +1640,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   step={0.01}
                   focusBorderColor={config.inputs}
                   value={productWeight}
-                  onChange={(e) => setProductWeight(e)}
-                >
+                  onChange={e => setProductWeight(e)}>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -1559,9 +1648,9 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                   </NumberInputStepper>
                 </NumberInput>
                 <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "weight")
-                    ? validators.find((obj) => obj.path === "weight").message
-                    : ""}
+                  {validators.find(obj => obj.path === 'weight')
+                    ? validators.find(obj => obj.path === 'weight').message
+                    : ''}
                 </FormErrorMessage>
               </FormControl>
 
@@ -1569,25 +1658,23 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 isRequired
                 mr={3}
                 isInvalid={
-                  validators.find((obj) => obj.path === "format") ? true : false
-                }
-              >
+                  validators.find(obj => obj.path === 'format') ? true : false
+                }>
                 <FormLabel>Formato da Encomenda</FormLabel>
                 <Select
                   id="format"
                   focusBorderColor={config.inputs}
                   placeholder="Formato da Encomenda"
                   value={formato}
-                  onChange={(e) => setFormato(e.target.value)}
-                >
-                  <option value={"1"}>Formato Caixa/Pacote</option>
-                  <option value={"2"}>Formato Rolo/Prisma</option>
-                  <option value={"3"}>Envelope</option>
+                  onChange={e => setFormato(e.target.value)}>
+                  <option value={'1'}>Formato Caixa/Pacote</option>
+                  <option value={'2'}>Formato Rolo/Prisma</option>
+                  <option value={'3'}>Envelope</option>
                 </Select>
                 <FormErrorMessage>
-                  {validators.find((obj) => obj.path === "format")
-                    ? validators.find((obj) => obj.path === "format").message
-                    : ""}
+                  {validators.find(obj => obj.path === 'format')
+                    ? validators.find(obj => obj.path === 'format').message
+                    : ''}
                 </FormErrorMessage>
               </FormControl>
             </Grid>
@@ -1597,12 +1684,11 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               leftIcon={<FaShippingFast />}
               mt={3}
               variant="outline"
-              onClick={() => setModalTravel(true)}
-            >
+              onClick={() => setModalTravel(true)}>
               Simular Frete
             </Button>
 
-            <Center rounded="md" p={2} bg={"blackAlpha.200"} mb={5} mt={5}>
+            <Center rounded="md" p={2} bg={'blackAlpha.200'} mb={5} mt={5}>
               <Heading fontSize="sm">Detalhes do Produto</Heading>
             </Center>
 
@@ -1614,7 +1700,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 rows={5}
                 maxLength={250}
                 value={information}
-                onChange={(e) =>
+                onChange={e =>
                   setInformation(capitalizeFirstLetter(e.target.value))
                 }
               />
@@ -1626,29 +1712,28 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 <Input
                   focusBorderColor={config.inputs}
                   value={listText}
-                  onChange={(e) =>
+                  onChange={e =>
                     setListText(capitalizeAllFirstLetter(e.target.value))
                   }
                 />
                 <Button
                   leftIcon={<FaPlus />}
                   colorScheme={config.buttons}
-                  onClick={() => handleList()}
-                >
+                  onClick={() => handleList()}>
                   Adicionar
                 </Button>
               </Grid>
             </FormControl>
 
             {list.length === 0 ? (
-              ""
+              ''
             ) : (
               <>
                 <List spacing={3} mt={5}>
-                  {list.map((li) => (
+                  {list.map(li => (
                     <ListItem key={li.text}>
                       <ListIcon as={MdCheckCircle} color="green.500" />
-                      {li.text}{" "}
+                      {li.text}{' '}
                       <Tooltip label="Excluir Especificação" hasArrow>
                         <IconButton
                           icon={<FaTrash />}
@@ -1670,9 +1755,8 @@ export default function HandleProducts({ item, onClosed, emitter }) {
               colorScheme={config.buttons}
               size="lg"
               onClick={() => register()}
-              isLoading={loading}
-            >
-              Salvar{" "}
+              isLoading={loading}>
+              Salvar{' '}
               <Kbd ml={3} color="ButtonText">
                 F12
               </Kbd>
@@ -1685,8 +1769,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
           onClose={() => handleCloseModalTravel()}
           size="3xl"
           isCentered
-          scrollBehavior="inside"
-        >
+          scrollBehavior="inside">
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Simular Frete</ModalHeader>
@@ -1700,17 +1783,17 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                       mask={[
                         /[0-9]/,
                         /\d/,
-                        ".",
+                        '.',
                         /\d/,
                         /\d/,
                         /\d/,
-                        "-",
+                        '-',
                         /\d/,
                         /\d/,
                         /\d/,
                       ]}
                       value={cep}
-                      onChange={(e) => setCep(e.target.value)}
+                      onChange={e => setCep(e.target.value)}
                       placeholder="CEP"
                       id="cep"
                       render={(ref, props) => (
@@ -1726,8 +1809,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                     <FormLabel>Serviços</FormLabel>
                     <CheckboxGroup
                       colorScheme={config.switchs}
-                      defaultValue={["04510", "04014"]}
-                    >
+                      defaultValue={['04510', '04014']}>
                       <Stack>
                         <Checkbox value="04510" size="lg" isReadOnly>
                           PAC
@@ -1741,21 +1823,20 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 </Box>
                 <Box w="100%">
                   <Grid templateColumns="1fr 1fr" gap={5}>
-                    {travels.map((trav) => (
+                    {travels.map(trav => (
                       <Box
                         rounded="md"
                         borderWidth="1px"
                         p={3}
-                        key={trav.Codigo}
-                      >
+                        key={trav.Codigo}>
                         <Stat>
                           <StatLabel>
-                            {trav.Codigo === "04510" ? "PAC" : "SEDEX"}
+                            {trav.Codigo === '04510' ? 'PAC' : 'SEDEX'}
                           </StatLabel>
                           <StatNumber>
-                            {parseFloat(trav.Valor).toLocaleString("pt-BR", {
-                              style: "currency",
-                              currency: "BRL",
+                            {parseFloat(trav.Valor).toLocaleString('pt-BR', {
+                              style: 'currency',
+                              currency: 'BRL',
                             })}
                           </StatNumber>
                           <StatHelpText>
@@ -1774,8 +1855,7 @@ export default function HandleProducts({ item, onClosed, emitter }) {
                 colorScheme={config.buttons}
                 leftIcon={<FaCalculator />}
                 isLoading={loadingTravel}
-                onClick={() => CalcTravel()}
-              >
+                onClick={() => CalcTravel()}>
                 Calcular
               </Button>
             </ModalFooter>
