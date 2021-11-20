@@ -1667,15 +1667,6 @@ export default function Produtos() {
               </FormControl>
             </Grid>
 
-            <Button
-              colorScheme={config.buttons}
-              leftIcon={<FaShippingFast />}
-              mt={3}
-              variant="outline"
-              onClick={() => setModalTravel(true)}>
-              Simular Frete
-            </Button>
-
             <Center rounded="md" p={2} bg={'blackAlpha.200'} mb={5} mt={5}>
               <Heading fontSize="sm">Detalhes do Produto</Heading>
             </Center>
