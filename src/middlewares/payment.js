@@ -127,10 +127,6 @@ export default function PaymentMiddleware({ order, handleClose }) {
   }, [secondInstallment, secontPayment, secondPayForm]);
 
   useEffect(() => {
-    console.log("PAGAMENTOS", payments);
-  }, [payments]);
-
-  useEffect(() => {
     if (showSecondPayment) {
       if (
         JSON.stringify(firstPayForm) !== "{}" &&
@@ -193,7 +189,6 @@ export default function PaymentMiddleware({ order, handleClose }) {
   useEffect(() => {
     if (data) {
       setPayForms(data);
-      console.log(data);
     }
   }, [data]);
 
