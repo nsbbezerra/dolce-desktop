@@ -54,6 +54,14 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
   Tag,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuItemOption,
+  MenuGroup,
+  MenuOptionGroup,
+  MenuDivider,
 } from "@chakra-ui/react";
 import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
@@ -71,6 +79,7 @@ import {
   FaArrowRight,
   FaArrowLeft,
   FaTimes,
+  FaTools,
 } from "react-icons/fa";
 import {
   AiOutlineBarcode,
@@ -564,96 +573,44 @@ export default function Cashier() {
                           currency: "BRL",
                         })}
                       </Td>
-                      <Td w="12%">
-                        <HStack spacing={2} justify="flex-end">
-                          <Tooltip label="Imprimir Pedido" hasArrow>
-                            <IconButton
-                              icon={<FaPrint />}
-                              rounded="full"
-                              size="xs"
-                              onClick={() => setModalPrint(true)}
-                              colorScheme={config.buttons}
-                              variant="ghost"
-                            />
-                          </Tooltip>
-                          <Tooltip label="Visualizar Pagamentos" hasArrow>
-                            <IconButton
-                              icon={<FaBarcode />}
-                              rounded="full"
-                              size="xs"
-                              onClick={() => findPaymentsByOrder(ord.id)}
-                              colorScheme={config.buttons}
-                              variant="ghost"
-                            />
-                          </Tooltip>
-
-                          <Popover placement="bottom-end">
-                            <PopoverTrigger>
-                              <IconButton
-                                icon={<FaClipboardList />}
-                                size="xs"
-                                rounded="full"
-                                colorScheme={config.buttons}
-                                variant="ghost"
-                              />
-                            </PopoverTrigger>
-                            <PopoverContent _focus={{ outline: "none" }}>
-                              <PopoverArrow />
-                              <PopoverCloseButton />
-                              <PopoverHeader>Confirmação!</PopoverHeader>
-                              <PopoverBody>
-                                Deseja converter este pedido em orçamento?
-                              </PopoverBody>
-                              <PopoverFooter d="flex" justifyContent="flex-end">
-                                <ButtonGroup size="xs">
-                                  <Button
-                                    colorScheme={config.buttons}
-                                    onClick={() => convertOrderToBudget(ord.id)}
-                                  >
-                                    Sim
-                                  </Button>
-                                </ButtonGroup>
-                              </PopoverFooter>
-                            </PopoverContent>
-                          </Popover>
-
-                          <Popover placement="bottom-end">
-                            <PopoverTrigger>
-                              <IconButton
-                                colorScheme="red"
-                                icon={<FaTrash />}
-                                size="xs"
-                                rounded="full"
-                                variant="ghost"
-                              />
-                            </PopoverTrigger>
-                            <PopoverContent _focus={{ outline: "none" }}>
-                              <PopoverArrow />
-                              <PopoverCloseButton />
-                              <PopoverHeader>Confirmação!</PopoverHeader>
-                              <PopoverBody>
-                                Deseja cancelar este pedido?
-                              </PopoverBody>
-                              <PopoverFooter d="flex" justifyContent="flex-end">
-                                <ButtonGroup size="xs">
-                                  <Button colorScheme={config.buttons}>
-                                    Sim
-                                  </Button>
-                                </ButtonGroup>
-                              </PopoverFooter>
-                            </PopoverContent>
-                          </Popover>
-
-                          <Button
-                            leftIcon={<FaCheck />}
+                      <Td w="8%">
+                        <Menu>
+                          <MenuButton
+                            as={Button}
+                            leftIcon={<FaTools />}
                             colorScheme={config.buttons}
                             size="xs"
-                            isFullWidth
-                            onClick={() => handleFinish(ord.id)}
                           >
-                            Finalizar
-                          </Button>
-                        </HStack>
+                            Opções
+                          </MenuButton>
+                          <MenuList>
+                            <MenuItem
+                              icon={<FaPrint />}
+                              onClick={() => setModalPrint(true)}
+                            >
+                              Imprimir
+                            </MenuItem>
+                            <MenuItem
+                              icon={<FaBarcode />}
+                              onClick={() => findPaymentsByOrder(ord.id)}
+                            >
+                              Pagamentos
+                            </MenuItem>
+                            <MenuItem
+                              icon={<FaClipboardList />}
+                              onClick={() => convertOrderToBudget(ord.id)}
+                            >
+                              Converter em Orçamento
+                            </MenuItem>
+                            <MenuDivider />
+                            <MenuItem
+                              icon={<FaCheck />}
+                              onClick={() => handleFinish(ord.id)}
+                            >
+                              Faturar
+                            </MenuItem>
+                          </MenuList>
+                        </Menu>
                       </Td>
                     </Tr>
                   ))}
@@ -1411,7 +1368,7 @@ export default function Cashier() {
         scrollBehavior="inside"
       >
         <ModalOverlay />
-        <ModalContent maxW="95vw" minH="95vh" pb={4} p={0} overflow="hidden">
+        <ModalContent maxW="95vw" minH="89vh" pb={4} p={0} overflow="hidden">
           <ModalHeader pt={2} pb={2} pl={5}>
             Imprimir
           </ModalHeader>
