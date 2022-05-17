@@ -13,7 +13,7 @@ const emitter = new EventEmitter();
 Menu.setApplicationMenu(false);
 
 function createWindow() {
-  const iconPath = path.resolve(__dirname, "icone.png");
+  const iconPath = path.resolve(__dirname, "assets", "icone.png");
   mainWindow = new BrowserWindow({
     width: 1300,
     height: 700,

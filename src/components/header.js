@@ -31,18 +31,16 @@ import {
   Heading,
   Divider,
   Grid,
+  useColorModeValue,
+  Stack,
 } from "@chakra-ui/react";
 import {
   FaUserCircle,
   FaCog,
   FaPaintBrush,
   FaSave,
-  FaTimes,
   FaSun,
   FaMoon,
-  FaWindowRestore,
-  FaWindowMaximize,
-  FaWindowMinimize,
 } from "react-icons/fa";
 
 import {
@@ -53,8 +51,9 @@ import {
 } from "react-icons/ai";
 import config from "../configs";
 import { GiShop } from "react-icons/gi";
+import { CgMaximize, CgMinimize, CgClose, CgMathMinus } from "react-icons/cg";
 
-import Icone from "../assets/logo.svg";
+import Icone from "../assets/icone.svg";
 
 import { useHistory } from "react-router-dom";
 import { useEmployee } from "../context/Employee";
@@ -67,7 +66,7 @@ export default function HeaderApp() {
   const { push } = useHistory();
   const { employee } = useEmployee();
 
-  const { setColorMode } = useColorMode();
+  const { setColorMode, colorMode } = useColorMode();
   const cancelRef = useRef();
   const [modalTheme, setModalTheme] = useState(false);
   const [theme, setTheme] = useState("light");
@@ -254,8 +253,8 @@ export default function HeaderApp() {
   async function findTheme() {
     const mode = await localStorage.getItem("mode");
     const destakColor = await localStorage.getItem("destak");
-    setTheme(mode);
-    setDestak(destakColor);
+    setTheme(mode || colorMode);
+    setDestak(destakColor || "blue");
     await setColorMode(mode);
   }
 
@@ -284,18 +283,28 @@ export default function HeaderApp() {
         h="60px"
         bg={config.header.bg}
         templateColumns="1fr 2fr 1fr"
-        pl={3}
+        pl={1}
         className="draggable"
+        alignItems="center"
       >
-        <Flex h="60px" justify="flex-start" align="center">
-          <Image
-            userSelect="none"
-            draggable={false}
-            src={Icone}
-            w="250px"
-            mr="15px"
-          />
-        </Flex>
+        <HStack>
+          <Flex
+            h="50px"
+            justify="center"
+            align="center"
+            rounded="full"
+            bg={useColorModeValue("whiteAlpha.700", "whiteAlpha.300")}
+            w="50px"
+          >
+            <Image userSelect="none" draggable={false} src={Icone} w="40px" />
+          </Flex>
+          <Stack spacing={-1} color="white">
+            <Heading fontSize="2xl" mt={0} mb={0} fontWeight="bolder">
+              NKGEST
+            </Heading>
+            <Text fontSize="sm">Sistema de Gestão Empresarial</Text>
+          </Stack>
+        </HStack>
 
         <Flex align="center" justify="center">
           <Flex>
@@ -309,12 +318,12 @@ export default function HeaderApp() {
                   bg:
                     useColorMode().colorMode === "light"
                       ? "whiteAlpha.500"
-                      : "whiteAlpha.100",
+                      : "whiteAlpha.200",
                 }}
                 bg={
                   useColorMode().colorMode === "light"
                     ? "whiteAlpha.500"
-                    : "whiteAlpha.100"
+                    : "whiteAlpha.200"
                 }
                 color="white"
                 type="text"
@@ -383,7 +392,7 @@ export default function HeaderApp() {
           <Tooltip label="Minimizar" hasArrow>
             <IconButton
               aria-label="Search database"
-              icon={<FaWindowMinimize />}
+              icon={<CgMathMinus />}
               size="sm"
               rounded="none"
               color="white"
@@ -402,13 +411,7 @@ export default function HeaderApp() {
           >
             <IconButton
               aria-label="Search database"
-              icon={
-                isMaximized === false ? (
-                  <FaWindowMaximize />
-                ) : (
-                  <FaWindowRestore />
-                )
-              }
+              icon={isMaximized === false ? <CgMaximize /> : <CgMinimize />}
               size="sm"
               rounded="none"
               colorScheme="whiteAlpha"
@@ -423,7 +426,7 @@ export default function HeaderApp() {
           <Tooltip label="Fechar" hasArrow>
             <IconButton
               aria-label="Search database"
-              icon={<FaTimes />}
+              icon={<CgClose />}
               size="sm"
               rounded="none"
               colorScheme="whiteAlpha"

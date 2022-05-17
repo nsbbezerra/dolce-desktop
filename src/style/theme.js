@@ -67,6 +67,11 @@ const customTheme = extendTheme({
         control: { _focus: { boxShadow: "none" } },
       },
     },
+    FormLabel: {
+      baseStyle: {
+        mb: 0,
+      },
+    },
   },
 });
 
