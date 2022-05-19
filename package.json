@@ -1,10 +1,9 @@
 {
   "name": "nkgest",
-  "productName": "NKGEST - Gerenciador de Ecomerce",
+  "productName": "NKGEST - Gestão Empresarial",
   "version": "1.0.1",
   "private": true,
   "homepage": "./",
-  "main": "public/electron.js",
   "dependencies": {
     "@chakra-ui/react": "^1.0.3",
     "@emotion/react": "^11.1.2",
@@ -12,7 +11,6 @@
     "axios": "^0.21.1",
     "cross-env": "^7.0.3",
     "date-fns": "^2.17.0",
-    "electron-is-dev": "^1.2.0",
     "eslint-config-airbnb": "^19.0.0",
     "eslint-plugin-react": "^7.27.0",
     "framer-motion": "^2.9.5",
@@ -34,10 +32,7 @@
   "scripts": {
     "dev": "yarn react-scripts start",
     "build": "react-scripts build",
-    "start": "concurrently \"cross-env BROWSER=none yarn react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
-    "package-win": "electron-builder build --x64 --win nsis -c.extraMetadata.main=build/electron.js --publish never",
-    "package-linux": "electron-builder build --linux appimage --x64 -c.extraMetadata.main=build/electron.js --publish never",
-    "package-mac": "electron-builder build --mac dmg --x64 -c.extraMetadata.main=build/electron.js --publish never"
+    "start": "yarn react-scripts start"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -55,41 +50,6 @@
     ]
   },
   "devDependencies": {
-    "concurrently": "^5.3.0",
-    "electron": "^11.2.2",
-    "electron-builder": "^22.5.1",
-    "eslint": "^7.32.0",
-    "wait-on": "^4.0.2"
-  },
-  "build": {
-    "files": [
-      "build/**/*",
-      "node_modules/**/*"
-    ],
-    "publish": {
-      "provider": "github",
-      "repo": "palmieri",
-      "owner": "nkinformatica"
-    },
-    "mac": {
-      "target": "dmg",
-      "icon": "build/icone.icns"
-    },
-    "win": {
-      "icon": "build/icone.ico",
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ]
-    },
-    "linux": {
-      "target": "AppImage",
-      "icon": "build/icone.png",
-      "category": "Office"
-    }
+    "eslint": "^7.32.0"
   }
 }

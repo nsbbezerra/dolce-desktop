@@ -21,8 +21,6 @@ import config from "../../configs/index";
 import HeaderApp from "../../components/headerApp";
 import { FaCog, FaSave } from "react-icons/fa";
 
-const remote = window.require("electron").remote;
-
 export default function ConfigsApp() {
   const [route, setRoute] = useState("");
   const [port, setPort] = useState("");
@@ -62,10 +60,6 @@ export default function ConfigsApp() {
   useEffect(() => {
     findRoute();
   }, []);
-
-  function closeApp() {
-    remote.getCurrentWindow().reload();
-  }
 
   return (
     <>
@@ -134,7 +128,7 @@ export default function ConfigsApp() {
             <AlertDialogBody>{modalMessage}</AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button colorScheme={config.buttons} onClick={() => closeApp()}>
+              <Button colorScheme={config.buttons} onClick={() => {}}>
                 Reiniciar Aplicação
               </Button>
             </AlertDialogFooter>

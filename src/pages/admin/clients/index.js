@@ -655,7 +655,7 @@ export default function ListClients() {
                     <Tr>
                       <Td>Cliente</Td>
                       <Td textAlign="center" w="12%">
-                        CFP
+                        CPF
                       </Td>
                       <Td textAlign="center" w="15%">
                         Email

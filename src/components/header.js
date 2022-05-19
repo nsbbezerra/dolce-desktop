@@ -58,10 +58,6 @@ import Icone from "../assets/icone.svg";
 import { useHistory } from "react-router-dom";
 import { useEmployee } from "../context/Employee";
 
-const ipcRenderer = window.require("electron").ipcRenderer;
-const remote = window.require("electron").remote;
-ipcRenderer.setMaxListeners(32);
-
 export default function HeaderApp() {
   const { push } = useHistory();
   const { employee } = useEmployee();
@@ -73,37 +69,6 @@ export default function HeaderApp() {
   const [alert, setAlert] = useState(false);
   const [destak, setDestak] = useState("");
   const [alertLogout, setAlertLogout] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(false);
-
-  ipcRenderer.on("maximized", () => {
-    setIsMaximized(true);
-  });
-  ipcRenderer.on("unmaximize", () => {
-    setIsMaximized(false);
-  });
-
-  useEffect(() => {
-    let max = remote.getCurrentWindow().isMaximized();
-    setIsMaximized(max);
-  }, []);
-
-  const handleCloseWindow = useCallback(() => {
-    ipcRenderer.invoke("close-event");
-  }, []);
-
-  const handleMinimize = useCallback(() => {
-    ipcRenderer.invoke("minimize-event");
-  }, []);
-
-  const handleMaximize = useCallback(() => {
-    if (remote.getCurrentWindow().isMaximized()) {
-      ipcRenderer.invoke("unmaximize-event");
-      setIsMaximized(false);
-    } else {
-      ipcRenderer.invoke("maximize-event");
-      setIsMaximized(true);
-    }
-  }, []);
 
   function RadioCard(props) {
     const { getInputProps, getCheckboxProps } = useRadio(props);
@@ -269,14 +234,6 @@ export default function HeaderApp() {
     setAlert(true);
   }
 
-  function closeWindow() {
-    remote.getCurrentWindow().reload();
-  }
-
-  function toogleDevTools() {
-    remote.getCurrentWindow().toggleDevTools();
-  }
-
   return (
     <>
       <Grid
@@ -366,7 +323,7 @@ export default function HeaderApp() {
                 icon={<GiShop />}
                 rounded="xl"
                 ml={3}
-                onClick={() => toogleDevTools()}
+                onClick={() => {}}
                 className="no-draggable"
                 colorScheme="whiteAlpha"
                 color="white"
@@ -386,58 +343,6 @@ export default function HeaderApp() {
               />
             </Tooltip>
           </Flex>
-        </Flex>
-
-        <Flex h="60px" justify="flex-end" align="startadm">
-          <Tooltip label="Minimizar" hasArrow>
-            <IconButton
-              aria-label="Search database"
-              icon={<CgMathMinus />}
-              size="sm"
-              rounded="none"
-              color="white"
-              w="40px"
-              colorScheme="whiteAlpha"
-              variant="solid"
-              fontSize="sm"
-              borderBottomLeftRadius="5px"
-              onClick={() => handleMinimize()}
-              className="no-draggable"
-            />
-          </Tooltip>
-          <Tooltip
-            label={isMaximized === false ? "Maximizar" : "Restaurar"}
-            hasArrow
-          >
-            <IconButton
-              aria-label="Search database"
-              icon={isMaximized === false ? <CgMaximize /> : <CgMinimize />}
-              size="sm"
-              rounded="none"
-              colorScheme="whiteAlpha"
-              variant="solid"
-              color="white"
-              w="40px"
-              fontSize="sm"
-              onClick={() => handleMaximize()}
-              className="no-draggable"
-            />
-          </Tooltip>
-          <Tooltip label="Fechar" hasArrow>
-            <IconButton
-              aria-label="Search database"
-              icon={<CgClose />}
-              size="sm"
-              rounded="none"
-              colorScheme="whiteAlpha"
-              variant="solid"
-              w="40px"
-              fontSize="md"
-              color="white"
-              onClick={() => handleCloseWindow()}
-              className="no-draggable"
-            />
-          </Tooltip>
         </Flex>
       </Grid>
 
@@ -501,7 +406,7 @@ export default function HeaderApp() {
               </Button>
               <Button
                 colorScheme={config.buttons}
-                onClick={() => closeWindow()}
+                onClick={() => window.location.reload()}
                 ml={3}
                 leftIcon={<AiOutlineReload />}
               >
@@ -536,7 +441,7 @@ export default function HeaderApp() {
               </Button>
               <Button
                 colorScheme={config.buttons}
-                onClick={() => closeWindow()}
+                onClick={() => {}}
                 ml={3}
                 leftIcon={<AiOutlineCheck />}
               >

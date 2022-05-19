@@ -52,11 +52,9 @@ import Hotkeys from "react-hot-keys";
 import Routes from "../routes/index";
 
 import { useEmployee } from "../context/Employee";
+import { version } from "../../package.json";
 
 import api from "../configs/axios";
-
-const remote = window.require("electron").remote;
-const version = window.require("electron").remote.app.getVersion();
 
 export default function Layout() {
   const initialRef = useRef();
@@ -122,10 +120,6 @@ export default function Layout() {
     if (keyName === "return") {
       handleAuth(e);
     }
-  }
-
-  function closeApp() {
-    remote.getCurrentWindow().reload();
   }
 
   async function saveRoute() {
@@ -221,13 +215,7 @@ export default function Layout() {
           return true;
         }}
       >
-        <Box
-          w={"100%"}
-          h="100%"
-          overflow="hidden"
-          borderWidth="1px"
-          borderColor={config.inputs}
-        >
+        <Box w={"100%"} h="100%" overflow="hidden">
           <Header />
           <Grid templateColumns="60px 1fr" w="100%" h="92vh" overflow="hidden">
             <Box>
@@ -436,7 +424,7 @@ export default function Layout() {
                 {showCloseButton === true ? (
                   <Button
                     colorScheme={config.buttons}
-                    onClick={() => closeApp()}
+                    onClick={() => window.location.reload()}
                   >
                     Reiniciar Aplicação
                   </Button>
