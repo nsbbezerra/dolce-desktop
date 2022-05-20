@@ -128,7 +128,10 @@ export default function ConfigsApp() {
             <AlertDialogBody>{modalMessage}</AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button colorScheme={config.buttons} onClick={() => {}}>
+              <Button
+                colorScheme={config.buttons}
+                onClick={() => window.location.reload()}
+              >
                 Reiniciar Aplicação
               </Button>
             </AlertDialogFooter>

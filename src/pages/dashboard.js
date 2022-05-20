@@ -15,7 +15,6 @@ import {
   Tr,
   Button,
 } from "@chakra-ui/react";
-import * as Recharts from "recharts/umd/Recharts";
 import {
   AiOutlineFall,
   AiOutlinePieChart,
@@ -26,123 +25,8 @@ import { FaBarcode, FaGlobe } from "react-icons/fa";
 import config from "../configs/index";
 import { useHistory } from "react-router-dom";
 
-const LineChart = Recharts.LineChart;
-const Line = Recharts.Line;
-const XAxis = Recharts.XAxis;
-const YAxis = Recharts.YAxis;
-const CartesianGrid = Recharts.CartesianGrid;
-const Tooltip = Recharts.Tooltip;
-const Legend = Recharts.Legend;
-const Responsive = Recharts.ResponsiveContainer;
-
 function Dashboard() {
   const { push } = useHistory();
-  const data = [
-    {
-      name: "Janeiro 2021",
-      Entradas: 4000,
-      Saidas: 2400,
-    },
-    {
-      name: "Fevereiro 2021",
-      Entradas: 3000,
-      Saidas: 1398,
-    },
-    {
-      name: "Março 2021",
-      Entradas: 2000,
-      Saidas: 9800,
-    },
-    {
-      name: "Abril 2021",
-      Entradas: 2780,
-      Saidas: 3908,
-    },
-    {
-      name: "Maio 2021",
-      Entradas: 1890,
-      Saidas: 4800,
-    },
-    {
-      name: "Junho 2021",
-      Entradas: 2390,
-      Saidas: 3800,
-    },
-    {
-      name: "Julho 2021",
-      Entradas: 3490,
-      Saidas: 4300,
-    },
-  ];
-
-  const dataTwo = [
-    {
-      name: "Janeiro 2021",
-      Vendas: 4000,
-    },
-    {
-      name: "Fevereiro 2021",
-      Vendas: 3000,
-    },
-    {
-      name: "Março 2021",
-      Vendas: 2000,
-    },
-    {
-      name: "Abril 2021",
-      Vendas: 2780,
-    },
-    {
-      name: "Maio 2021",
-      Vendas: 1890,
-    },
-    {
-      name: "Junho 2021",
-      Vendas: 2390,
-    },
-    {
-      name: "Julho 2021",
-      Vendas: 3490,
-    },
-  ];
-
-  const dataThree = [
-    {
-      name: "Janeiro 2021",
-      Recebidos: 4000,
-      Devidos: 2400,
-    },
-    {
-      name: "Fevereiro 2021",
-      Recebidos: 3000,
-      Devidos: 1398,
-    },
-    {
-      name: "Março 2021",
-      Recebidos: 2000,
-      Devidos: 9800,
-    },
-    {
-      name: "Abril 2021",
-      Recebidos: 2780,
-      Devidos: 3908,
-    },
-    {
-      name: "Maio 2021",
-      Recebidos: 1890,
-      Devidos: 4800,
-    },
-    {
-      name: "Junho 2021",
-      Recebidos: 2390,
-      Devidos: 3800,
-    },
-    {
-      name: "Julho 2021",
-      Recebidos: 3490,
-      Devidos: 4300,
-    },
-  ];
 
   function routing(rt) {
     push(rt);
@@ -331,29 +215,7 @@ function Dashboard() {
           <Icon as={FaBarcode} mr={3} />
           <Heading size="sm">Status de Pagamentos</Heading>
         </Flex>
-        <Flex align="center" justify="center" p={2}>
-          <div style={{ width: "100%", height: 300 }}>
-            <Responsive>
-              <LineChart
-                data={dataThree}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="Recebidos" stroke="#38A169" />
-                <Line type="monotone" dataKey="Devidos" stroke="#E53E3E" />
-              </LineChart>
-            </Responsive>
-          </div>
-        </Flex>
+        <Flex align="center" justify="center" p={2}></Flex>
       </Box>
 
       <Grid templateColumns="repeat(2, 1fr)" gap="25px">
@@ -362,29 +224,7 @@ function Dashboard() {
             <Icon as={AiOutlinePieChart} mr={3} />
             <Heading size="sm">Balanço Mensal</Heading>
           </Flex>
-          <Flex align="center" justify="center" p={2}>
-            <div style={{ width: "100%", height: 300 }}>
-              <Responsive>
-                <LineChart
-                  data={data}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="Entradas" stroke="#38A169" />
-                  <Line type="monotone" dataKey="Saidas" stroke="#E53E3E" />
-                </LineChart>
-              </Responsive>
-            </div>
-          </Flex>
+          <Flex align="center" justify="center" p={2}></Flex>
         </Box>
 
         <Box borderWidth="1px" rounded="md" shadow="md" mt="25px">
@@ -392,28 +232,7 @@ function Dashboard() {
             <Icon as={FaGlobe} mr={3} />
             <Heading size="sm">Vendas Realizadas no Site</Heading>
           </Flex>
-          <Flex align="center" justify="center" p={2}>
-            <div style={{ width: "100%", height: 300 }}>
-              <Responsive>
-                <LineChart
-                  data={dataTwo}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="Vendas" stroke="#38A169" />
-                </LineChart>
-              </Responsive>
-            </div>
-          </Flex>
+          <Flex align="center" justify="center" p={2}></Flex>
         </Box>
       </Grid>
     </>

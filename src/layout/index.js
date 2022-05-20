@@ -48,13 +48,14 @@ import Lottie from "../components/lottie";
 import serverAnimation from "../animations/server.json";
 import authAnimation from "../animations/auth.json";
 import config from "../configs/index";
-import Hotkeys from "react-hot-keys";
 import Routes from "../routes/index";
 
 import { useEmployee } from "../context/Employee";
 import { version } from "../../package.json";
 
 import api from "../configs/axios";
+import { Formik, Field, Form } from "formik";
+import * as Yup from "yup";
 
 export default function Layout() {
   const initialRef = useRef();
@@ -68,14 +69,9 @@ export default function Layout() {
   const [showPass, setShowPass] = useState(true);
   const [route, setRoute] = useState("");
   const [port, setPort] = useState("");
-  const [user, setUser] = useState("");
-  const [pass, setPass] = useState("");
 
   const [wrongUser, setWrongUser] = useState(false);
   const [wrongPass, setWrongPass] = useState(false);
-
-  const [wrongUserMessage, setWrongUserMessage] = useState("");
-  const [wrongPassMessage, setWrongPassMessage] = useState("");
 
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
@@ -93,14 +89,6 @@ export default function Layout() {
     });
   }
 
-  useEffect(() => {
-    setWrongUser(false);
-  }, [user]);
-
-  useEffect(() => {
-    setWrongPass(false);
-  }, [pass]);
-
   async function findRoute() {
     const tp = await localStorage.getItem("typert");
     const rt = await localStorage.getItem("route");
@@ -113,12 +101,6 @@ export default function Layout() {
       setRoute(rt);
       setModalRoute(false);
       setModalAuth(true);
-    }
-  }
-
-  function onKeyDown(keyName, e, handle) {
-    if (keyName === "return") {
-      handleAuth(e);
     }
   }
 
@@ -145,27 +127,21 @@ export default function Layout() {
     findRoute();
   }, []);
 
-  async function handleAuth(e) {
-    if (e) {
-      e.preventDefault();
-    }
-    if (user === "" || !user) {
-      setWrongUser(true);
-      setWrongUserMessage("Insira seu nome de usuário");
-      return false;
-    }
-    if (pass === "" || !pass) {
-      setWrongPass(true);
-      setWrongPassMessage("Insira uma senha");
-      return false;
-    }
-    setWrongPass(false);
-    setWrongUser(false);
-    setLoadingAuth(true);
+  async function handleAuth(values) {
     try {
+      const schema = Yup.object().shape({
+        user: Yup.string().required("Insira seu usuário"),
+        password: Yup.string().required("Insira sua senha"),
+      });
+
+      await schema.validate(values, {
+        abortEarly: false,
+      });
+
+      setLoadingAuth(true);
       const response = await api.post("/employeeautenticate", {
-        user: user,
-        password: pass,
+        user: values.user,
+        password: values.password,
         vers: version,
       });
       setEmployee(response.data);
@@ -173,29 +149,25 @@ export default function Layout() {
       setModalAuth(false);
     } catch (error) {
       setLoadingAuth(false);
-      if (error.response.data.warning) {
-        showToast(error.response.data.message, "error", "Erro");
-        return false;
-      }
-      if (error.message === "Network Error") {
-        alert(
-          "Sem conexão com o servidor, verifique sua conexão com a internet."
-        );
-        return false;
-      }
-      const typeError = error.response.data.message || "";
-      if (typeError === "Senha Inválida") {
-        setWrongPassMessage(typeError);
-        setWrongPass(true);
-        const input = document.getElementById("pass");
-        input.focus();
+      if (error instanceof Yup.ValidationError) {
+        error.inner.forEach((error) => {
+          showToast(error.message, "error", "Erro");
+        });
       } else {
-        setWrongUserMessage(typeError);
-        setWrongUser(true);
-        const input = document.getElementById("user");
-        input.focus();
+        if (error.response.data.warning) {
+          showToast(error.response.data.message, "error", "Erro");
+          return false;
+        }
+        if (error.message === "Network Error") {
+          alert(
+            "Sem conexão com o servidor, verifique sua conexão com a internet."
+          );
+          return false;
+        }
+        const typeError = error.response.data.message || "";
+        showToast(typeError, "error", "Erro");
+        setLoadingAuth(false);
       }
-      setLoadingAuth(false);
     }
   }
 
@@ -207,240 +179,243 @@ export default function Layout() {
         overflow: "hidden",
       }}
     >
-      <Hotkeys
-        keyName="return, enter"
-        onKeyDown={onKeyDown}
-        allowRepeat
-        filter={(event) => {
-          return true;
-        }}
+      <Box w={"100%"} h="100%" overflow="hidden">
+        <Header />
+        <Grid templateColumns="60px 1fr" w="100%" h="92vh" overflow="hidden">
+          <Box>
+            <Sider />
+          </Box>
+
+          <Box p={2} w="100%" overflow="hidden">
+            <Box
+              w="100%"
+              h="100%"
+              maxH="100%"
+              maxW="100%"
+              overflow="auto"
+              p={3}
+            >
+              <Routes />
+            </Box>
+          </Box>
+        </Grid>
+      </Box>
+
+      <Modal
+        isOpen={modalRoute}
+        onClose={() => setModalRoute(false)}
+        isCentered
+        scrollBehavior="inside"
+        size="lg"
       >
-        <Box w={"100%"} h="100%" overflow="hidden">
-          <Header />
-          <Grid templateColumns="60px 1fr" w="100%" h="92vh" overflow="hidden">
-            <Box>
-              <Sider />
-            </Box>
+        <ModalOverlay />
+        <ModalContent maxW="40rem">
+          <ModalHeader>Configuração da Rota para o Servidor</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Flex align="center" justify="center">
+              <Lottie animation={serverAnimation} height={200} width={200} />
+            </Flex>
+            <Grid templateColumns="2fr 1fr" gap="15px" mt={5}>
+              <FormControl>
+                <FormLabel>
+                  <Stack direction="row">
+                    <Text mr={3}>Rota (url):</Text>
+                    <RadioGroup
+                      colorScheme={config.switchs}
+                      value={typeRoute}
+                      onChange={setTypeRoute}
+                    >
+                      <Stack direction="row">
+                        <Radio value="http">http</Radio>
+                        <Radio value="https">https</Radio>
+                      </Stack>
+                    </RadioGroup>
+                  </Stack>
+                </FormLabel>
+                <InputGroup>
+                  <InputLeftAddon>{`${typeRoute}://`}</InputLeftAddon>
+                  <Input
+                    focusBorderColor={config.inputs}
+                    placeholder="Rota ou Url"
+                    value={route}
+                    onChange={(e) => setRoute(e.target.value)}
+                  />
+                </InputGroup>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Porta</FormLabel>
+                <InputGroup>
+                  <InputLeftAddon>:</InputLeftAddon>
+                  <Input
+                    focusBorderColor={config.inputs}
+                    placeholder="Porta"
+                    value={port}
+                    onChange={(e) => setPort(e.target.value)}
+                  />
+                </InputGroup>
+              </FormControl>
+            </Grid>
+          </ModalBody>
 
-            <Box p={2} w="100%" overflow="hidden">
-              <Box
-                w="100%"
-                h="100%"
-                maxH="100%"
-                maxW="100%"
-                overflow="auto"
-                p={3}
-              >
-                <Routes />
-              </Box>
-            </Box>
-          </Grid>
-        </Box>
+          <ModalFooter>
+            <Button
+              colorScheme={config.buttons}
+              leftIcon={<FaSave />}
+              onClick={() => {
+                saveRoute();
+              }}
+            >
+              Salvar
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
-        <Modal
-          isOpen={modalRoute}
-          onClose={() => setModalRoute(false)}
-          isCentered
-          scrollBehavior="inside"
-          size="lg"
-        >
-          <ModalOverlay />
-          <ModalContent maxW="40rem">
-            <ModalHeader>Configuração da Rota para o Servidor</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex align="center" justify="center">
-                <Lottie animation={serverAnimation} height={200} width={200} />
-              </Flex>
-              <Grid templateColumns="2fr 1fr" gap="15px" mt={5}>
-                <FormControl>
-                  <FormLabel>
-                    <Stack direction="row">
-                      <Text mr={3}>Rota (url):</Text>
-                      <RadioGroup
-                        colorScheme={config.switchs}
-                        value={typeRoute}
-                        onChange={setTypeRoute}
-                      >
-                        <Stack direction="row">
-                          <Radio value="http">http</Radio>
-                          <Radio value="https">https</Radio>
-                        </Stack>
-                      </RadioGroup>
-                    </Stack>
-                  </FormLabel>
-                  <InputGroup>
-                    <InputLeftAddon>{`${typeRoute}://`}</InputLeftAddon>
-                    <Input
+      <Modal
+        isOpen={modalAuth}
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+        isCentered
+        scrollBehavior="inside"
+        size="sm"
+        initialFocusRef={initialRef}
+      >
+        <ModalOverlay />
+
+        <ModalContent>
+          <Formik
+            initialValues={{ user: "", password: "" }}
+            onSubmit={(values) => {
+              handleAuth(values);
+            }}
+          >
+            <Form>
+              <ModalBody>
+                <Flex align="center" justify="center" mb={5}>
+                  <Lottie animation={authAnimation} height={120} width={120} />
+                </Flex>
+
+                <FormControl isRequired>
+                  <InputGroup size="lg">
+                    <InputLeftElement
+                      pointerEvents="none"
+                      children={<FaUser />}
+                    />
+                    <Field
+                      as={Input}
+                      ref={initialRef}
+                      type="text"
+                      placeholder="Usuário"
+                      name="user"
                       focusBorderColor={config.inputs}
-                      placeholder="Rota ou Url"
-                      value={route}
-                      onChange={(e) => setRoute(e.target.value)}
+                      id="user"
+                      pl={10}
                     />
                   </InputGroup>
                 </FormControl>
-                <FormControl>
-                  <FormLabel>Porta</FormLabel>
-                  <InputGroup>
-                    <InputLeftAddon>:</InputLeftAddon>
-                    <Input
+
+                <FormControl mt={3} isRequired>
+                  <InputGroup size="lg">
+                    <InputLeftElement
+                      pointerEvents="none"
+                      children={<FaKey />}
+                    />
+                    <Field
+                      as={Input}
+                      type={showPass === true ? "password" : "text"}
+                      placeholder="Senha"
                       focusBorderColor={config.inputs}
-                      placeholder="Porta"
-                      value={port}
-                      onChange={(e) => setPort(e.target.value)}
+                      id="pass"
+                      name="password"
+                      pl={10}
+                    />
+                    <InputRightElement
+                      children={
+                        <IconButton
+                          rounded="full"
+                          size="sm"
+                          icon={
+                            showPass === true ? (
+                              <AiFillEye />
+                            ) : (
+                              <AiFillEyeInvisible />
+                            )
+                          }
+                          onClick={() => setShowPass(!showPass)}
+                        />
+                      }
                     />
                   </InputGroup>
                 </FormControl>
-              </Grid>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button
-                colorScheme={config.buttons}
-                leftIcon={<FaSave />}
-                onClick={() => {
-                  saveRoute();
-                }}
-              >
-                Salvar
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-
-        <Modal
-          isOpen={modalAuth}
-          closeOnEsc={false}
-          closeOnOverlayClick={false}
-          isCentered
-          scrollBehavior="inside"
-          size="sm"
-          initialFocusRef={initialRef}
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <ModalBody>
-              <Flex align="center" justify="center" mb={5}>
-                <Lottie animation={authAnimation} height={120} width={120} />
-              </Flex>
-
-              <FormControl isInvalid={wrongUser}>
-                <InputGroup size="lg">
-                  <InputLeftElement
-                    pointerEvents="none"
-                    children={<FaUser />}
+              </ModalBody>
+              <ModalFooter>
+                <Text fontSize="xs" color="gray.600" mr={10}>
+                  Versão: {version}
+                </Text>
+                <Tooltip label="Configuração de rota do servidor" hasArrow>
+                  <IconButton
+                    icon={<FaServer />}
+                    colorScheme={config.buttons}
+                    variant="outline"
+                    size="lg"
+                    fontSize="3xl"
+                    mr={3}
+                    onClick={() => setModalRoute(true)}
                   />
-                  <Input
-                    ref={initialRef}
-                    type="text"
-                    placeholder="Usuário"
-                    value={user}
-                    onChange={(e) => setUser(e.target.value)}
-                    focusBorderColor={config.inputs}
-                    id="user"
-                  />
-                </InputGroup>
-                <FormErrorMessage>{wrongUserMessage}</FormErrorMessage>
-              </FormControl>
-
-              <FormControl mt={3} isInvalid={wrongPass}>
-                <InputGroup size="lg">
-                  <InputLeftElement pointerEvents="none" children={<FaKey />} />
-                  <Input
-                    type={showPass === true ? "password" : "text"}
-                    placeholder="Senha"
-                    value={pass}
-                    onChange={(e) => setPass(e.target.value)}
-                    focusBorderColor={config.inputs}
-                    id="pass"
-                  />
-                  <InputRightElement
-                    children={
-                      <IconButton
-                        rounded="full"
-                        size="sm"
-                        icon={
-                          showPass === true ? (
-                            <AiFillEye />
-                          ) : (
-                            <AiFillEyeInvisible />
-                          )
-                        }
-                        onClick={() => setShowPass(!showPass)}
-                      />
-                    }
-                  />
-                </InputGroup>
-                <FormErrorMessage>{wrongPassMessage}</FormErrorMessage>
-              </FormControl>
-            </ModalBody>
-            <ModalFooter>
-              <Text fontSize="xs" color="gray.600" mr={10}>
-                Versão: {version}
-              </Text>
-              <Tooltip label="Configuração de rota do servidor" hasArrow>
-                <IconButton
-                  icon={<FaServer />}
+                </Tooltip>
+                <Button
                   colorScheme={config.buttons}
-                  variant="outline"
+                  leftIcon={<AiOutlineLogin />}
                   size="lg"
-                  fontSize="3xl"
-                  mr={3}
-                  onClick={() => setModalRoute(true)}
-                />
-              </Tooltip>
-              <Button
-                colorScheme={config.buttons}
-                leftIcon={<AiOutlineLogin />}
-                size="lg"
-                isLoading={loadingAuth}
-                type="submit"
-                onClick={() => handleAuth()}
-              >
-                Login
-                <Kbd ml={3} color="ButtonText">
-                  <Icon as={AiOutlineEnter} />
-                </Kbd>
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+                  isLoading={loadingAuth}
+                  type="submit"
+                >
+                  Login
+                  <Kbd ml={3} color="ButtonText">
+                    <Icon as={AiOutlineEnter} />
+                  </Kbd>
+                </Button>
+              </ModalFooter>
+            </Form>
+          </Formik>
+        </ModalContent>
+      </Modal>
 
-        <AlertDialog
-          isOpen={modalConfirmeRoute}
-          closeOnEsc={false}
-          closeOnOverlayClick={false}
-          isCentered
-        >
-          <AlertDialogOverlay>
-            <AlertDialogContent>
-              <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                {modalTitle}
-              </AlertDialogHeader>
+      <AlertDialog
+        isOpen={modalConfirmeRoute}
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+        isCentered
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              {modalTitle}
+            </AlertDialogHeader>
 
-              <AlertDialogBody>{modalMessage}</AlertDialogBody>
+            <AlertDialogBody>{modalMessage}</AlertDialogBody>
 
-              <AlertDialogFooter>
-                {showCloseButton === true ? (
-                  <Button
-                    colorScheme={config.buttons}
-                    onClick={() => window.location.reload()}
-                  >
-                    Reiniciar Aplicação
-                  </Button>
-                ) : (
-                  <Button
-                    colorScheme={config.buttons}
-                    onClick={() => setModalConfirmeRoute(false)}
-                  >
-                    OK
-                  </Button>
-                )}
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialogOverlay>
-        </AlertDialog>
-      </Hotkeys>
+            <AlertDialogFooter>
+              {showCloseButton === true ? (
+                <Button
+                  colorScheme={config.buttons}
+                  onClick={() => window.location.reload()}
+                >
+                  Reiniciar Aplicação
+                </Button>
+              ) : (
+                <Button
+                  colorScheme={config.buttons}
+                  onClick={() => setModalConfirmeRoute(false)}
+                >
+                  OK
+                </Button>
+              )}
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </div>
   );
 }

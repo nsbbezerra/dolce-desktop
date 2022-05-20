@@ -425,10 +425,10 @@ export default function HeaderApp() {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Logout
+              Sair
             </AlertDialogHeader>
 
-            <AlertDialogBody>Deseja fazer logout?</AlertDialogBody>
+            <AlertDialogBody>Deseja sair?</AlertDialogBody>
 
             <AlertDialogFooter>
               <Button
@@ -441,7 +441,7 @@ export default function HeaderApp() {
               </Button>
               <Button
                 colorScheme={config.buttons}
-                onClick={() => {}}
+                onClick={() => window.location.reload()}
                 ml={3}
                 leftIcon={<AiOutlineCheck />}
               >
