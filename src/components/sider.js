@@ -45,11 +45,9 @@ import {
 import { RiPriceTag2Fill } from "react-icons/ri";
 import { MdDashboard } from "react-icons/md";
 import config from "../configs";
-import { useEmployee } from "../context/Employee";
 
 export default function Sider() {
   const { push } = useHistory();
-  const { employee } = useEmployee();
 
   function routing(rt) {
     push(rt);
@@ -159,38 +157,10 @@ export default function Sider() {
             Fornecedores
           </MenuItem>
           <MenuItem
-            icon={<AiFillShop />}
-            onClick={() => routing("/registerDepartment")}
-          >
-            Departamentos
-          </MenuItem>
-          <MenuItem
-            icon={<FaTags />}
-            onClick={() => routing("/registerCategory")}
-          >
-            Categorias
-          </MenuItem>
-          <MenuItem
-            icon={<RiPriceTag2Fill />}
-            onClick={() => routing("/subCategories")}
-          >
-            Sub-Categorias
-          </MenuItem>
-          <MenuItem
             icon={<FaTag />}
             onClick={() => routing("/registerProducts")}
           >
             Produtos
-          </MenuItem>
-          <MenuDivider />
-          <MenuItem
-            icon={<FaRulerCombined />}
-            onClick={() => routing("/sizes")}
-          >
-            Tamanhos
-          </MenuItem>
-          <MenuItem icon={<FaImages />} onClick={() => routing("/images")}>
-            Galeria de Imagens
           </MenuItem>
           <MenuDivider />
           <MenuItem
@@ -219,21 +189,6 @@ export default function Sider() {
           />
         </Tooltip>
         <MenuList shadow="lg">
-          <MenuItem
-            icon={<AiFillShop />}
-            onClick={() => routing("/listdepartment")}
-          >
-            Departamentos
-          </MenuItem>
-          <MenuItem icon={<FaTags />} onClick={() => routing("/listcategory")}>
-            Categorias
-          </MenuItem>
-          <MenuItem
-            icon={<RiPriceTag2Fill />}
-            onClick={() => routing("/listSubCategories")}
-          >
-            Sub-Categorias
-          </MenuItem>
           <MenuItem icon={<FaTag />} onClick={() => routing("/listproduct")}>
             Produtos
           </MenuItem>

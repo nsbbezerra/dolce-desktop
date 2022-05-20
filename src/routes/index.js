@@ -12,22 +12,14 @@ import ListProviders from "../pages/admin/providers/index";
 /** CADASTROS */
 import RegisterClientes from "../pages/cadastro/clientes";
 import RegisterAddress from "../pages/cadastro/endereco";
-import RegisterDepartment from "../pages/cadastro/departamento";
-import RegisterCategory from "../pages/cadastro/categoria";
 import RegisterEmployee from "../pages/cadastro/colaboradores";
 import RegisterProducts from "../pages/cadastro/produtos/produtos";
-import RegisterSizes from "../pages/cadastro/produtos/tamanhos";
-import RegisterImages from "../pages/cadastro/produtos/imagens";
 import RegisterProvider from "../pages/cadastro/provider";
 import MakePromotional from "../pages/cadastro/promotional";
-import SubCategories from "../pages/cadastro/subCategories";
 import XmlImporter from "../pages/cadastro/xmlIndex";
 
 /** ESTOQUE */
-import ListDepartment from "../pages/products/department";
-import ListCategory from "../pages/products/category";
 import ListProduct from "../pages/products/products";
-import ListSubCat from "../pages/products/subCategories";
 
 /** CAIXA */
 import CashierMoviment from "../pages/cashier/moviment";
@@ -62,12 +54,6 @@ export default function Routers() {
       </Route>
       <Route path="/registerAddress">
         <RegisterAddress />
-      </Route>
-      <Route path="/registerDepartment">
-        <RegisterDepartment />
-      </Route>
-      <Route path="/registerCategory">
-        <RegisterCategory />
       </Route>
       <Route path="/registerEmlpoyee">
         <RegisterEmployee />
@@ -123,23 +109,11 @@ export default function Routers() {
       <Route path="/cashierreport">
         <CashierReport />
       </Route>
-      <Route path="/listdepartment">
-        <ListDepartment />
-      </Route>
-      <Route path="/listcategory">
-        <ListCategory />
-      </Route>
       <Route path="/listproduct">
         <ListProduct />
       </Route>
       <Route path="/configapp">
         <ConfigApp />
-      </Route>
-      <Route path="/sizes">
-        <RegisterSizes />
-      </Route>
-      <Route path="/images">
-        <RegisterImages />
       </Route>
       <Route path="/providers">
         <RegisterProvider />
@@ -149,12 +123,6 @@ export default function Routers() {
       </Route>
       <Route path="/promotional">
         <MakePromotional />
-      </Route>
-      <Route path="/subCategories">
-        <SubCategories />
-      </Route>
-      <Route path="/listSubCategories">
-        <ListSubCat />
       </Route>
       <Route path="/xmlimporter">
         <XmlImporter />

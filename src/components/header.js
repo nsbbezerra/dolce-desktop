@@ -51,7 +51,6 @@ import {
 } from "react-icons/ai";
 import config from "../configs";
 import { GiShop } from "react-icons/gi";
-import { CgMaximize, CgMinimize, CgClose, CgMathMinus } from "react-icons/cg";
 
 import Icone from "../assets/icone.svg";
 

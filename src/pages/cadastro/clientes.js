@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -14,24 +14,14 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  FormErrorMessage,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogContent,
-  AlertDialogOverlay,
-  Text,
   useToast,
-  Kbd,
-  Icon,
 } from "@chakra-ui/react";
 import { FaUserFriends, FaSave } from "react-icons/fa";
 import config from "../../configs";
 import HeaderApp from "../../components/headerApp";
-import Hotkeys from "react-hot-keys";
-import axios from "axios";
 import MaskedInput from "react-text-mask";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 import { useEmployee } from "../../context/Employee";
 import api from "../../configs/axios";
@@ -42,58 +32,10 @@ export default function SaveClient() {
   const [loading, setLoading] = useState(false);
   const [loadingAddress, setLoadingAddress] = useState(false);
   const [modalAddress, setModalAddress] = useState(false);
-  const [validators, setValidators] = useState([]);
-  const [modalCaution, setModalCaution] = useState(false);
-  const [modalTitle, setModalTitle] = useState("");
-  const [modalMessage, setModalMessage] = useState("");
-  const [modalErroMessage, setModalErroMessage] = useState("");
 
-  const [name, setName] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [gender, setGender] = useState("");
-  const [email, setEmail] = useState("");
-  const [contact, setContact] = useState("");
-  const [user, setUser] = useState("");
-  const [password, setPassword] = useState("");
   const [idClient, setIdClient] = useState(null);
 
-  const [street, setStreet] = useState("");
-  const [number, setNumber] = useState("");
-  const [comp, setComp] = useState("");
-  const [bairro, setBairro] = useState("");
-  const [cep, setCep] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-
-  function clear() {
-    setName("");
-    setCpf("");
-    setGender("");
-    setEmail("");
-    setContact("");
-    setUser("");
-    setStreet("");
-    setNumber("");
-    setComp("");
-    setBairro("");
-    setCep("");
-    setCity("");
-    setState();
-    setIdClient(null);
-    setPassword("");
-  }
-
-  function handleValidator(path, message) {
-    let val = [];
-    let info = { path: path, message: message };
-    val.push(info);
-    setValidators(val);
-    const inpt = document.getElementById(path);
-    inpt.focus();
-    setTimeout(() => {
-      setValidators([]);
-    }, 4000);
-  }
+  const [type, setType] = useState("person");
 
   function showToast(message, status, title) {
     toast({
@@ -106,348 +48,355 @@ export default function SaveClient() {
     });
   }
 
-  async function register(e) {
-    if (e) {
-      e.preventDefault();
-    }
-    if (name === "" || !name) {
-      handleValidator("name", "O Nome é obrigatório");
-      return false;
-    }
-    if (cpf === "" || !cpf) {
-      handleValidator("cpf", "O CPF é obrigatório");
-      return false;
-    }
-    if (cpf.includes("_")) {
-      handleValidator("cpf", "Digite um CFP válido");
-      return false;
-    }
-    if (gender === "" || !gender) {
-      handleValidator("gender", "o Gênero é obrigatório");
-      return false;
-    }
-    if (email === "" || !email) {
-      handleValidator("email", "O Email é obrigatório");
-      return false;
-    }
-    if (
-      (email.length && !email.includes("@")) ||
-      (email.length && !email.includes("."))
-    ) {
-      handleValidator(
-        "email",
-        "Digite um email válido, deve conter um (@) e um (.)"
-      );
-      return false;
-    }
-    if (contact === "" || !contact) {
-      handleValidator("contact", "O Telefone é obrigatório");
-      return false;
-    }
-    if (contact.includes("_")) {
-      handleValidator("contact", "Digite um Telefone válido");
-      return false;
-    }
-    if (password === "" || !password) {
-      handleValidator("password", "A Senha é obrigatória");
-      return false;
-    }
-    if (user === "" || !user) {
-      handleValidator("user", "O Nome de usuário é obrigatório");
-      return false;
-    }
-    setLoading(true);
+  async function register(values) {
     try {
+      const schema = Yup.object().shape({
+        name: Yup.string().required("Insira o nome"),
+        gender: Yup.string(),
+        type: Yup.string(),
+        cpf: Yup.string().required("Insira um CPF ou CNPJ"),
+        email: Yup.string().email("Insira um email válido"),
+        socialName: Yup.string(),
+        stateRegistration: Yup.string(),
+        municipalRegistration: Yup.string(),
+        contact: Yup.string().required("Insira um telefone de contato"),
+      });
+
+      await schema.validate(values, {
+        abortEarly: false,
+      });
+
+      setLoading(true);
+
       const response = await api.post(
         "/clients",
         {
-          name,
-          gender,
-          cpf,
-          email,
-          contact,
-          user,
-          password,
+          name: values.name,
+          gender: values.gender,
+          type: type,
+          cpf: values.cpf,
+          email: values.email,
+          contact: values.contact,
+          socialName: values.socialName,
+          stateRegistration: values.stateRegistration,
+          municipalRegistration: values.municipalRegistration,
         },
         { headers: { "x-access-token": employee.token } }
       );
-      console.log(response);
       setIdClient(response.data.client);
       setLoading(false);
       showToast(response.data.message, "success", "Sucesso");
       setModalAddress(true);
     } catch (error) {
       setLoading(false);
-      if (error.message === "Network Error") {
-        alert(
-          "Sem conexão com o servidor, verifique sua conexão com a internet."
-        );
-        return false;
-      }
-      const statusCode = error.response.status || 400;
-      const typeError =
-        error.response.data.message || "Ocorreu um erro ao salvar";
-      const errorMesg = error.response.data.errorMessage || statusCode;
-      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
-      showToast(
-        errorMessageFinal,
-        "error",
-        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
-      );
-    }
-  }
-
-  async function registerAddress() {
-    if (idClient === null || !idClient) {
-      setModalErroMessage("Cod: 400");
-      setModalMessage("Nenhum cliente selecionado");
-      setModalTitle("Erro no cadastro");
-      setModalCaution(true);
-      return false;
-    }
-    if (street === "" || !street) {
-      handleValidator("street", "O nome da Rua/Avenida é obrigatório");
-      return false;
-    }
-    if (number === "" || !number) {
-      handleValidator("number", "Obrigatório");
-      return false;
-    }
-    if (bairro === "" || !bairro) {
-      handleValidator("bairro", "O Bairro é obrigatório");
-      return false;
-    }
-    if (cep === "" || !cep) {
-      handleValidator("cep", "O CEP é obrigatório");
-      return false;
-    }
-    if (cep.includes("_")) {
-      handleValidator("cep", "Digite um CEP válido");
-      return false;
-    }
-    if (city === "" || !city) {
-      handleValidator("city", "O nome da Cidade é obrigatório");
-      return false;
-    }
-    if (state === "" || !state) {
-      handleValidator("state", "Obrigatório");
-      return false;
-    }
-    setLoadingAddress(true);
-    try {
-      const response = await api.post(
-        "/address",
-        {
-          client_id: idClient,
-          street,
-          number,
-          comp,
-          bairro,
-          cep,
-          city,
-          state,
-        },
-        { headers: { "x-access-token": employee.token } }
-      );
-      showToast(response.data.message, "success", "Sucesso");
-      setModalAddress(false);
-      setLoadingAddress(false);
-      clear();
-    } catch (error) {
-      setLoadingAddress(false);
-      if (error.message === "Network Error") {
-        alert(
-          "Sem conexão com o servidor, verifique sua conexão com a internet."
-        );
-        return false;
-      }
-      const statusCode = error.response.status || 400;
-      const typeError =
-        error.response.data.message || "Ocorreu um erro ao salvar";
-      const errorMesg = error.response.data.errorMessage || statusCode;
-      const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
-      showToast(
-        errorMessageFinal,
-        "error",
-        statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
-      );
-    }
-  }
-
-  function capitalizeFirstLetter(string) {
-    let splited = string.split(" ");
-    let toJoin = splited.map((e) => {
-      return e.charAt(0).toUpperCase() + e.slice(1);
-    });
-    let joined = toJoin.join(" ");
-    return joined;
-  }
-
-  function onKeyDown(keyName, e, handle) {
-    if (keyName === "f12") {
-      register(e);
-    }
-  }
-
-  useEffect(() => {
-    handleCep(cep);
-  }, [cep]);
-
-  async function handleCep(value) {
-    const parse = value.replace(/([\u0300-\u036f]|[^0-9a-zA-Z])/g, "");
-    if (parse.length === 8) {
-      try {
-        const response = await axios.get(
-          `https://brasilapi.com.br/api/cep/v1/${parse}`
-        );
-        setValidators([]);
-        setCity(response.data.city);
-        setState(response.data.state);
-      } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        error.inner.forEach((err) => {
+          showToast(err.message, "error", "Erro");
+        });
+      } else {
         if (error.message === "Network Error") {
           alert(
             "Sem conexão com o servidor, verifique sua conexão com a internet."
           );
           return false;
         }
-        const err = error.response.data.errors[0].message || "CEP Inválido";
-        handleValidator("cep", err);
+        const statusCode = error.response.status || 400;
+        const typeError =
+          error.response.data.message || "Ocorreu um erro ao salvar";
+        const errorMesg = error.response.data.errorMessage || statusCode;
+        const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+        showToast(
+          errorMessageFinal,
+          "error",
+          statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+        );
       }
     }
   }
 
+  async function registerAddress(values) {
+    try {
+      const schema = Yup.object().shape({
+        street: Yup.string().required("Insira o nome da rua"),
+        number: Yup.string().required("Insira o número"),
+        comp: Yup.string(),
+        bairro: Yup.string().required("Insira o bairro"),
+        cep: Yup.string().required("Insira o CEP"),
+        city: Yup.string().required("Insira a cidade"),
+        state: Yup.string().required("Insira o estado"),
+      });
+
+      await schema.validate(values, {
+        abortEarly: false,
+      });
+
+      setLoadingAddress(true);
+
+      const response = await api.post(
+        "/address",
+        {
+          client_id: idClient,
+          street: values.street,
+          number: values.number,
+          comp: values.comp,
+          bairro: values.bairro,
+          cep: values.cep,
+          city: values.city,
+          state: values.state,
+        },
+        { headers: { "x-access-token": employee.token } }
+      );
+      showToast(response.data.message, "success", "Sucesso");
+      setModalAddress(false);
+      setLoadingAddress(false);
+      formik.resetForm({
+        values: {
+          name: "",
+          gender: "masc",
+          type: "",
+          cpf: "",
+          email: "",
+          socialName: "",
+          stateRegistration: "",
+          municipalRegistration: "",
+          contact: "",
+        },
+      });
+      formikAddress.resetForm({
+        values: {
+          street: "",
+          number: "",
+          comp: "",
+          bairro: "",
+          cep: "",
+          city: "",
+          state: "",
+        },
+      });
+    } catch (error) {
+      setLoadingAddress(false);
+      if (error instanceof Yup.ValidationError) {
+        error.inner.forEach((err) => {
+          showToast(err.message, "error", "Erro");
+        });
+      } else {
+        if (error.message === "Network Error") {
+          alert(
+            "Sem conexão com o servidor, verifique sua conexão com a internet."
+          );
+          return false;
+        }
+        const statusCode = error.response.status || 400;
+        const typeError =
+          error.response.data.message || "Ocorreu um erro ao salvar";
+        const errorMesg = error.response.data.errorMessage || statusCode;
+        const errorMessageFinal = `${typeError} + Cod: ${errorMesg}`;
+        showToast(
+          errorMessageFinal,
+          "error",
+          statusCode === 401 ? "Erro Autorização" : "Erro no Cadastro"
+        );
+      }
+    }
+  }
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      gender: "masc",
+      type: "",
+      cpf: "",
+      email: "",
+      socialName: "",
+      stateRegistration: "",
+      municipalRegistration: "",
+      contact: "",
+    },
+    onSubmit: (values) => {
+      register(values);
+    },
+  });
+
+  const formikAddress = useFormik({
+    initialValues: {
+      street: "",
+      number: "",
+      comp: "",
+      bairro: "",
+      cep: "",
+      city: "",
+      state: "",
+    },
+    onSubmit: (values) => {
+      registerAddress(values);
+    },
+  });
+
   return (
     <>
-      <Hotkeys
-        keyName="f12"
-        onKeyDown={onKeyDown}
-        allowRepeat
-        filter={(event) => {
-          return true;
-        }}
-      >
-        <HeaderApp title="Cadastro de Clientes" icon={FaUserFriends} />
+      <HeaderApp title="Cadastro de Clientes" icon={FaUserFriends} />
 
+      <form onSubmit={formik.handleSubmit}>
         <Box shadow="md" rounded="md" borderWidth="1px" p={3} mt="25px">
-          <Grid templateColumns="1fr 1fr 250px" gap="15px">
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "name") ? true : false
-              }
-            >
-              <FormLabel>Nome</FormLabel>
-              <Input
-                placeholder="Nome completo"
-                focusBorderColor={config.inputs}
-                value={name}
-                onChange={(e) => setName(capitalizeFirstLetter(e.target.value))}
-                id="name"
-              />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "name")
-                  ? validators.find((obj) => obj.path === "name").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "cpf") ? true : false
-              }
-            >
-              <FormLabel>CPF</FormLabel>
-              <MaskedInput
-                mask={[
-                  /[0-9]/,
-                  /\d/,
-                  /\d/,
-                  ".",
-                  /\d/,
-                  /\d/,
-                  /\d/,
-                  ".",
-                  /\d/,
-                  /\d/,
-                  /\d/,
-                  "-",
-                  /\d/,
-                  /\d/,
-                ]}
-                value={cpf}
-                onChange={(e) => setCpf(e.target.value)}
-                placeholder="CPF"
-                id="cpf"
-                render={(ref, props) => (
-                  <Input
-                    ref={ref}
-                    {...props}
-                    focusBorderColor={config.inputs}
-                  />
-                )}
-              />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "cpf")
-                  ? validators.find((obj) => obj.path === "cpf").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl
-              id="gender"
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "gender") ? true : false
-              }
-            >
-              <FormLabel>Genero</FormLabel>
+          <Grid
+            templateColumns={
+              type === "person" ? "150px 2fr 1fr 150px" : "150px 2fr 1fr"
+            }
+            gap="15px"
+          >
+            <FormControl isRequired>
+              <FormLabel>Tipo</FormLabel>
               <Select
-                id="gender"
+                id="type"
+                name="type"
                 placeholder="Selecione"
                 variant="outline"
                 focusBorderColor={config.inputs}
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
+                value={type}
+                onChange={(e) => setType(e.target.value)}
               >
-                <option value="masc">Masculino</option>
-                <option value="fem">Femenino</option>
+                <option value="company">Pessoa Jurídica</option>
+                <option value="person">Pessoa Física</option>
               </Select>
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "gender")
-                  ? validators.find((obj) => obj.path === "gender").message
-                  : ""}
-              </FormErrorMessage>
             </FormControl>
+            <FormControl isRequired>
+              <FormLabel>
+                {type === "person" ? "Nome Completo" : "Nome Fantasia"}
+              </FormLabel>
+              <Input
+                placeholder={
+                  type === "person" ? "Nome Completo" : "Nome Fantasia"
+                }
+                focusBorderColor={config.inputs}
+                name="name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                autoFocus
+              />
+            </FormControl>
+            <FormControl isRequired>
+              <FormLabel>{type === "person" ? "CPF" : "CNPJ"}</FormLabel>
+              <Input
+                as={MaskedInput}
+                mask={
+                  type === "person"
+                    ? [
+                        /[0-9]/,
+                        /\d/,
+                        /\d/,
+                        ".",
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        ".",
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        "-",
+                        /\d/,
+                        /\d/,
+                      ]
+                    : [
+                        /[0-9]/,
+                        /\d/,
+                        ".",
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        ".",
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        "/",
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        "-",
+                        /\d/,
+                        /\d/,
+                      ]
+                }
+                name="cpf"
+                placeholder={type === "person" ? "CPF" : "CNPJ"}
+                value={formik.values.cpf}
+                onChange={formik.handleChange}
+              />
+            </FormControl>
+            {type === "person" && (
+              <FormControl id="gender" isRequired>
+                <FormLabel>Genero</FormLabel>
+                <Select
+                  id="gender"
+                  name="gender"
+                  placeholder="Selecione"
+                  variant="outline"
+                  focusBorderColor={config.inputs}
+                  value={formik.values.gender}
+                  onChange={formik.handleChange}
+                >
+                  <option value="masc">Masculino</option>
+                  <option value="fem">Femenino</option>
+                </Select>
+              </FormControl>
+            )}
           </Grid>
+
+          {type === "company" && (
+            <Grid templateColumns="2fr 1fr 1fr" gap="15px" mt={3}>
+              <FormControl>
+                <FormLabel>Razão Social</FormLabel>
+                <Input
+                  id="socialName"
+                  placeholder="Razão Social"
+                  focusBorderColor={config.inputs}
+                  name="socialName"
+                  value={formik.values.socialName}
+                  onChange={formik.handleChange}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Inscrição Estadual</FormLabel>
+                <Input
+                  id="stateRegistration"
+                  placeholder="Inscrição Estadual"
+                  focusBorderColor={config.inputs}
+                  name="stateRegistration"
+                  value={formik.values.stateRegistration}
+                  onChange={formik.handleChange}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Inscrição Municipal</FormLabel>
+                <Input
+                  id="stateRegistration"
+                  placeholder="Inscrição Municipal"
+                  focusBorderColor={config.inputs}
+                  name="municipalRegistration"
+                  value={formik.values.municipalRegistration}
+                  onChange={formik.handleChange}
+                />
+              </FormControl>
+            </Grid>
+          )}
+
           <Grid templateColumns="1fr 1fr" gap="15px" mt={3}>
-            <FormControl
-              isInvalid={
-                validators.find((obj) => obj.path === "email") ? true : false
-              }
-              isRequired
-            >
+            <FormControl>
               <FormLabel>Email</FormLabel>
               <Input
                 id="email"
                 placeholder="Email"
                 focusBorderColor={config.inputs}
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                value={formik.values.email}
+                onChange={formik.handleChange}
               />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "email")
-                  ? validators.find((obj) => obj.path === "email").message
-                  : ""}
-              </FormErrorMessage>
             </FormControl>
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "contact") ? true : false
-              }
-            >
+            <FormControl isRequired>
               <FormLabel>Telefone</FormLabel>
-              <MaskedInput
+              <Input
+                as={MaskedInput}
                 mask={[
                   "(",
                   /[0-9]/,
@@ -465,142 +414,60 @@ export default function SaveClient() {
                   /\d/,
                   /\d/,
                 ]}
-                value={contact}
-                onChange={(e) => setContact(e.target.value)}
+                name="contact"
+                value={formik.values.contact}
+                onChange={formik.handleChange}
                 placeholder="Telefone"
-                id="contact"
-                render={(ref, props) => (
-                  <Input
-                    ref={ref}
-                    {...props}
-                    focusBorderColor={config.inputs}
-                  />
-                )}
               />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "contact")
-                  ? validators.find((obj) => obj.path === "contact").message
-                  : ""}
-              </FormErrorMessage>
             </FormControl>
           </Grid>
 
-          <Grid templateColumns="1fr 1fr" gap="15px" mt={3}>
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "user") ? true : false
-              }
-            >
-              <FormLabel>Usuário</FormLabel>
-              <Input
-                id="user"
-                placeholder="Usuário"
-                focusBorderColor={config.inputs}
-                value={user}
-                onChange={(e) => setUser(e.target.value.toLowerCase())}
-              />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "user")
-                  ? validators.find((obj) => obj.path === "user").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl
-              isRequired
-              isInvalid={
-                validators.find((obj) => obj.path === "password") ? true : false
-              }
-            >
-              <FormLabel>Senha</FormLabel>
-              <Input
-                id="password"
-                placeholder="Usuário"
-                type="password"
-                focusBorderColor={config.inputs}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <FormErrorMessage>
-                {validators.find((obj) => obj.path === "password")
-                  ? validators.find((obj) => obj.path === "password").message
-                  : ""}
-              </FormErrorMessage>
-            </FormControl>
-          </Grid>
           <Divider mt={5} mb={5} />
           <Button
             leftIcon={<FaSave />}
             colorScheme={config.buttons}
             size="lg"
             isLoading={loading}
-            onClick={() => register()}
+            type="submit"
           >
-            Cadastrar{" "}
-            <Kbd ml={3} color="ButtonText">
-              F12
-            </Kbd>
+            Cadastrar
           </Button>
         </Box>
+      </form>
 
-        <Modal
-          isOpen={modalAddress}
-          closeOnEsc={false}
-          closeOnOverlayClick={false}
-          isCentered
-          size="xl"
-        >
-          <ModalOverlay />
-          <ModalContent maxW="70rem">
+      <Modal
+        isOpen={modalAddress}
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+        isCentered
+        size="xl"
+      >
+        <ModalOverlay />
+        <ModalContent maxW="70rem">
+          <form onSubmit={formikAddress.handleSubmit}>
             <ModalHeader>Cadastrar Endereço</ModalHeader>
             <ModalBody>
               <Grid templateColumns="1fr 100px" gap="15px">
-                <FormControl
-                  isRequired
-                  isInvalid={
-                    validators.find((obj) => obj.path === "street")
-                      ? true
-                      : false
-                  }
-                >
+                <FormControl isRequired>
                   <FormLabel>Logradouro</FormLabel>
                   <Input
                     placeholder="Logradouro"
                     focusBorderColor={config.inputs}
-                    value={street}
-                    onChange={(e) =>
-                      setStreet(capitalizeFirstLetter(e.target.value))
-                    }
-                    id="street"
+                    value={formikAddress.values.street}
+                    onChange={formikAddress.handleChange}
+                    name="street"
                   />
-                  <FormErrorMessage>
-                    {validators.find((obj) => obj.path === "street")
-                      ? validators.find((obj) => obj.path === "street").message
-                      : ""}
-                  </FormErrorMessage>
                 </FormControl>
-                <FormControl
-                  isRequired
-                  isInvalid={
-                    validators.find((obj) => obj.path === "number")
-                      ? true
-                      : false
-                  }
-                >
+                <FormControl isRequired>
                   <FormLabel>Numero</FormLabel>
                   <Input
                     placeholder="Numero"
                     focusBorderColor={config.inputs}
                     type="text"
-                    value={number}
-                    onChange={(e) => setNumber(e.target.value.toUpperCase())}
-                    id="number"
+                    value={formikAddress.values.number}
+                    onChange={formikAddress.handleChange}
+                    name="number"
                   />
-                  <FormErrorMessage>
-                    {validators.find((obj) => obj.path === "number")
-                      ? validators.find((obj) => obj.path === "number").message
-                      : ""}
-                  </FormErrorMessage>
                 </FormControl>
               </Grid>
               <Grid templateColumns="1fr 1fr" gap="15px" mt={3}>
@@ -609,46 +476,27 @@ export default function SaveClient() {
                   <Input
                     placeholder="Complemento"
                     focusBorderColor={config.inputs}
-                    value={comp}
-                    onChange={(e) =>
-                      setComp(capitalizeFirstLetter(e.target.value))
-                    }
+                    value={formikAddress.values.comp}
+                    onChange={formikAddress.handleChange}
+                    name="comp"
                   />
                 </FormControl>
-                <FormControl
-                  isRequired
-                  isInvalid={
-                    validators.find((obj) => obj.path === "bairro")
-                      ? true
-                      : false
-                  }
-                >
+                <FormControl isRequired>
                   <FormLabel>Bairro</FormLabel>
                   <Input
-                    id="bairro"
+                    name="bairro"
                     placeholder="Bairro"
                     focusBorderColor={config.inputs}
-                    value={bairro}
-                    onChange={(e) =>
-                      setBairro(capitalizeFirstLetter(e.target.value))
-                    }
+                    value={formikAddress.values.bairro}
+                    onChange={formikAddress.handleChange}
                   />
-                  <FormErrorMessage>
-                    {validators.find((obj) => obj.path === "bairro")
-                      ? validators.find((obj) => obj.path === "bairro").message
-                      : ""}
-                  </FormErrorMessage>
                 </FormControl>
               </Grid>
               <Grid templateColumns="1fr 1fr 100px" gap="15px" mt={3}>
-                <FormControl
-                  isRequired
-                  isInvalid={
-                    validators.find((obj) => obj.path === "cep") ? true : false
-                  }
-                >
+                <FormControl isRequired>
                   <FormLabel>CEP</FormLabel>
-                  <MaskedInput
+                  <Input
+                    as={MaskedInput}
                     mask={[
                       /[0-9]/,
                       /\d/,
@@ -661,63 +509,32 @@ export default function SaveClient() {
                       /\d/,
                       /\d/,
                     ]}
-                    value={cep}
-                    onChange={(e) => setCep(e.target.value)}
+                    value={formikAddress.values.cep}
+                    onChange={formikAddress.handleChange}
                     placeholder="CEP"
-                    id="cep"
-                    render={(ref, props) => (
-                      <Input
-                        ref={ref}
-                        {...props}
-                        focusBorderColor={config.inputs}
-                      />
-                    )}
+                    name="cep"
                   />
-                  <FormErrorMessage>
-                    {validators.find((obj) => obj.path === "cep")
-                      ? validators.find((obj) => obj.path === "cep").message
-                      : ""}
-                  </FormErrorMessage>
                 </FormControl>
-                <FormControl
-                  isRequired
-                  isInvalid={
-                    validators.find((obj) => obj.path === "city") ? true : false
-                  }
-                >
+                <FormControl isRequired>
                   <FormLabel>Cidade</FormLabel>
                   <Input
                     placeholder="Cidade"
                     focusBorderColor={config.inputs}
                     type="text"
-                    value={city}
-                    onChange={(e) =>
-                      setCity(capitalizeFirstLetter(e.target.value))
-                    }
-                    id="city"
+                    value={formikAddress.values.city}
+                    onChange={formikAddress.handleChange}
+                    name="city"
                   />
-                  <FormErrorMessage>
-                    {validators.find((obj) => obj.path === "city")
-                      ? validators.find((obj) => obj.path === "city").message
-                      : ""}
-                  </FormErrorMessage>
                 </FormControl>
-                <FormControl
-                  isRequired
-                  isInvalid={
-                    validators.find((obj) => obj.path === "state")
-                      ? true
-                      : false
-                  }
-                >
+                <FormControl isRequired>
                   <FormLabel>UF</FormLabel>
                   <Select
                     placeholder="Selecione"
                     variant="outline"
                     focusBorderColor={config.inputs}
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    id="state"
+                    value={formikAddress.values.state}
+                    onChange={formikAddress.handleChange}
+                    name="state"
                   >
                     <option value="AC">AC</option>
                     <option value="AL">AL</option>
@@ -747,11 +564,6 @@ export default function SaveClient() {
                     <option value="SE">SE</option>
                     <option value="TO">TO</option>
                   </Select>
-                  <FormErrorMessage>
-                    {validators.find((obj) => obj.path === "state")
-                      ? validators.find((obj) => obj.path === "state").message
-                      : ""}
-                  </FormErrorMessage>
                 </FormControl>
               </Grid>
             </ModalBody>
@@ -761,47 +573,14 @@ export default function SaveClient() {
                 leftIcon={<FaSave />}
                 colorScheme={config.buttons}
                 isLoading={loadingAddress}
-                onClick={() => registerAddress()}
+                type="submit"
               >
                 Cadastrar
               </Button>
             </ModalFooter>
-          </ModalContent>
-        </Modal>
-
-        <AlertDialog
-          isOpen={modalCaution}
-          onClose={() => setModalCaution(false)}
-          isCentered
-        >
-          <AlertDialogOverlay>
-            <AlertDialogContent>
-              <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                {modalTitle}
-              </AlertDialogHeader>
-
-              <AlertDialogBody>
-                <Text>{modalMessage}</Text>
-                <Text color="red.500" mt={3}>
-                  {modalErroMessage || modalErroMessage !== ""
-                    ? `Erro: ${modalErroMessage}`
-                    : ""}
-                </Text>
-              </AlertDialogBody>
-
-              <AlertDialogFooter>
-                <Button
-                  colorScheme={config.buttons}
-                  onClick={() => setModalCaution(false)}
-                  ml={3}
-                >
-                  Fechar
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialogOverlay>
-        </AlertDialog>
-      </Hotkeys>
+          </form>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

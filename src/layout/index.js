@@ -27,13 +27,13 @@ import {
   InputLeftElement,
   InputRightElement,
   IconButton,
-  FormErrorMessage,
   Kbd,
   Icon,
   Tooltip,
   ModalCloseButton,
   ModalHeader,
   useToast,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import Sider from "../components/sider";
 import Header from "../components/header";
@@ -54,7 +54,7 @@ import { useEmployee } from "../context/Employee";
 import { version } from "../../package.json";
 
 import api from "../configs/axios";
-import { Formik, Field, Form } from "formik";
+import { useFormik } from "formik";
 import * as Yup from "yup";
 
 export default function Layout() {
@@ -69,9 +69,6 @@ export default function Layout() {
   const [showPass, setShowPass] = useState(true);
   const [route, setRoute] = useState("");
   const [port, setPort] = useState("");
-
-  const [wrongUser, setWrongUser] = useState(false);
-  const [wrongPass, setWrongPass] = useState(false);
 
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
@@ -170,6 +167,16 @@ export default function Layout() {
       }
     }
   }
+
+  const formik = useFormik({
+    initialValues: {
+      user: "",
+      password: "",
+    },
+    onSubmit: (values) => {
+      handleAuth(values);
+    },
+  });
 
   return (
     <div
@@ -284,101 +291,96 @@ export default function Layout() {
         <ModalOverlay />
 
         <ModalContent>
-          <Formik
-            initialValues={{ user: "", password: "" }}
-            onSubmit={(values) => {
-              handleAuth(values);
-            }}
-          >
-            <Form>
-              <ModalBody>
-                <Flex align="center" justify="center" mb={5}>
-                  <Lottie animation={authAnimation} height={120} width={120} />
-                </Flex>
+          <form onSubmit={formik.handleSubmit}>
+            <ModalBody>
+              <Flex align="center" justify="center" mb={5}>
+                <Lottie animation={authAnimation} height={120} width={120} />
+              </Flex>
 
-                <FormControl isRequired>
-                  <InputGroup size="lg">
-                    <InputLeftElement
-                      pointerEvents="none"
-                      children={<FaUser />}
-                    />
-                    <Field
-                      as={Input}
-                      ref={initialRef}
-                      type="text"
-                      placeholder="Usuário"
-                      name="user"
-                      focusBorderColor={config.inputs}
-                      id="user"
-                      pl={10}
-                    />
-                  </InputGroup>
-                </FormControl>
-
-                <FormControl mt={3} isRequired>
-                  <InputGroup size="lg">
-                    <InputLeftElement
-                      pointerEvents="none"
-                      children={<FaKey />}
-                    />
-                    <Field
-                      as={Input}
-                      type={showPass === true ? "password" : "text"}
-                      placeholder="Senha"
-                      focusBorderColor={config.inputs}
-                      id="pass"
-                      name="password"
-                      pl={10}
-                    />
-                    <InputRightElement
-                      children={
-                        <IconButton
-                          rounded="full"
-                          size="sm"
-                          icon={
-                            showPass === true ? (
-                              <AiFillEye />
-                            ) : (
-                              <AiFillEyeInvisible />
-                            )
-                          }
-                          onClick={() => setShowPass(!showPass)}
-                        />
-                      }
-                    />
-                  </InputGroup>
-                </FormControl>
-              </ModalBody>
-              <ModalFooter>
-                <Text fontSize="xs" color="gray.600" mr={10}>
-                  Versão: {version}
-                </Text>
-                <Tooltip label="Configuração de rota do servidor" hasArrow>
-                  <IconButton
-                    icon={<FaServer />}
-                    colorScheme={config.buttons}
-                    variant="outline"
-                    size="lg"
-                    fontSize="3xl"
-                    mr={3}
-                    onClick={() => setModalRoute(true)}
+              <FormControl isRequired>
+                <InputGroup size="lg">
+                  <InputLeftElement
+                    pointerEvents="none"
+                    children={<FaUser />}
                   />
-                </Tooltip>
-                <Button
+                  <Input
+                    ref={initialRef}
+                    type="text"
+                    placeholder="Usuário"
+                    name="user"
+                    focusBorderColor={config.inputs}
+                    id="user"
+                    autoFocus
+                    value={formik.values.user}
+                    onChange={formik.handleChange}
+                  />
+                </InputGroup>
+              </FormControl>
+
+              <FormControl mt={3} isRequired>
+                <InputGroup size="lg">
+                  <InputLeftElement pointerEvents="none" children={<FaKey />} />
+                  <Input
+                    type={showPass === true ? "password" : "text"}
+                    placeholder="Senha"
+                    focusBorderColor={config.inputs}
+                    id="pass"
+                    name="password"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                  />
+                  <InputRightElement
+                    children={
+                      <IconButton
+                        rounded="full"
+                        size="sm"
+                        icon={
+                          showPass === true ? (
+                            <AiFillEye />
+                          ) : (
+                            <AiFillEyeInvisible />
+                          )
+                        }
+                        onClick={() => setShowPass(!showPass)}
+                      />
+                    }
+                  />
+                </InputGroup>
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Text
+                fontSize="xs"
+                color={useColorModeValue("gray.600", "gray.100")}
+                mr={10}
+              >
+                Versão: {version}
+              </Text>
+              <Tooltip label="Configuração de rota do servidor" hasArrow>
+                <IconButton
+                  icon={<FaServer />}
                   colorScheme={config.buttons}
-                  leftIcon={<AiOutlineLogin />}
+                  variant="outline"
                   size="lg"
-                  isLoading={loadingAuth}
-                  type="submit"
-                >
-                  Login
-                  <Kbd ml={3} color="ButtonText">
-                    <Icon as={AiOutlineEnter} />
-                  </Kbd>
-                </Button>
-              </ModalFooter>
-            </Form>
-          </Formik>
+                  fontSize="3xl"
+                  mr={3}
+                  onClick={() => setModalRoute(true)}
+                />
+              </Tooltip>
+              <Button
+                colorScheme={config.buttons}
+                leftIcon={<AiOutlineLogin />}
+                size="lg"
+                isLoading={loadingAuth}
+                type="submit"
+              >
+                Login
+                <Kbd ml={3} color="ButtonText">
+                  <Icon as={AiOutlineEnter} />
+                </Kbd>
+              </Button>
+            </ModalFooter>
+          </form>
         </ModalContent>
       </Modal>
 
